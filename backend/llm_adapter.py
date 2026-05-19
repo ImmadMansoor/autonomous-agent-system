@@ -113,6 +113,13 @@ def build_plan(**data) -> AgentPlan:
     payload["recommended_actions"] = recommendations
     payload["workplan"] = workplan
     payload["extracted_facts"] = facts
+    payload["audience_personas"] = as_list(data.get("audience_personas"))
+    payload["demand_forecast"] = data.get("demand_forecast")
+    payload["staffing_plan"] = data.get("staffing_plan")
+    payload["competitor_strategy"] = data.get("competitor_strategy")
+    payload["revenue_projection"] = data.get("revenue_projection")
+    payload["campaign_plan"] = data.get("campaign_plan")
+    payload["bundle_recommendations"] = as_list(data.get("bundle_recommendations"))
     payload["clarifying_questions"] = as_list(data.get("clarifying_questions"))
     payload["secondary_actions"] = as_list(data.get("secondary_actions"))
     payload["simulated_execution"] = simulated
@@ -396,6 +403,8 @@ Think critically like a business strategist.
 - If a signal is vague or incomplete (e.g., "business is slow today" or "what should I do?"), you MUST output `clarifying_questions` to gather more context (e.g., "What time of day is it?", "Are there any local events or weather issues?").
 - If the signal contains actionable events (e.g., a marathon, a heatwave, competitor pricing), deduce the hidden opportunities. For example, if there is a marathon, don't just alert staff—suggest setting up a temporary stall outside and promoting healthy, high-margin natural drinks (like lemonade) based strictly on your CURRENT MENU STATE.
 - Provide `strategic_advice` detailing broader, proactive business moves beyond simple menu tweaks.
+- Use probabilistic reasoning. Say a crowd is more likely to be fitness-focused or budget-sensitive; do not claim every person is the same.
+- Reason across audience/persona, weather, demand prediction, menu fit, inventory, competitor strategy, margin, staffing, campaign, ethics, and outcome simulation.
 
 You MUST respond with ONLY valid JSON. No markdown, no explanation outside the JSON."""
 
@@ -468,6 +477,43 @@ Respond with this exact JSON structure:
         "staff_or_customer_message": "Draft operational message if useful"
     }},
     "strategic_advice": "High-level proactive business advice. Use null if not applicable.",
+    "audience_personas": [
+        {{"persona": "fitness-focused runners and spectators", "probability": 0.78, "reason": "Why this persona is likely."}}
+    ],
+    "demand_forecast": {{
+        "overall_demand_lift_pct": 25,
+        "category_lifts_pct": {{"cold_beverages": 40, "light_food": 25, "heavy_meals": -8}},
+        "priority_items": ["iced_lemonade"],
+        "confidence": 0.72,
+        "reason": "Why demand is expected to move."
+    }},
+    "staffing_plan": {{
+        "recommendation": "Operational staffing/prep recommendation.",
+        "extra_counter_staff": 1,
+        "extra_prep_staff": 0,
+        "prep_start_minutes_early": 30
+    }},
+    "competitor_strategy": {{
+        "active": false,
+        "strategy": "Margin-safe response if competitors are relevant.",
+        "recommended_item_id": null,
+        "reason": "Why this avoids destructive pricing."
+    }},
+    "revenue_projection": {{
+        "estimated_extra_units": 6,
+        "estimated_profit_pkr": 900,
+        "confidence": 0.65,
+        "assumptions": ["Directional estimate based on menu price, demand lift, and margin proxy."]
+    }},
+    "campaign_plan": {{
+        "channel": "local_campaign",
+        "target": "target audience",
+        "message": "Customer-facing campaign or notice draft.",
+        "offer": "offer name or null"
+    }},
+    "bundle_recommendations": [
+        {{"name": "Hydration Fast Pass", "items": ["iced_lemonade"], "positioning": "healthy hydration", "discount_pct": 8}}
+    ],
     "clarifying_questions": [
         "Ask questions only if the signal is too vague or lacks business context."
     ],
@@ -525,6 +571,13 @@ Use null for primary_action when the signal needs clarification and no safe acti
             simulated_execution=data.get("simulated_execution"),
             extracted_facts=as_list(data.get("extracted_facts")),
             strategic_advice=data.get("strategic_advice"),
+            audience_personas=as_list(data.get("audience_personas")),
+            demand_forecast=data.get("demand_forecast"),
+            staffing_plan=data.get("staffing_plan"),
+            competitor_strategy=data.get("competitor_strategy"),
+            revenue_projection=data.get("revenue_projection"),
+            campaign_plan=data.get("campaign_plan"),
+            bundle_recommendations=as_list(data.get("bundle_recommendations")),
             clarifying_questions=as_list(data.get("clarifying_questions")),
             primary_action=primary_action,
             secondary_actions=secondary_actions,

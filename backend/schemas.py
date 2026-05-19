@@ -51,6 +51,13 @@ class AgentPlan(BaseModel):
     simulated_execution: Optional[dict] = None
     extracted_facts: List[str] = Field(default_factory=list)
     strategic_advice: Optional[str] = None
+    audience_personas: List[dict] = Field(default_factory=list)
+    demand_forecast: Optional[dict] = None
+    staffing_plan: Optional[dict] = None
+    competitor_strategy: Optional[dict] = None
+    revenue_projection: Optional[dict] = None
+    campaign_plan: Optional[dict] = None
+    bundle_recommendations: List[dict] = Field(default_factory=list)
     clarifying_questions: List[str] = Field(default_factory=list)
     primary_action: Optional[PlannedAction] = None
     secondary_actions: List[PlannedAction] = Field(default_factory=list)

@@ -181,7 +181,18 @@ def create_customer_notice(db: Session, run_id: int, message: str, affected_item
     return result
 
 def estimate_revenue_impact(db: Session, run_id: int, action_plan: dict):
-    # More believable ROI math
+    projection = action_plan.get("revenue_projection") or {}
+    if projection.get("estimated_profit_pkr") is not None:
+        result = {
+            "estimated_impact": float(projection.get("estimated_profit_pkr") or 0),
+            "currency": "PKR",
+            "reason": "Strategic intelligence projection based on demand lift, menu fit, stock/prep readiness, and margin proxy.",
+            "details": projection,
+        }
+        log_tool_trace(db, run_id, "estimate_revenue_impact", {"action_plan": action_plan}, result)
+        return result
+
+    # Fallback ROI math for older plans without strategic intelligence.
     primary = action_plan.get("primary_action", {})
     if primary:
         tool = primary.get("tool", "")

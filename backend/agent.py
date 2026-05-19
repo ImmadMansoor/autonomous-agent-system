@@ -8,6 +8,7 @@ import tools
 from weather import fetch_weather_context
 from llm_adapter import GeminiPlanner, DeterministicPlanner
 from schemas import PlannedAction
+from strategic_intelligence import build_strategic_intelligence, enrich_plan
 
 CRISIS_KEYWORDS = [
     "strike", "hartal", "flood", "sailaab", "disaster", "emergency",
@@ -121,6 +122,46 @@ def apply_policy_overrides(db: Session, run_id: int, raw_signal: str, before_sta
 
     return plan
 
+def log_strategic_intelligence(db: Session, run_id: int, plan):
+    for persona in plan.audience_personas or []:
+        log_trace(
+            db,
+            run_id,
+            "persona",
+            f"{persona.get('persona')} probability {persona.get('probability')}: {persona.get('reason')}",
+        )
+    if plan.demand_forecast:
+        forecast = plan.demand_forecast
+        log_trace(
+            db,
+            run_id,
+            "demand_forecast",
+            f"Demand lift {forecast.get('overall_demand_lift_pct', 0)}%; priority items: {', '.join(forecast.get('priority_items', []))}.",
+        )
+    if plan.staffing_plan:
+        staffing = plan.staffing_plan
+        log_trace(
+            db,
+            run_id,
+            "staffing_plan",
+            f"{staffing.get('recommendation')} Extra counter: {staffing.get('extra_counter_staff', 0)}, extra prep: {staffing.get('extra_prep_staff', 0)}.",
+        )
+    if plan.competitor_strategy and plan.competitor_strategy.get("active"):
+        log_trace(db, run_id, "competitor_strategy", plan.competitor_strategy.get("strategy"))
+    if plan.bundle_recommendations:
+        bundle = plan.bundle_recommendations[0]
+        log_trace(db, run_id, "bundle_strategy", f"{bundle.get('name')}: {bundle.get('positioning')}.")
+    if plan.campaign_plan:
+        log_trace(db, run_id, "campaign_plan", plan.campaign_plan.get("message"))
+    if plan.revenue_projection:
+        projection = plan.revenue_projection
+        log_trace(
+            db,
+            run_id,
+            "revenue_projection",
+            f"Estimated extra units {projection.get('estimated_extra_units', 0)}, estimated profit {projection.get('estimated_profit_pkr', 0)} PKR.",
+        )
+
 def execute_action(db: Session, run_id: int, action, requires_approval: bool):
     if not action:
         return
@@ -187,11 +228,14 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
         planner = DeterministicPlanner()
         plan = planner.plan(signal.raw_text, before_state, weather_context)
 
+    intelligence = build_strategic_intelligence(signal.raw_text, before_state, weather_context)
+    plan = enrich_plan(plan, intelligence)
     plan = apply_policy_overrides(db, agent_run.id, signal.raw_text, before_state, plan)
 
     # Log extracted facts as reasoning chain
     for i, fact in enumerate(plan.extracted_facts):
         log_trace(db, agent_run.id, "reasoning", f"[Step {i+1}] {fact}")
+    log_strategic_intelligence(db, agent_run.id, plan)
 
     for i, step in enumerate(plan.workplan):
         log_trace(db, agent_run.id, "workplan", f"[Task {i+1}] {step}")
@@ -268,6 +312,11 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
             "insight": plan.insight,
             "primary_action": plan_dict.get("primary_action"),
             "recommended_actions": plan.recommended_actions,
+            "audience_personas": plan_dict.get("audience_personas"),
+            "demand_forecast": plan_dict.get("demand_forecast"),
+            "staffing_plan": plan_dict.get("staffing_plan"),
+            "campaign_plan": plan_dict.get("campaign_plan"),
+            "bundle_recommendations": plan_dict.get("bundle_recommendations"),
             "revenue_impact_estimate": agent_run.revenue_impact_estimate,
         },
     )
