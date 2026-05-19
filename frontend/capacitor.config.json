@@ -1,5 +1,5 @@
 {
   "appId": "com.menumind.agent",
   "appName": "MenuMind",
-  "webDir": "dist"
+  "webDir": "out"
 }
