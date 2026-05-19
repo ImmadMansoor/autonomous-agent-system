@@ -26,6 +26,17 @@ def execute_action(db: Session, run_id: int, action, requires_approval: bool):
         log_trace(db, run_id, "tool_call", f"Failed: Unknown tool {tool_name}")
         return {"status": "error", "message": f"Unknown tool {tool_name}"}
 
+    # Strict Validation of Tool Arguments using Pydantic Schemas
+    schema = getattr(tools, "TOOL_SCHEMAS", {}).get(tool_name)
+    if schema:
+        try:
+            validated_args = schema(**tool_args).model_dump()
+            tool_args = validated_args
+        except Exception as e:
+            error_msg = f"Validation failed for tool '{tool_name}' arguments: {str(e)}"
+            log_trace(db, run_id, "tool_call", f"Failed: {error_msg}")
+            return {"status": "error", "message": error_msg}
+
     safe_tools = ["create_approval", "send_staff_alert", "create_customer_notice", "estimate_revenue_impact"]
     
     if requires_approval and tool_name not in safe_tools:
@@ -34,20 +45,25 @@ def execute_action(db: Session, run_id: int, action, requires_approval: bool):
         tools.create_approval(db, run_id, action_type=tool_name, payload=tool_args, reason="Held by approval guard")
         return {"status": "held"}
         
-    result = tools.TOOL_REGISTRY[tool_name](db, run_id, **tool_args)
-    if result.get("status") == "error":
-        log_trace(db, run_id, "tool_call", f"Tool {tool_name} failed: {result.get('message')}")
-    return result
+    try:
+        result = tools.TOOL_REGISTRY[tool_name](db, run_id, **tool_args)
+        if result.get("status") == "error":
+            log_trace(db, run_id, "tool_call", f"Tool {tool_name} failed: {result.get('message')}")
+        return result
+    except Exception as e:
+        error_msg = f"Tool {tool_name} crashed with exception: {type(e).__name__}: {str(e)}"
+        log_trace(db, run_id, "tool_call", error_msg)
+        traceback.print_exc()
+        return {"status": "error", "message": error_msg}
 
-def run_agent_pipeline(signal_event_id: int, db: Session):
+def run_agent_pipeline(signal_event_id: int, db: Session, run_id: int):
     signal = db.query(models.SignalEvent).filter(models.SignalEvent.id == signal_event_id).first()
     if not signal:
         return
     
-    agent_run = models.AgentRun(signal_event_id=signal.id, status="running")
-    db.add(agent_run)
-    db.commit()
-    db.refresh(agent_run)
+    agent_run = db.query(models.AgentRun).filter(models.AgentRun.id == run_id).first()
+    if not agent_run:
+        return
     
     # Snapshot before state
     before_state = tools.get_menu_state(db)

@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import models, schemas, agent
-from database import engine, get_db
+from database import engine, get_db, SessionLocal
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -34,11 +34,30 @@ def create_signal(signal: schemas.SignalEventCreate, db: Session = Depends(get_d
     db.refresh(db_signal)
     return db_signal
 
+def run_agent_task(signal_event_id: int, run_id: int):
+    db = SessionLocal()
+    try:
+        agent.run_agent_pipeline(signal_event_id, db, run_id)
+    finally:
+        db.close()
+
 @app.post("/agent/run/{signal_event_id}")
-def run_agent(signal_event_id: int, db: Session = Depends(get_db)):
-    run_id = agent.run_agent_pipeline(signal_event_id, db)
-    if not run_id:
+def run_agent(signal_event_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    signal = db.query(models.SignalEvent).filter(models.SignalEvent.id == signal_event_id).first()
+    if not signal:
         raise HTTPException(status_code=404, detail="Signal event not found")
+        
+    # Synchronously create the AgentRun and commit it to obtain its database ID
+    agent_run = models.AgentRun(signal_event_id=signal.id, status="running")
+    db.add(agent_run)
+    db.commit()
+    db.refresh(agent_run)
+    
+    run_id = agent_run.id
+    
+    # Add background task to run agent pipeline
+    background_tasks.add_task(run_agent_task, signal_event_id, run_id)
+    
     return {"status": "success", "agent_run_id": run_id}
 
 @app.get("/agent/runs/{run_id}", response_model=schemas.AgentRun)

@@ -1,6 +1,8 @@
 import json
 from sqlalchemy.orm import Session
 import models
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any
 
 def get_menu_state(db: Session) -> dict:
     items = db.query(models.MenuItem).all()
@@ -171,4 +173,57 @@ TOOL_REGISTRY = {
     "create_customer_notice": create_customer_notice,
     "estimate_revenue_impact": estimate_revenue_impact,
     "crisis_response": crisis_response
+}
+
+# Validation Schemas for Tools
+class UpdateMenuAvailabilitySchema(BaseModel):
+    item_id: str
+    available: bool
+    reason: str
+
+class AdjustItemPriceSchema(BaseModel):
+    item_id: str
+    new_price: float
+    reason: str
+
+class SetItemPromotionSchema(BaseModel):
+    item_id: str
+    promoted: bool
+    reason: str
+
+class ExtendPrepTimeSchema(BaseModel):
+    item_id: str
+    minutes: int
+    reason: str
+
+class CreateApprovalSchema(BaseModel):
+    action_type: str
+    payload: dict
+    reason: str
+
+class SendStaffAlertSchema(BaseModel):
+    message: str
+    severity: str
+
+class CreateCustomerNoticeSchema(BaseModel):
+    message: str
+    affected_items: List[str]
+
+class EstimateRevenueImpactSchema(BaseModel):
+    action_plan: dict
+
+class CrisisResponseSchema(BaseModel):
+    delay_mins: int
+    message: str
+
+TOOL_SCHEMAS = {
+    "update_menu_availability": UpdateMenuAvailabilitySchema,
+    "adjust_item_price": AdjustItemPriceSchema,
+    "set_item_promotion": SetItemPromotionSchema,
+    "extend_prep_time": ExtendPrepTimeSchema,
+    "create_approval": CreateApprovalSchema,
+    "send_staff_alert": SendStaffAlertSchema,
+    "create_customer_notice": CreateCustomerNoticeSchema,
+    "estimate_revenue_impact": EstimateRevenueImpactSchema,
+    "crisis_response": CrisisResponseSchema
 }

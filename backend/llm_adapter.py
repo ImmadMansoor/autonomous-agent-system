@@ -3,6 +3,7 @@ import os
 import re
 from schemas import AgentPlan, PlannedAction
 from dotenv import load_dotenv
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 load_dotenv()
 
@@ -348,6 +349,7 @@ Respond with this exact JSON structure:
     ]
 }}"""
 
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def plan(self, raw_signal: str, before_state: dict) -> AgentPlan:
         if not model:
             raise Exception("Gemini API key not found")
