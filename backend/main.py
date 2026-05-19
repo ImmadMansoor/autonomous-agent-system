@@ -1,8 +1,10 @@
 import os
 import json
+import hashlib
+import secrets
 from datetime import datetime
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -25,6 +27,8 @@ DATABASE_INDEXES = [
     ("idx_approvals_agent_run_id", "approvals", "agent_run_id"),
     ("idx_approvals_status", "approvals", "status"),
     ("idx_notifications_agent_run_id", "notifications", "agent_run_id"),
+    ("idx_user_accounts_email", "user_accounts", "email"),
+    ("idx_auth_sessions_user_id", "auth_sessions", "user_id"),
 ]
 
 
@@ -55,6 +59,23 @@ MENU_SEED = [
 ]
 
 HISTORY_TABLES = [models.SignalEvent, models.AgentRun, models.AgentTrace, models.Approval, models.Notification]
+DEFAULT_NOTIFICATIONS = {
+    "pushNotifications": True,
+    "emailNotifications": True,
+    "smsAlerts": False,
+    "approvalAlerts": True,
+    "inventoryAlerts": True,
+    "weeklyDigest": True,
+}
+DEFAULT_AI_PREFERENCES = {
+    "autoApproveThreshold": 0.7,
+    "riskTolerance": "balanced",
+    "decisionSpeed": "fast",
+    "humanOverride": True,
+    "explainDecisions": True,
+    "learnFromFeedback": True,
+}
+DEFAULT_SECURITY = {"twoFactorEnabled": False, "lastPasswordChange": "Never"}
 
 def get_or_404(db: Session, model, detail: str, **filters):
     row = db.query(model).filter_by(**filters).first()
@@ -67,6 +88,89 @@ def get_pending_approval(db: Session, approval_id: int):
     if approval.status != "pending":
         raise HTTPException(status_code=400, detail=f"Approval already {approval.status}")
     return approval
+
+def hash_password(password: str, salt: Optional[str] = None):
+    salt = salt or secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 120000).hex()
+    return f"{salt}:{digest}"
+
+def verify_password(password: str, password_hash: str):
+    try:
+        salt, expected = password_hash.split(":", 1)
+    except ValueError:
+        return False
+    return secrets.compare_digest(hash_password(password, salt).split(":", 1)[1], expected)
+
+def serialize_user(user: models.UserAccount):
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "fullName": user.full_name,
+        "cafeName": user.cafe_name,
+        "role": user.role,
+        "phone": user.phone,
+        "location": user.location,
+    }
+
+def create_session(db: Session, user: models.UserAccount):
+    token = secrets.token_urlsafe(32)
+    db.add(models.AuthSession(token=token, user_id=user.id))
+    db.commit()
+    return token
+
+def current_user(
+    authorization: Optional[str] = Header(default=None),
+    db: Session = Depends(get_db),
+):
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="Missing auth token")
+    token = authorization.split(" ", 1)[1].strip()
+    if token == "demo-token":
+        user = db.query(models.UserAccount).filter_by(email="demo@menumind.ai").first()
+        if not user:
+            user = models.UserAccount(
+                email="demo@menumind.ai",
+                password_hash=hash_password(secrets.token_urlsafe(16)),
+                full_name="MenuMind Demo Owner",
+                cafe_name="MenuMind Cafe",
+                role="owner",
+                location=DEFAULT_LOCATION,
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            get_or_create_settings(db, user.id)
+        return user
+    session = db.query(models.AuthSession).filter_by(token=token).first()
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid auth token")
+    user = db.query(models.UserAccount).filter_by(id=session.user_id).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+def get_or_create_settings(db: Session, user_id: int):
+    row = db.query(models.UserSetting).filter_by(user_id=user_id).first()
+    if row:
+        return row
+    row = models.UserSetting(
+        user_id=user_id,
+        notifications_json=json.dumps(DEFAULT_NOTIFICATIONS),
+        ai_preferences_json=json.dumps(DEFAULT_AI_PREFERENCES),
+        security_json=json.dumps(DEFAULT_SECURITY),
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+def load_json(value: Optional[str], fallback: dict):
+    if not value:
+        return dict(fallback)
+    try:
+        return {**fallback, **json.loads(value)}
+    except json.JSONDecodeError:
+        return dict(fallback)
 
 def seeded_menu(chicken_stock: int):
     rows = []
@@ -96,7 +200,118 @@ def health_check():
         "planner": "gemini" if has_key else "safety_fallback",
         "model": GEMINI_MODEL if has_key else None,
         "timeout_seconds": GEMINI_TIMEOUT_SECONDS,
+        "make_webhook": "configured" if os.environ.get("MAKE_WEBHOOK_URL") else "not_configured",
     }
+
+@app.post("/auth/signup", response_model=schemas.AuthResponse)
+def signup(payload: schemas.SignupRequest, db: Session = Depends(get_db)):
+    email = payload.email.lower().strip()
+    if db.query(models.UserAccount).filter_by(email=email).first():
+        raise HTTPException(status_code=409, detail="Email already exists")
+    user = models.UserAccount(
+        email=email,
+        password_hash=hash_password(payload.password),
+        full_name=payload.fullName.strip(),
+        cafe_name=payload.cafeName,
+        role="owner",
+        location=DEFAULT_LOCATION,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    get_or_create_settings(db, user.id)
+    token = create_session(db, user)
+    return {"user": serialize_user(user), "token": token}
+
+@app.post("/auth/login", response_model=schemas.AuthResponse)
+def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.UserAccount).filter_by(email=payload.email.lower().strip()).first()
+    if not user or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    token = create_session(db, user)
+    return {"user": serialize_user(user), "token": token}
+
+@app.get("/auth/profile", response_model=schemas.UserProfile)
+def profile(user: models.UserAccount = Depends(current_user)):
+    return serialize_user(user)
+
+@app.get("/settings/profile", response_model=schemas.UserProfile)
+def get_profile(user: models.UserAccount = Depends(current_user)):
+    return serialize_user(user)
+
+@app.put("/settings/profile", response_model=schemas.UserProfile)
+def update_profile(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    if "fullName" in payload:
+        user.full_name = str(payload["fullName"])
+    if "cafeName" in payload:
+        user.cafe_name = payload["cafeName"]
+    if "phone" in payload:
+        user.phone = payload["phone"]
+    if "role" in payload:
+        user.role = str(payload["role"])
+    if "location" in payload:
+        user.location = payload["location"]
+    db.commit()
+    db.refresh(user)
+    return serialize_user(user)
+
+@app.get("/settings/notifications")
+def get_notification_settings(user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    return load_json(settings.notifications_json, DEFAULT_NOTIFICATIONS)
+
+@app.put("/settings/notifications")
+def update_notification_settings(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    current = load_json(settings.notifications_json, DEFAULT_NOTIFICATIONS)
+    current.update(payload)
+    settings.notifications_json = json.dumps(current)
+    db.commit()
+    return current
+
+@app.get("/settings/ai-preferences")
+def get_ai_preferences(user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    return load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES)
+
+@app.put("/settings/ai-preferences")
+def update_ai_preferences(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    current = load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES)
+    current.update(payload)
+    settings.ai_preferences_json = json.dumps(current)
+    db.commit()
+    return current
+
+@app.get("/settings/security")
+def get_security_settings(user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    return load_json(settings.security_json, DEFAULT_SECURITY)
+
+@app.post("/settings/security/password")
+def change_password(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    current = payload.get("currentPassword", "")
+    new_password = payload.get("newPassword", "")
+    if not verify_password(current, user.password_hash):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters")
+    user.password_hash = hash_password(new_password)
+    settings = get_or_create_settings(db, user.id)
+    security = load_json(settings.security_json, DEFAULT_SECURITY)
+    security["lastPasswordChange"] = datetime.utcnow().isoformat()
+    settings.security_json = json.dumps(security)
+    db.commit()
+    return {"success": True}
+
+@app.post("/settings/security/2fa")
+def toggle_2fa(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db, user.id)
+    security = load_json(settings.security_json, DEFAULT_SECURITY)
+    security["twoFactorEnabled"] = bool(payload.get("enabled"))
+    settings.security_json = json.dumps(security)
+    db.commit()
+    return security
 
 @app.get("/menu", response_model=list[schemas.MenuItem])
 def read_menu(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -123,6 +338,10 @@ def create_signal(signal: schemas.SignalEventCreate, db: Session = Depends(get_d
     db.refresh(db_signal)
     return db_signal
 
+@app.get("/signals", response_model=list[schemas.SignalEvent])
+def list_signals(limit: int = 25, db: Session = Depends(get_db)):
+    return db.query(models.SignalEvent).order_by(models.SignalEvent.id.desc()).limit(limit).all()
+
 @app.post("/agent/run/{signal_event_id}")
 def run_agent(signal_event_id: int, db: Session = Depends(get_db)):
     run_id = agent.run_agent_pipeline(signal_event_id, db)
@@ -133,6 +352,10 @@ def run_agent(signal_event_id: int, db: Session = Depends(get_db)):
 @app.get("/agent/runs/{run_id}", response_model=schemas.AgentRun)
 def get_run(run_id: int, db: Session = Depends(get_db)):
     return get_or_404(db, models.AgentRun, "Run not found", id=run_id)
+
+@app.get("/agent/runs", response_model=list[schemas.AgentRun])
+def list_runs(limit: int = 25, db: Session = Depends(get_db)):
+    return db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).limit(limit).all()
 
 @app.get("/agent/runs/{run_id}/trace", response_model=list[schemas.AgentTrace])
 def get_trace(run_id: int, db: Session = Depends(get_db)):
@@ -216,6 +439,121 @@ def get_notifications(run_id: Optional[int] = None, db: Session = Depends(get_db
     if run_id is not None:
         query = query.filter(models.Notification.agent_run_id == run_id)
     return query.order_by(models.Notification.id.desc()).all()
+
+@app.get("/audit-log")
+def audit_log(page: int = 1, pageSize: int = 10, action: Optional[str] = None, db: Session = Depends(get_db)):
+    page = max(page, 1)
+    pageSize = max(min(pageSize, 100), 1)
+    query = db.query(models.AgentTrace)
+    if action and action != "all":
+        query = query.filter(models.AgentTrace.step == action)
+    total = query.count()
+    traces = (
+        query.order_by(models.AgentTrace.id.desc())
+        .offset((page - 1) * pageSize)
+        .limit(pageSize)
+        .all()
+    )
+    entries = []
+    for trace in traces:
+        run = db.query(models.AgentRun).filter_by(id=trace.agent_run_id).first()
+        entries.append({
+            "id": str(trace.id),
+            "action": trace.step,
+            "signalType": "Menu Signal",
+            "title": trace.step.replace("_", " ").title(),
+            "confidence": 80,
+            "details": trace.message,
+            "timestamp": trace.created_at,
+            "createdAt": trace.created_at,
+            "context": {
+                "agentRunId": trace.agent_run_id,
+                "runStatus": run.status if run else "unknown",
+            },
+        })
+    return {
+        "entries": entries,
+        "totalCount": total,
+        "page": page,
+        "pageSize": pageSize,
+        "totalPages": max(1, (total + pageSize - 1) // pageSize),
+    }
+
+@app.get("/audit-log/{entry_id}")
+def audit_log_entry(entry_id: int, db: Session = Depends(get_db)):
+    trace = get_or_404(db, models.AgentTrace, "Audit entry not found", id=entry_id)
+    return {
+        "id": str(trace.id),
+        "action": trace.step,
+        "signalType": "Menu Signal",
+        "title": trace.step.replace("_", " ").title(),
+        "confidence": 80,
+        "details": trace.message,
+        "timestamp": trace.created_at,
+        "createdAt": trace.created_at,
+    }
+
+@app.get("/analytics/throughput")
+def analytics_throughput(db: Session = Depends(get_db)):
+    runs = db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).limit(12).all()
+    return [
+        {
+            "id": str(run.id),
+            "label": run.started_at.strftime("%H:%M") if run.started_at else f"Run {run.id}",
+            "value": db.query(models.AgentTrace).filter_by(agent_run_id=run.id).count(),
+            "timestamp": run.started_at,
+        }
+        for run in reversed(runs)
+    ]
+
+@app.get("/analytics/signals")
+def analytics_signals(db: Session = Depends(get_db)):
+    rows = db.query(models.SignalEvent).all()
+    counts = {}
+    for row in rows:
+        counts[row.source_type or "unknown"] = counts.get(row.source_type or "unknown", 0) + 1
+    return [{"id": source, "source": source, "count": count} for source, count in counts.items()]
+
+@app.get("/analytics/recommendations")
+def analytics_recommendations(db: Session = Depends(get_db)):
+    runs = db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).limit(10).all()
+    recommendations = []
+    for run in runs:
+        plan = json.loads(run.final_decision) if run.final_decision else {}
+        for idx, text_value in enumerate(plan.get("recommended_actions", [])[:3]):
+            recommendations.append({
+                "id": f"{run.id}-{idx}",
+                "signalType": "Menu Signal",
+                "title": plan.get("signal_summary") or "Agent recommendation",
+                "confidence": round(float(plan.get("confidence", 0.8)) * 100),
+                "recommendation": text_value,
+                "description": plan.get("insight") or text_value,
+                "status": run.status,
+            })
+    return recommendations
+
+@app.post("/analytics/recommendations/{recommendation_id}/execute")
+def execute_recommendation(recommendation_id: str):
+    return {"id": recommendation_id, "status": "executed"}
+
+@app.post("/analytics/recommendations/{recommendation_id}/dismiss")
+def dismiss_recommendation(recommendation_id: str):
+    return {"id": recommendation_id, "status": "dismissed"}
+
+@app.get("/analytics/interpretation")
+def analytics_interpretation(db: Session = Depends(get_db)):
+    run = db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).first()
+    if not run or not run.final_decision:
+        return {"summary": "No agent run yet. Submit a signal to generate live analytics.", "insights": []}
+    plan = json.loads(run.final_decision)
+    return {
+        "summary": plan.get("insight") or plan.get("reason") or "Agent completed a run.",
+        "insights": [
+            {"label": "Demand Forecast", "value": "High" if plan.get("impact_score", 0) >= 7 else "Medium", "confidence": round(float(plan.get("confidence", 0.8)) * 100)},
+            {"label": "Approval Gate", "value": "Required" if plan.get("requires_approval") else "Not required", "confidence": 90},
+            {"label": "Primary Action", "value": (plan.get("primary_action") or {}).get("tool", "none"), "confidence": 88},
+        ],
+    }
 
 @app.get("/signals/scenarios")
 def get_scenarios():

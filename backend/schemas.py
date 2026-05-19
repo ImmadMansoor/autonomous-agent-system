@@ -115,3 +115,26 @@ class WeatherContext(BaseModel):
     longitude: Optional[float] = None
     current: Optional[dict] = None
     daily: Optional[dict] = None
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class SignupRequest(BaseModel):
+    fullName: str
+    cafeName: Optional[str] = None
+    email: str
+    password: str
+
+class UserProfile(BaseModel):
+    id: str
+    email: str
+    fullName: str
+    cafeName: Optional[str] = None
+    role: str = "owner"
+    phone: Optional[str] = None
+    location: Optional[str] = None
+
+class AuthResponse(BaseModel):
+    user: UserProfile
+    token: str

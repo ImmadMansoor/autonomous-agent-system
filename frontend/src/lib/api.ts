@@ -1,6 +1,26 @@
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
 type AnyRecord = Record<string, any>;
+type NotificationSettings = {
+  pushNotifications: boolean;
+  emailNotifications: boolean;
+  smsAlerts: boolean;
+  approvalAlerts: boolean;
+  inventoryAlerts: boolean;
+  weeklyDigest: boolean;
+};
+type AiPreferences = {
+  autoApproveThreshold: number;
+  riskTolerance: string;
+  decisionSpeed: string;
+  humanOverride: boolean;
+  explainDecisions: boolean;
+  learnFromFeedback: boolean;
+};
+type SecuritySettings = {
+  twoFactorEnabled: boolean;
+  lastPasswordChange: string;
+};
 
 let lastRun: AnyRecord | null = null;
 
@@ -101,12 +121,17 @@ const demoUser = {
 
 export const api = {
   auth: {
-    login: async (_data: { email: string; password: string }) => ({ user: demoUser, token: 'demo-token' }),
-    signup: async (_data: { fullName: string; cafeName?: string; email: string; password: string }) => ({
-      user: { ...demoUser, fullName: _data.fullName, cafeName: _data.cafeName || demoUser.cafeName, email: _data.email },
-      token: 'demo-token',
-    }),
-    getProfile: async () => demoUser,
+    login: (data: { email: string; password: string }) =>
+      request<{ user: typeof demoUser; token: string }>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    signup: (data: { fullName: string; cafeName?: string; email: string; password: string }) =>
+      request<{ user: typeof demoUser; token: string }>('/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    getProfile: () => request<typeof demoUser>('/auth/profile'),
   },
 
   operations: {
@@ -122,17 +147,18 @@ export const api = {
       };
     },
     getSignals: async () => {
-      const scenarios = await request<AnyRecord[]>('/signals/scenarios');
-      const current = lastRun?.signal
-        ? [{
-            id: String(lastRun.signal.id),
-            type: lastRun.signal.source_type || 'web',
-            source: lastRun.signal.source_type || 'web',
-            message: lastRun.signal.raw_text,
-            priority: lastRun.run?.requires_approval ? 'high' : 'medium',
-            createdAt: lastRun.signal.created_at || new Date().toISOString(),
-          }]
-        : [];
+      const [signals, scenarios] = await Promise.all([
+        request<AnyRecord[]>('/signals?limit=10').catch(() => []),
+        request<AnyRecord[]>('/signals/scenarios'),
+      ]);
+      const current = signals.map((signal) => ({
+        id: String(signal.id),
+        type: signal.source_type || 'web',
+        source: signal.source_type || 'web',
+        message: signal.raw_text,
+        priority: signal.status === 'processed' ? 'medium' : 'high',
+        createdAt: signal.created_at || new Date().toISOString(),
+      }));
       return [
         ...current,
         ...scenarios.map((s) => ({
@@ -235,40 +261,20 @@ export const api = {
   },
 
   auditLog: {
-    getEntries: async (params: { page?: number; pageSize?: number; action?: string } = {}) => {
-      const trace = lastRun?.trace || [];
-      const entries = trace.map((t: AnyRecord) => ({
-        id: String(t.id),
-        action: t.step,
-        signalType: 'Menu Signal',
-        title: String(t.step || 'agent').replaceAll('_', ' '),
-        confidence: Math.round((lastRun?.plan?.confidence || 0.8) * 100),
-        details: t.message,
-        timestamp: t.created_at,
-        createdAt: t.created_at,
-      }));
-      const page = params.page || 1;
-      const pageSize = params.pageSize || 10;
-      return {
-        entries: entries.slice((page - 1) * pageSize, page * pageSize),
-        totalCount: entries.length,
-        page,
-        pageSize,
-        totalPages: Math.max(1, Math.ceil(entries.length / pageSize)),
-      };
+    getEntries: (params: { page?: number; pageSize?: number; action?: string } = {}) => {
+      const query = new URLSearchParams();
+      if (params.page) query.set('page', String(params.page));
+      if (params.pageSize) query.set('pageSize', String(params.pageSize));
+      if (params.action) query.set('action', params.action);
+      return request<{
+        entries: AnyRecord[];
+        totalCount: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      }>(`/audit-log?${query}`);
     },
-    getEntry: async (id: string) => {
-      const entry = (lastRun?.trace || []).find((t: AnyRecord) => String(t.id) === id);
-      return {
-        id,
-        action: entry?.step || 'agent',
-        signalType: 'Menu Signal',
-        title: entry?.step || 'Agent trace',
-        confidence: Math.round((lastRun?.plan?.confidence || 0.8) * 100),
-        details: entry?.message || 'Run a signal to populate the audit trail.',
-        timestamp: entry?.created_at || new Date().toISOString(),
-      };
-    },
+    getEntry: (id: string) => request<AnyRecord>(`/audit-log/${id}`),
   },
 
   inventory: {
@@ -356,68 +362,27 @@ export const api = {
   },
 
   analytics: {
-    getThroughput: async () => [
-      { id: 'a1', label: 'Observe', value: 1, timestamp: new Date().toISOString() },
-      { id: 'a2', label: 'Reason', value: lastRun?.trace?.length || 0, timestamp: new Date().toISOString() },
-      { id: 'a3', label: 'Act', value: lastRun?.diff?.changes?.length || 0, timestamp: new Date().toISOString() },
-    ],
-    getSignals: async () => [
-      { id: 'source-web', source: 'web', count: lastRun ? 1 : 0 },
-      { id: 'source-weather', source: 'weather', count: 1 },
-      { id: 'source-inventory', source: 'inventory', count: 1 },
-    ],
-    getRecommendations: async () => {
-      const plan = lastRun?.plan || {};
-      const recommendations = Array.isArray(plan.recommended_actions) ? plan.recommended_actions : [];
-      return recommendations.map((description: string, index: number) => ({
-        id: `rec-${index}`,
-        signalType: 'Menu Signal',
-        title: index === 0 ? 'Execute primary action' : 'Recommended action',
-        confidence: Math.round((plan.confidence || 0.8) * 100),
-        recommendation: description,
-        description,
-        status: 'pending',
-      }));
-    },
-    executeRecommendation: async (id: string) => ({ id }),
-    dismissRecommendation: async (id: string) => ({ id }),
-    getInterpretation: async () => {
-      const plan = lastRun?.plan || {};
-      return {
-        summary: plan.insight || 'Run a signal to generate a live operational interpretation.',
-        insights: [
-          { label: 'Demand Forecast', value: plan.impact_score >= 7 ? 'High' : 'Medium', confidence: Math.round((plan.confidence || 0.8) * 100) },
-          { label: 'Staffing Need', value: plan.requires_approval ? 'Manager review' : 'Normal', confidence: 82 },
-          { label: 'Inventory Optimization', value: actionLabel(plan.primary_action), confidence: 88 },
-        ],
-      };
-    },
+    getThroughput: () => request<AnyRecord[]>('/analytics/throughput'),
+    getSignals: () => request<AnyRecord[]>('/analytics/signals'),
+    getRecommendations: () => request<AnyRecord[]>('/analytics/recommendations'),
+    executeRecommendation: (id: string) => request<{ id: string }>(`/analytics/recommendations/${id}/execute`, { method: 'POST' }),
+    dismissRecommendation: (id: string) => request<{ id: string }>(`/analytics/recommendations/${id}/dismiss`, { method: 'POST' }),
+    getInterpretation: () => request<{ summary: string; insights: AnyRecord[] }>('/analytics/interpretation'),
   },
 
   settings: {
-    getProfile: async () => demoUser,
-    updateProfile: async (data: AnyRecord) => ({ ...demoUser, ...data }),
-    getNotifications: async () => ({
-      pushNotifications: true,
-      emailNotifications: true,
-      smsAlerts: false,
-      approvalAlerts: true,
-      inventoryAlerts: true,
-      weeklyDigest: true,
-    }),
-    updateNotifications: async (data: AnyRecord) => data,
-    getAiPreferences: async () => ({
-      autoApproveThreshold: 0.7,
-      riskTolerance: 'balanced',
-      decisionSpeed: 'fast',
-      humanOverride: true,
-      explainDecisions: true,
-      learnFromFeedback: true,
-    }),
-    updateAiPreferences: async (data: AnyRecord) => data,
-    getSecurity: async () => ({ twoFactorEnabled: false, lastPasswordChange: 'Demo mode' }),
-    changePassword: async (_data: { currentPassword: string; newPassword: string }) => ({ success: true }),
-    toggle2FA: async (enabled: boolean) => ({ enabled }),
+    getProfile: () => request<typeof demoUser>('/settings/profile'),
+    updateProfile: (data: AnyRecord) => request('/settings/profile', { method: 'PUT', body: JSON.stringify(data) }),
+    getNotifications: () => request<NotificationSettings>('/settings/notifications'),
+    updateNotifications: (data: Partial<NotificationSettings>) =>
+      request<NotificationSettings>('/settings/notifications', { method: 'PUT', body: JSON.stringify(data) }),
+    getAiPreferences: () => request<AiPreferences>('/settings/ai-preferences'),
+    updateAiPreferences: (data: Partial<AiPreferences>) =>
+      request<AiPreferences>('/settings/ai-preferences', { method: 'PUT', body: JSON.stringify(data) }),
+    getSecurity: () => request<SecuritySettings>('/settings/security'),
+    changePassword: (data: { currentPassword: string; newPassword: string }) =>
+      request('/settings/security/password', { method: 'POST', body: JSON.stringify(data) }),
+    toggle2FA: (enabled: boolean) => request('/settings/security/2fa', { method: 'POST', body: JSON.stringify({ enabled }) }),
   },
 };
 

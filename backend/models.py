@@ -70,3 +70,30 @@ class Notification(Base):
     message = Column(Text)
     status = Column(String, default="sent")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class UserAccount(Base):
+    __tablename__ = "user_accounts"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    email = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+    full_name = Column(String)
+    cafe_name = Column(String, nullable=True)
+    role = Column(String, default="owner")
+    phone = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class AuthSession(Base):
+    __tablename__ = "auth_sessions"
+    token = Column(String, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class UserSetting(Base):
+    __tablename__ = "user_settings"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, unique=True, index=True)
+    notifications_json = Column(Text, nullable=True)
+    ai_preferences_json = Column(Text, nullable=True)
+    security_json = Column(Text, nullable=True)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

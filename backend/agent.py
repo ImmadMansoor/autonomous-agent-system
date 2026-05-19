@@ -255,6 +255,22 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
     # Snapshot after state
     after_state = tools.get_menu_state(db)
     agent_run.after_state_json = json.dumps(after_state)
+    tools.dispatch_external_event(
+        db,
+        agent_run.id,
+        "agent_run_completed",
+        {
+            "signal": signal.raw_text,
+            "status": "requires_approval" if plan.requires_approval else "completed",
+            "confidence": plan.confidence,
+            "impact_score": plan.impact_score,
+            "requires_approval": plan.requires_approval,
+            "insight": plan.insight,
+            "primary_action": plan_dict.get("primary_action"),
+            "recommended_actions": plan.recommended_actions,
+            "revenue_impact_estimate": agent_run.revenue_impact_estimate,
+        },
+    )
 
     agent_run.completed_at = datetime.utcnow()
     agent_run.final_decision = json.dumps(plan_dict)

@@ -1,6 +1,44 @@
 import json
+import os
+import urllib.error
+import urllib.request
 from sqlalchemy.orm import Session
 import models
+
+WEBHOOK_TIMEOUT_SECONDS = 6
+
+def post_json(url: str, payload: dict):
+    data = json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=WEBHOOK_TIMEOUT_SECONDS) as response:
+        body = response.read().decode("utf-8", errors="replace")
+        return {"status_code": response.status, "body": body[:500]}
+
+def dispatch_external_event(db: Session, run_id: int, event_type: str, payload: dict):
+    webhook_url = os.environ.get("MAKE_WEBHOOK_URL")
+    if not webhook_url:
+        return {"status": "skipped", "reason": "MAKE_WEBHOOK_URL not configured"}
+
+    event_payload = {
+        "source": "menumind",
+        "event_type": event_type,
+        "agent_run_id": run_id,
+        "payload": payload,
+    }
+
+    try:
+        response = post_json(webhook_url, event_payload)
+        result = {"status": "sent", "target": "make", **response}
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        result = {"status": "failed", "target": "make", "message": str(exc)}
+
+    log_tool_trace(db, run_id, "make_webhook", event_payload, result)
+    return result
 
 def get_menu_state(db: Session) -> dict:
     items = db.query(models.MenuItem).all()
@@ -112,7 +150,13 @@ def send_staff_alert(db: Session, run_id: int, message: str, severity: str):
     )
     db.add(notification)
     db.commit()
-    result = {"status": "success", "channel": "slack", "message": message, "severity": severity}
+    external = dispatch_external_event(
+        db,
+        run_id,
+        "staff_alert",
+        {"channel": "slack_staff", "message": message, "severity": severity},
+    )
+    result = {"status": "success", "channel": "slack", "message": message, "severity": severity, "external": external}
     log_tool_trace(db, run_id, "send_staff_alert", {"message": message, "severity": severity}, result)
     return result
 
@@ -126,7 +170,13 @@ def create_customer_notice(db: Session, run_id: int, message: str, affected_item
     )
     db.add(notification)
     db.commit()
-    result = {"status": "success", "channel": "email", "message": message, "items": affected_items}
+    external = dispatch_external_event(
+        db,
+        run_id,
+        "customer_notice",
+        {"channel": "customer_notice", "message": message, "affected_items": affected_items},
+    )
+    result = {"status": "success", "channel": "email", "message": message, "items": affected_items, "external": external}
     log_tool_trace(db, run_id, "create_customer_notice", {"message": message, "affected_items": affected_items}, result)
     return result
 
@@ -156,7 +206,13 @@ def crisis_response(db: Session, run_id: int, delay_mins: int, message: str):
     )
     db.add(notification)
     db.commit()
-    result = {"status": "success", "action": "crisis_mode_activated", "delay_mins": delay_mins, "message": message}
+    external = dispatch_external_event(
+        db,
+        run_id,
+        "crisis_response",
+        {"delay_mins": delay_mins, "message": message},
+    )
+    result = {"status": "success", "action": "crisis_mode_activated", "delay_mins": delay_mins, "message": message, "external": external}
     log_tool_trace(db, run_id, "crisis_response", {"delay_mins": delay_mins, "message": message}, result)
     return result
 
