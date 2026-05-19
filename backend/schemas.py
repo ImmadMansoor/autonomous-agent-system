@@ -43,7 +43,15 @@ class AgentPlan(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0)
     impact_score: int = Field(..., ge=0, le=10)
     requires_approval: bool
+    signal_summary: Optional[str] = None
+    insight: Optional[str] = None
+    impact_analysis: Optional[str] = None
+    recommended_actions: List[str] = Field(default_factory=list)
+    workplan: List[str] = Field(default_factory=list)
+    simulated_execution: Optional[dict] = None
     extracted_facts: List[str] = Field(default_factory=list)
+    strategic_advice: Optional[str] = None
+    clarifying_questions: List[str] = Field(default_factory=list)
     primary_action: Optional[PlannedAction] = None
     secondary_actions: List[PlannedAction] = Field(default_factory=list)
     reason: str
@@ -96,3 +104,14 @@ class Notification(BaseModel):
     created_at: datetime
     class Config:
         from_attributes = True
+
+class WeatherContext(BaseModel):
+    available: bool
+    source: str
+    location: str
+    summary: str
+    risks: List[str] = Field(default_factory=list)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    current: Optional[dict] = None
+    daily: Optional[dict] = None

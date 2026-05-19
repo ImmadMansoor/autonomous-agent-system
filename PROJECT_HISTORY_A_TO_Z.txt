@@ -1,108 +1,296 @@
-PROJECT HISTORY & STRATEGIC DIRECTION (A to Z)
-Date: May 16, 2026
-Project: MenuMind (Autonomous Cafe Operations Agent)
-Hackathon: Google Antigravity Hackathon - Challenge 1
+MenuMind Project History A to Z
+Last updated: 2026-05-19
 
-=========================================================
-OUR MOTTO & CORE GOAL
-=========================================================
-MOTTO: "Zero-Code Simplicity meets True Agentic Autonomy."
+Purpose of this file
+- This is the durable handoff for any AI or teammate joining MenuMind with no prior context.
+- Keep it under 1000 lines. Prefer compact facts over chat transcripts.
+- For shared reasoning notes, Carl is the name used for this assistant.
 
-GOAL: To win Google Antigravity Hackathon Challenge 1 by building "MenuMind," an autonomous agent that protects small food businesses from operational chaos. It ingests messy real-world signals (supplier texts, weather alerts, competitor pricing), reasons through the business and ethical impact autonomously using Gemini 1.5, and directly executes database mutations and staff alerts without human intervention (unless ethical boundaries demand approval).
+1. Project Snapshot
+- Product: MenuMind, an autonomous cafe operations agent.
+- Hackathon target: Google Antigravity Hackathon, Challenge 1: autonomous content-to-action / agentic app workflow.
+- Core promise: turn messy business signals into safe cafe actions, not just chatbot advice.
+- Core loop: raw signal -> planner -> policy guard -> tool execution -> database mutation -> trace/UI result.
+- Example signal: "A marathon is in G-13 now; what should my restaurant do?"
+- Example real result: Gemini recommends promoting Iced Mint Lemonade, alerts staff, and updates menu state.
 
-=========================================================
-THE JOURNEY (A TO Z)
-=========================================================
+2. Original Goal
+- Build a demo that proves autonomous reasoning and execution for small food businesses.
+- Signals can come from supplier messages, weather, local events, competitor pricing, or crisis alerts.
+- The agent must show insight, action, simulation/result, and traceability.
+- Mobile app/prototype is mandatory for the hackathon.
 
-1. THE INCEPTION & INITIAL MISUNDERSTANDING
----------------------------------------------------------
-- The user provided the main hackathon challenge PDF, a screenshot clarifying that Antigravity is the IDE (not the runtime agent), and specific project proposal files for a project named "MenuMind".
-- Gemini 3 initially proposed a completely new "Supply Chain" project. 
-- The user quickly corrected this, pointing out the MenuMind documentation. Gemini 3 pivoted to fully support MenuMind.
+3. Early Architecture Debate
+- Earlier plans considered Supabase + Make.com + FlutterFlow as a low-code stack.
+- Gemini and other models argued Supabase/Make would show cloud workflow proof.
+- The local build initially felt fake because some generated logic looked like static if/else or demo presets.
+- The final decision was not to restart from scratch, because the local FastAPI + React system became real and recoverable.
+- Current position: keep FastAPI/React as the main product, use Make/Supabase only as optional cloud proof.
 
-2. THE ORIGINAL MENUMIND ARCHITECTURE (FROM THE PDF)
----------------------------------------------------------
-- The original proposal relied on a "Zero-Code" 3-Layer stack:
-  a. Make.com (The Bridge): Ingestion, webhooks, and routing.
-  b. Google Antigravity (The Brain): Semantic reasoning via a single prompt.
-  c. Supabase & FlutterFlow (The Body): Live database and mobile UI visualization.
+4. Current Runtime Architecture
+- Backend: FastAPI, SQLAlchemy, Pydantic.
+- Database: SQLite by default via `backend/database.py`; optional `DATABASE_URL` exists but Supabase schema is not aligned yet.
+- Agent pipeline: `backend/agent.py`.
+- Planner: `backend/llm_adapter.py`.
+- Tools: `backend/tools.py`.
+- Frontend: React/Vite in `frontend/src/App.jsx`.
+- Styling: `frontend/src/index.css`.
+- PWA files: `frontend/public/manifest.json`, `frontend/public/sw.js`.
 
-3. ANTIGRAVITY'S INITIAL BACKEND & CARL'S INTERVENTION
----------------------------------------------------------
-- The AI agent 'Antigravity' scaffolded a custom Python backend (FastAPI).
-- Gemini 3 found issues: Antigravity used SQLite instead of Supabase (breaking the FlutterFlow live stream requirement), and duplicated Make.com routing.
-- The AI agent 'Carl' pointed out that Antigravity's backend was using "fake logic"—deterministic Python `if/else` keyword matching instead of actual LLM reasoning. This would fail the "Autonomous Content-to-Action" requirement.
+5. Main Backend Flow
+- `POST /signals` stores a raw business signal.
+- `POST /agent/run/{signal_id}` starts the autonomous pipeline.
+- Pipeline snapshots menu state before planning.
+- Planner returns structured `AgentPlan`.
+- Policy guard modifies or holds risky actions.
+- Tools execute allowed changes.
+- Pipeline snapshots menu state after execution.
+- UI reads trace, before/after diff, notifications, approvals, and final decision.
 
-4. THE STRATEGIC DEVIATION: THE HYBRID ARCHITECTURE
----------------------------------------------------------
-- Because the Hackathon heavily rewards "Agentic Reasoning" and "Technical Implementation," the user authorized deviating from the original PDF's Make.com approach.
-- Gemini 3 proposed the "Hybrid Architecture":
-  - Drop Make.com entirely.
-  - Use the custom Python FastAPI backend as the true Brain and Bridge for complex, dynamic LLM tool-calling (Agentic Loops).
-  - Keep Supabase (PostgreSQL) and FlutterFlow for real-time mobile execution.
+6. Important API Endpoints
+- `GET /health`: backend status, planner mode, Gemini model, timeout.
+- `GET /menu`: current menu state.
+- `POST /signals`: create signal event.
+- `POST /agent/run/{signal_id}`: run agent.
+- `GET /agent/runs/{run_id}`: final run record.
+- `GET /agent/runs/{run_id}/trace`: audit trace.
+- `GET /menu/before-after/{run_id}`: state diff.
+- `GET /approvals`: pending/handled approvals.
+- `POST /approvals/{id}/approve`: approve held action.
+- `GET /notifications`: staff/customer simulated messages.
+- `GET /signals/scenarios`: clean preset signals.
+- `POST /demo/reset`: reset local demo state.
 
-5. ANTIGRAVITY'S SECOND ITERATION (TRUE AI LOGIC)
----------------------------------------------------------
-- Antigravity rewrote the backend logic, removing hardcoded `if/else` actions and introducing `llm_adapter.py`. 
-- The system now uses a `GeminiPlanner` to feed unstructured text to the Gemini API, forcing the LLM to autonomously evaluate the scenario and choose a tool.
-- A `DeterministicPlanner` was added as a smart fallback.
+7. Database Tables
+- Local SQLAlchemy tables:
+  - `menu_items`
+  - `signal_events`
+  - `agent_runs`
+  - `agent_trace`
+  - `approvals`
+  - `notifications`
+- Local `menu_items.id` is a string such as `chicken_wrap` or `iced_lemonade`.
+- Local menu fields include `base_price`, `current_price`, `is_available`, `is_promoted`, `stock_level`, `margin_pct`, `prep_time_min`.
 
-6. GEMINI 3'S REFINEMENTS & BUG FIXES
----------------------------------------------------------
-- Gemini 3 finalized the backend setup:
-  - Migrated the database setup to support `psycopg2-binary` for native Supabase (PostgreSQL) connection via a `DATABASE_URL` environment variable, keeping SQLite as a local fallback.
-  - Fixed several broken relative imports that were crashing the server.
-  - Fixed a 404 Bug in the Gemini API call by requesting the `gemini-1.5-flash-latest` model.
-  - Executed `test_run.py` to prove autonomous execution.
+8. Planner Behavior
+- Gemini is the preferred real planner when `GEMINI_API_KEY` exists.
+- The project now uses Gemini REST `generateContent`, not the deprecated `google.generativeai` SDK.
+- Default model: `gemini-2.5-flash`.
+- Default timeout: 35 seconds.
+- Safety fallback remains intentionally, but it is clearly labeled and is not allowed to pretend to be Gemini.
+- The frontend no longer contains hardcoded demo planning logic.
 
-7. CARL'S SMOKE TEST FEEDBACK RESOLVED
----------------------------------------------------------
-- Carl requested proof of a successful run be pasted directly into `SHARED_PLAN.md` and demanded stricter test assertions (e.g., verifying Chicken Wrap becomes unavailable, Beef Wrap is promoted, and an 'all_customers' notification fires after a crisis approval).
-- Gemini 3 updated `smoke_test.py` to include these exact strict assertions.
-- Gemini 3 executed the updated smoke test against the running FastAPI server (100% pass rate) and appended the execution proof into `SHARED_PLAN.md`.
+9. AgentPlan Contract
+- Planner returns:
+  - `signal_summary`
+  - `extracted_facts`
+  - `insight`
+  - `impact_analysis`
+  - `recommended_actions`
+  - `workplan`
+  - `simulated_execution`
+  - `strategic_advice`
+  - `clarifying_questions`
+  - `confidence`
+  - `impact_score`
+  - `requires_approval`
+  - `reason`
+  - `primary_action`
+  - `secondary_actions`
+- Trace is judge-facing evidence of autonomy.
 
-8. FINAL BUG FIXES & PERSISTENT PROOF
----------------------------------------------------------
-- Carl pointed out two backend bugs: approving the same approval twice, and failing to update the `AgentRun` status/trace after an approval execution. He also noted the local SQLite DB lacked the persistent proof of the latest tests.
-- Gemini 3 fixed these bugs in `main.py` with strict status guards and trace logging upon approval.
-- Gemini 3 booted up a fresh background server and re-ran the full strict smoke test suite. This perfectly populated `menumind.db` with the latest records, providing the exact persisted proof Carl required.
+10. Tool Registry
+- Allowed tools in `backend/tools.py`:
+  - `update_menu_availability`
+  - `adjust_item_price`
+  - `set_item_promotion`
+  - `extend_prep_time`
+  - `create_approval`
+  - `send_staff_alert`
+  - `create_customer_notice`
+  - `estimate_revenue_impact`
+  - `crisis_response`
+- Future tools should be added to the registry; do not let Gemini execute arbitrary code.
 
-=========================================================
-OUR ACHIEVEMENTS
-=========================================================
-- 100% Autonomous Backend: We successfully transitioned from a rigid zero-code idea to a highly technical, robust Python backend that leverages true Gemini LLM reasoning.
-- Fault Tolerance: The agent safely falls back to deterministic logic if the API fails, ensuring demo reliability.
-- Ethical Guardrails: We built a system that actively blocks price-gouging during crises (e.g., floods/strikes) and routes it to a human-approval queue.
-- Strict Validation: We have a comprehensive suite of passing smoke tests proving the agent mutates the database accurately based on chaotic textual input.
+11. Safety Rules
+- Crisis signals require approval.
+- Price increases above 15% require approval.
+- Public-stress situations such as heatwaves, marathons, strikes, blocked roads, emergencies, or protests must not raise prices.
+- Public-stress upward price actions are converted into promotions.
+- Supply shocks with buffer stock should extend prep time instead of disabling the item.
+- Routine supply, weather, competitor, and event actions may execute automatically when safe.
 
-=========================================================
-WHAT NEXT? (IMMEDIATE NEXT STEPS)
-=========================================================
-1. Cloud Database Connection: We will provision the actual Supabase PostgreSQL instance and plug the `DATABASE_URL` into our environment so the FastAPI server talks to the live cloud.
-2. Frontend UI (Mobile-First): As per the original plan, the UI model must now build the mobile-first dashboard (using React or FlutterFlow as decided) that listens to the live database and displays:
-   - Scenario trigger buttons.
-   - The before/after menu state diff.
-   - The live trace terminal showing the agent's "thoughts."
-   - The approval queue and ROI badge.
-=========================================================
-CLARIFICATIONS & STATE OF THE PROJECT (Q&A)
-=========================================================
-1. The Architecture Pivot
-Q: Did you explicitly tell Antigravity to build a Python backend, or did it do this on its own? Do you or anyone on your team know Python, FastAPI, or backend development?
-A: We did not explicitly tell Antigravity to build a Python backend initially. The user's prompt was to "make the backend logic find if theres any error". Antigravity, acting as an autonomous developer, generated the FastAPI code on its own. However, when the user subsequently authorized us to deviate from the PDF ("if its better system then the one mentioned in the pdf then you can deviate"), we formally adopted the Python backend. While the original constraint was "NO coding," the pivot to Python was necessary to score highly on the "Technical Implementation" rubric, and the AI models (Antigravity, Carl, and Gemini 3) are handling 100% of the backend coding on behalf of the user.
+12. Key Problems Fixed
+- Replaced fake-looking frontend demo planner with real backend calls.
+- Removed manual Demo Mode toggle because it confused real AI with simulation.
+- Removed `Analyze Signal` wording and replaced it with `Run live agent`.
+- Rebuilt UI from a blue/glass AI-looking dashboard into a cleaner operations console.
+- Added business insight, impact, primary action, menu changes, messages, and collapsible audit trace.
+- Confirmed browser run can show `Planner: Gemini live`.
+- Replaced deprecated Gemini Python SDK with official REST API call.
+- Raised Gemini timeout to 35 seconds.
+- Added robust JSON extraction and parsing.
+- Added policy override to clear false approval flags for routine supply actions.
+- Added policy override to force approval for crisis signals.
+- Added public-stress pricing guardrail.
+- Added PWA manifest and service worker.
+- Added lightweight browser voice input to Signal Intake. It uses the browser speech recognizer when available, requires no separate API key, fills the textarea, and never auto-runs the agent.
+- Added lightweight browser TTS for completed runs. It uses browser speech synthesis, requires no separate API key, and reads only a compact result summary when the user clicks `Speak result`.
+- Added `.aiignore`, `.cursorignore`, `.geminiignore`, `.gitignore`, and `AGENTS.md` to reduce context waste.
+- Compressed older proposal/debate markdown files.
 
-2. The Make.com Question
-Q: Which direction are you actually building right now?
-A: Option B: Hybrid (Python FastAPI backend + Supabase + FlutterFlow, no Make.com). We explicitly dropped Make.com because a custom Python backend allows for true, dynamic LLM tool-calling (Agentic Loops), which Make.com struggles to simulate effectively for a hackathon demanding high technical execution.
+13. Current Frontend State
+- Main screen:
+  - Header with planner status.
+  - Signal intake textarea.
+  - `Speak signal` mic button for browser voice transcription when supported.
+  - `Run live agent` button.
+  - `Reset state` button.
+  - Preset buttons that only fill the textarea, not execute hidden logic.
+  - Menu state panel.
+  - Decision section after a run.
+  - `Speak result` button after a run for browser text-to-speech when supported.
+  - Audit trace in a collapsed details block.
+- The frontend does not decide business logic.
+- The frontend calls the backend and displays the backend result.
+- Current bundle after cleanup: about 203 kB JS gzip source bundle output was reduced from the older larger UI path.
 
-3. The "Carl" Factor
-Q: Is Carl another AI assistant, a human, or a judge?
-A: Carl is another AI assistant/agent working collaboratively within our shared workspace. In `SHARED_PLAN.md`, the directive was established: "Use the name 'Carl' for this agent in shared notes." Carl acts as an aggressive code reviewer and strategic mentor, pushing the other models (Antigravity and Gemini 3) to ensure the logic isn't "faked" and that strict tests are written. Because Carl is an AI, the team (the other AI models) is perfectly capable of maintaining the complex code he demands.
+14. Current Backend State
+- `backend/main.py` exposes routes and seed scenarios.
+- `backend/agent.py` owns observe/reason/policy/execute/finalize.
+- `backend/llm_adapter.py` owns Gemini REST planning and safety fallback planning.
+- `backend/tools.py` owns actual state mutations and simulated notifications.
+- `backend/database.py` supports SQLite by default and `DATABASE_URL` if supplied.
+- `backend/requirements.txt` no longer needs `google-generativeai`.
 
-4. The Database Reality
-Q: Is your Supabase PostgreSQL instance actually provisioned and connected right now? Or is the backend running on SQLite only?
-A: The backend is currently running locally on SQLite only. While Gemini 3 updated the code (`psycopg2-binary` installed, `DATABASE_URL` routing configured) so that it is instantly ready to connect to Supabase, the actual Supabase project has not yet been provisioned by the user. Therefore, FlutterFlow currently has no live data source to connect to. Provisioning Supabase is the immediate next blocker.
+15. Supabase Status
+- Supabase project exists and is connected through MCP.
+- Project: `MenuMind`, active healthy, region `ap-south-1`.
+- Cloud tables:
+  - `public.menu_items`: 4 rows.
+  - `public.agent_logs`: 0 rows.
+  - `public.pending_approvals`: 0 rows.
+- Migration added: unique constraint on `menu_items.name` for Make upsert.
+- Current Supabase schema does not match local SQLAlchemy schema.
+- Do not point local `DATABASE_URL` at current Supabase until schemas are aligned.
+- RLS is disabled on public tables; this is not production-safe.
+- Do not expose service role or secret keys in frontend.
 
-5. The Demo Video Timeline
-Q: Has any FlutterFlow UI been built yet? Has any demo video recording started? What percentage of time has been spent on backend vs. frontend vs. demo prep?
-A: No FlutterFlow UI has been built yet. No demo video recording has started. 100% of the time so far has been spent on Phase 1 & 2 (Backend Foundation and Agentic Logic Verification). With the hackathon clock ticking (~2.5 days left), the backend is now frozen and stable, and all remaining time must immediately shift to provisioning Supabase, building the UI, and recording the demo.
+16. Make.com Status
+- There is no native Make.com plugin in this environment.
+- Carl cannot directly inspect Make internals unless using browser screenshots/session or Make execution logs.
+- Make can still connect through webhooks and HTTP calls.
+- Current Make screenshot shows:
+  - Webhook
+  - HTTP GET Supabase menu_items
+  - Google Gemini AI
+  - HTTP POST Supabase menu_items upsert
+- Best role for Make: external signal collector / cloud workflow proof, not the main agent brain.
+
+17. Recommended Make Integration
+- Preferred Make -> MenuMind flow:
+  1. Make Custom Webhook receives a supplier/weather/event/competitor signal.
+  2. Make HTTP module calls public/deployed MenuMind `POST /signals`.
+  3. Make HTTP module calls `POST /agent/run/{signal_id}`.
+  4. Make reads `GET /agent/runs/{run_id}`, `/trace`, `/menu/before-after/{run_id}`, `/notifications`, or `/approvals`.
+- Make cannot call `localhost`; expose FastAPI through deployment or a demo tunnel.
+- Stable inbound payload:
+  - `source_type`: supplier/weather/competitor/event/manual.
+  - `raw_text`: the messy signal text.
+  - Optional metadata can stay in Make/Supabase logs.
+- For hackathon demo, local FastAPI remains the real autonomous agent. Make/Supabase can be shown as external automation proof.
+
+18. Mobile App / APK Requirement
+- Challenge notes say a working prototype with mobile app is mandatory.
+- Current app is mobile-first React and has PWA support.
+- Best 48-hour APK path: Capacitor Android wrapper around existing Vite app.
+- Do not rewrite in Expo or FlutterFlow now; that creates too much risk.
+- PWA remains backup evidence, not the strongest APK proof.
+- `API_URL` is configurable through frontend `VITE_API_URL` because `localhost` inside an APK means the phone, not the laptop.
+- For Android emulator use `http://10.0.2.2:8000`.
+- For physical phone use laptop LAN IP, e.g. `http://192.168.x.x:8000`, same Wi-Fi.
+
+19. Clean Demo Scenarios
+- Supply shock:
+  - Signal: Roman Urdu chicken delivery failure.
+  - Expected: hide Chicken Wrap if stock low, promote Beef Wrap, staff alert.
+- Heatwave:
+  - Signal: Islamabad 44C heat advisory.
+  - Expected: promote Iced Mint Lemonade, staff prep alert.
+- Competitor price attack:
+  - Signal: competitor drops burger price.
+  - Expected: avoid destructive price war, promote/discount within safe limits.
+- Crisis guardrail:
+  - Signal: strike/blocked roads/delivery freeze.
+  - Expected: no surge pricing, approval required.
+- Contradiction:
+  - Signal: supplier says unavailable but inventory buffer exists.
+  - Expected: conserve availability or extend prep time.
+- Marathon/event:
+  - Signal: G-13 marathon or hot event near cafe.
+  - Expected: promote healthy cold drink, staff alert, strategic advice.
+
+20. Verification Already Done
+- Backend Python compile passes.
+- Frontend production build passes.
+- Browser UI check passes.
+- Live Gemini REST smoke test returned real plan.
+- Browser live run verified `Planner: Gemini live`.
+- Local UI displays Business Insight, Impact, Primary Action, Recommended Actions, Menu Changes, Messages, Audit Trace.
+- Supabase MCP connection verified.
+
+21. Current Known Risks
+- Make.com internals cannot be inspected without browser/session/log screenshots.
+- Supabase RLS is disabled; do not treat current cloud tables as production-secure.
+- Local and Supabase schemas differ.
+- APK not yet generated.
+- Backend must be reachable from APK/mobile device.
+- API keys previously appeared in chat/screenshots; rotate exposed keys before public sharing.
+
+22. How To Run Locally
+- Backend:
+  `cd backend`
+  `python -m pip install -r requirements.txt`
+  `python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload`
+- Frontend:
+  `cd frontend`
+  `npm install`
+  `npm run dev`
+- Health:
+  Open `http://127.0.0.1:8000/health`.
+- UI:
+  Open `http://127.0.0.1:5173/`.
+
+23. How To Build Frontend
+- `cd frontend`
+- `npm run build`
+- Output goes to `frontend/dist`.
+
+24. How To Build APK Next
+- Add configurable API URL first.
+- Install Capacitor packages in `frontend`.
+- Create `capacitor.config`.
+- Build Vite.
+- Add Android platform.
+- Sync Capacitor.
+- Build debug APK with Android Studio or Gradle.
+- Test on emulator or phone using reachable backend URL.
+
+25. Collaboration Notes
+- Carl: current coding agent / implementation lead.
+- Matt: mobile APK reviewer; recommends Capacitor Android.
+- Gemini: Make/Supabase reviewer; recommends Make as external signal collector, not brain.
+- Carb: documentation reviewer; recommends compact source-of-truth history under 1000 lines.
+- Future docs should use `Carl:` when recording this assistant's ideas in cross-model brainstorming.
+
+26. Rules For Future AI Sessions
+- Read `AGENTS.md` first, then this file, then only relevant runtime files.
+- Do not read PDFs, screenshots, logs, databases, `node_modules`, `.venv`, or `dist` unless specifically needed.
+- Preserve the working signal -> planner -> policy -> tools -> state -> trace -> UI loop.
+- Keep safety fallback, but label it honestly.
+- Do not reintroduce frontend hardcoded planning.
+- Do not pivot architecture unless user explicitly asks.
+- Prefer small verified fixes.
+- Run backend compile and frontend build after code changes.
+- For Supabase tasks, use Supabase MCP and surface RLS risks.
+- For Make tasks, use webhook tests, screenshots, and Supabase results because no native Make plugin exists.

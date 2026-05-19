@@ -37,20 +37,10 @@ def run_smoke_test():
         run_res = resp.json()
         run_id = run_res.get("agent_run_id")
 
-        # Check Run Status (Poll until completion since execution is async)
-        import time
-        start_time = time.time()
-        timeout = 25
-        run_details = {}
-        status = "running"
-        while time.time() - start_time < timeout:
-            resp = requests.get(f"{BASE_URL}/agent/runs/{run_id}")
-            run_details = resp.json()
-            status = run_details['status']
-            if status in ["completed", "requires_approval", "failed"]:
-                break
-            time.sleep(0.5)
-            
+        # Check Run Status
+        resp = requests.get(f"{BASE_URL}/agent/runs/{run_id}")
+        run_details = resp.json()
+        status = run_details['status']
         print(f"OK: Final Run Status: {status}")
 
         # Get trace to verify reasoning happened

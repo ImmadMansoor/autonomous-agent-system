@@ -19,17 +19,17 @@ class MenuItem(Base):
 class SignalEvent(Base):
     __tablename__ = "signal_events"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     source_type = Column(String)
     raw_text = Column(Text)
-    status = Column(String, default="pending")
+    status = Column(String, default="pending", index=True)
     confidence = Column(Float, nullable=True)
     impact_score = Column(Integer, nullable=True)
 
 class AgentRun(Base):
     __tablename__ = "agent_runs"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    signal_event_id = Column(Integer)
+    signal_event_id = Column(Integer, index=True)
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
     final_decision = Column(Text, nullable=True)
@@ -42,7 +42,7 @@ class AgentRun(Base):
 class AgentTrace(Base):
     __tablename__ = "agent_trace"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    agent_run_id = Column(Integer)
+    agent_run_id = Column(Integer, index=True)
     step = Column(String)
     message = Column(Text)
     tool_name = Column(String, nullable=True)
@@ -53,18 +53,18 @@ class AgentTrace(Base):
 class Approval(Base):
     __tablename__ = "approvals"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    agent_run_id = Column(Integer)
+    agent_run_id = Column(Integer, index=True)
     action_type = Column(String)
     payload_json = Column(Text)
     reason = Column(Text)
-    status = Column(String, default="pending") # pending, approved, rejected
+    status = Column(String, default="pending", index=True) # pending, approved, rejected
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     resolved_at = Column(DateTime(timezone=True), nullable=True)
 
 class Notification(Base):
     __tablename__ = "notifications"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    agent_run_id = Column(Integer)
+    agent_run_id = Column(Integer, index=True)
     channel = Column(String)
     recipient = Column(String)
     message = Column(Text)

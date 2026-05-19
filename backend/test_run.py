@@ -28,13 +28,7 @@ def test_pipeline():
     run_id = run_info.get("agent_run_id")
     print(f"Run ID: {run_id}")
 
-    print("\n5. Fetching Agent Trace (waiting for completion)...")
-    status = "running"
-    while status == "running":
-        res = requests.get(f"{BASE_URL}/agent/runs/{run_id}")
-        status = res.json().get("status")
-        time.sleep(0.5)
-
+    print("\n5. Fetching Agent Trace...")
     res = requests.get(f"{BASE_URL}/agent/runs/{run_id}/trace")
     traces = res.json()
     for t in traces:
