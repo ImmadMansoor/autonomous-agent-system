@@ -22,6 +22,7 @@ const iconMap = {
   weather: Cloud,
   sms: MessageSquare,
   pos: Package,
+  inventory: Package,
 };
 
 const statusConfig = {
@@ -41,8 +42,9 @@ export function SignalCard({
   isSelected = false,
   onSelect,
 }: SignalCardProps) {
-  const Icon = iconMap[source];
-  const statusStyle = statusConfig[status];
+  // Safe fallbacks to prevent undefined icon or status styles rendering crashes.
+  const Icon = iconMap[source] || Globe;
+  const statusStyle = statusConfig[status] || statusConfig.parsed;
   
   const handleClick = () => {
     if (onSelect) {

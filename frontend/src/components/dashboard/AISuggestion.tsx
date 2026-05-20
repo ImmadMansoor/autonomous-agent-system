@@ -16,7 +16,11 @@ const categoryColors: Record<string, string> = {
   pricing: 'var(--primary)',
   inventory: 'var(--error)',
   marketing: '#8b5cf6',
+  agent: 'var(--primary)',
 };
+
+const getCategoryColor = (category: string) => categoryColors[category] || 'var(--primary)';
+
 
 export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionProps) {
   return (
@@ -28,7 +32,7 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
         border: '1px solid #E2E8F0',
         borderRadius: 'var(--radius-xl)',
         padding: 'var(--space-lg)',
-        backgroundColor: `${categoryColors[suggestion.category]}10`,
+        backgroundColor: `${getCategoryColor(suggestion.category)}10`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-sm)' }}>
@@ -36,7 +40,7 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
           fontFamily: 'var(--font-headline)',
           fontSize: 'var(--font-size-headline-sm)',
           fontWeight: 600,
-          color: categoryColors[suggestion.category],
+          color: getCategoryColor(suggestion.category),
           display: 'flex',
           alignItems: 'center',
           gap: 'var(--space-sm)',
@@ -77,7 +81,7 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
             onClick={onApply}
             style={{
               padding: 'var(--space-xs) var(--space-md)',
-              background: categoryColors[suggestion.category],
+              background: getCategoryColor(suggestion.category),
               color: 'white',
               borderRadius: 'var(--radius-lg)',
               border: 'none',

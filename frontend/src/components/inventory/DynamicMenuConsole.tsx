@@ -276,9 +276,8 @@ export function DynamicMenuConsole({
         variants={STAGGER_CONTAINER}
         initial="hidden"
         animate="visible"
+        className="menu-grid"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: SPACING.GUTTER,
         }}
       >
@@ -391,19 +390,6 @@ export function DynamicMenuConsole({
           </div>
         </div>
       )}
-      
-      <style jsx global>{`
-        @media (max-width: 1024px) {
-          .menu-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-        @media (max-width: 640px) {
-          .menu-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

@@ -29,12 +29,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         justifyContent: 'center',
       }}>
         <Loader2 size={48} style={{ animation: 'spin 1s linear infinite', color: 'var(--primary)' }} />
-        <style jsx>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
     );
   }

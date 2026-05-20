@@ -1,87 +1,108 @@
 MenuMind Project History A to Z
-Last updated: 2026-05-19
+Last updated: 2026-05-20
+Owner/user: Tayyab
+Assistant name in shared docs: Carl
 
 Purpose of this file
-- This is the durable handoff for any AI or teammate joining MenuMind with no prior context.
-- Keep it under 1000 lines. Prefer compact facts over chat transcripts.
-- For shared reasoning notes, Carl is the name used for this assistant.
+- Durable handoff for any AI/teammate joining MenuMind with no prior context.
+- Keep under 1000 lines; do not paste chat transcripts.
+- Include only what matters for architecture, demo, deployment, and next work.
 
-1. Project Snapshot
-- Product: MenuMind, an autonomous cafe operations agent.
-- Hackathon target: Google Antigravity Hackathon, Challenge 1: autonomous content-to-action / agentic app workflow.
-- Core promise: turn messy business signals into safe cafe actions, not just chatbot advice.
-- Core loop: raw signal -> planner -> policy guard -> tool execution -> database mutation -> trace/UI result.
-- Example signal: "A marathon is in G-13 now; what should my restaurant do?"
-- Example real result: Gemini recommends promoting Iced Mint Lemonade, alerts staff, and updates menu state.
+1. One-Line Summary
+- MenuMind is an autonomous cafe operations agent for the Google Antigravity Hackathon.
+- It turns messy signals such as supplier messages, weather, local events, competitor moves, and crises into safe menu, staff, approval, and notification actions.
+- Core loop: observe -> reason with Gemini/fallback -> policy guard -> execute tools -> persist state -> show trace/result in UI -> optionally dispatch externally through Make.
 
-2. Original Goal
-- Build a demo that proves autonomous reasoning and execution for small food businesses.
-- Signals can come from supplier messages, weather, local events, competitor pricing, or crisis alerts.
-- The agent must show insight, action, simulation/result, and traceability.
-- Mobile app/prototype is mandatory for the hackathon.
+2. Hackathon Goal
+- Target: Google Antigravity Hackathon, Challenge 1: autonomous content-to-action / agentic app workflow.
+- The demo must show input -> insight -> action -> simulation/result with clear agent trace.
+- Mobile app/prototype is mandatory; current safest APK route is Capacitor around the frontend after backend deployment.
 
-3. Early Architecture Debate
-- Earlier plans considered Supabase + Make.com + FlutterFlow as a low-code stack.
-- Gemini and other models argued Supabase/Make would show cloud workflow proof.
-- The local build initially felt fake because some generated logic looked like static if/else or demo presets.
-- The final decision was not to restart from scratch, because the local FastAPI + React system became real and recoverable.
-- Current position: keep FastAPI/React as the main product, use Make/Supabase only as optional cloud proof.
+3. Product Promise
+- Not a chatbot and not a static if/else demo.
+- The restaurant owner can enter a freeform real-world signal:
+  "A marathon is happening near G-13 with warm weather. What should my restaurant do?"
+- MenuMind should reason about demand, health-conscious customers, hydration, stock, staffing, promotions, competition, and ethical limits.
+- The result should include insight, impact, primary action, recommended actions, menu changes, messages, approvals if needed, and audit trace.
 
-4. Current Runtime Architecture
-- Backend: FastAPI, SQLAlchemy, Pydantic.
-- Database: SQLite by default via `backend/database.py`; optional `DATABASE_URL` exists but Supabase schema is not aligned yet.
-- Agent pipeline: `backend/agent.py`.
-- Planner: `backend/llm_adapter.py`.
-- Tools: `backend/tools.py`.
-- Frontend: React/Vite in `frontend/src/App.jsx`.
-- Styling: `frontend/src/index.css`.
-- PWA files: `frontend/public/manifest.json`, `frontend/public/sw.js`.
+4. Main Stack Today
+- Backend: FastAPI + SQLAlchemy + Pydantic.
+- Local DB: SQLite by default via `backend/menumind.db`.
+- Optional cloud DB: `DATABASE_URL` supported, but Supabase schema must be aligned before using it as the backend database.
+- Planner: Gemini REST API through `backend/llm_adapter.py`, default model `gemini-2.5-flash`.
+- Safety fallback: deterministic planner remains as honest resilience when Gemini/API times out.
+- Frontend: Next.js dashboard in `frontend/src/app` and `frontend/src/components`.
+- External automation: Make.com webhook dispatch from backend when configured.
+- Weather: Open-Meteo no-key weather context in `backend/weather.py`.
 
-5. Main Backend Flow
-- `POST /signals` stores a raw business signal.
-- `POST /agent/run/{signal_id}` starts the autonomous pipeline.
-- Pipeline snapshots menu state before planning.
-- Planner returns structured `AgentPlan`.
-- Policy guard modifies or holds risky actions.
-- Tools execute allowed changes.
-- Pipeline snapshots menu state after execution.
-- UI reads trace, before/after diff, notifications, approvals, and final decision.
+5. Important Current Files
+- `backend/main.py`: API routes, auth, settings, analytics, audit, demo reset, health.
+- `backend/agent.py`: observe/reason/policy/execute/finalize pipeline.
+- `backend/llm_adapter.py`: Gemini planner and deterministic fallback.
+- `backend/tools.py`: tool registry, state mutations, notification records, Make webhook dispatch.
+- `backend/models.py`: SQLAlchemy tables.
+- `backend/schemas.py`: Pydantic contracts.
+- `backend/weather.py`: live no-key weather context.
+- `frontend/src/lib/api.ts`: frontend API adapter to FastAPI.
+- `frontend/src/lib/auth.tsx`: frontend auth state and local token storage.
+- `frontend/src/components/dashboard/SignalInput.tsx`: live signal submission box.
+- `PROJECT_HISTORY_A_TO_Z.txt`: this file; compact source of truth.
+- `AGENTS.md`: future AI working rules.
 
-6. Important API Endpoints
-- `GET /health`: backend status, planner mode, Gemini model, timeout.
-- `GET /menu`: current menu state.
-- `POST /signals`: create signal event.
-- `POST /agent/run/{signal_id}`: run agent.
-- `GET /agent/runs/{run_id}`: final run record.
-- `GET /agent/runs/{run_id}/trace`: audit trace.
-- `GET /menu/before-after/{run_id}`: state diff.
-- `GET /approvals`: pending/handled approvals.
-- `POST /approvals/{id}/approve`: approve held action.
-- `GET /notifications`: staff/customer simulated messages.
-- `GET /signals/scenarios`: clean preset signals.
-- `POST /demo/reset`: reset local demo state.
+6. Current Backend Tables
+- `menu_items`: live menu state.
+- `signal_events`: raw signals.
+- `agent_runs`: one autonomous run per signal.
+- `agent_trace`: judge-facing reasoning/tool trace.
+- `approvals`: human approval queue.
+- `notifications`: simulated staff/customer/system messages.
+- `user_accounts`: real backend login/signup users.
+- `auth_sessions`: bearer tokens.
+- `user_settings`: persisted notification, AI preference, and security settings.
 
-7. Database Tables
-- Local SQLAlchemy tables:
-  - `menu_items`
-  - `signal_events`
-  - `agent_runs`
-  - `agent_trace`
-  - `approvals`
-  - `notifications`
-- Local `menu_items.id` is a string such as `chicken_wrap` or `iced_lemonade`.
-- Local menu fields include `base_price`, `current_price`, `is_available`, `is_promoted`, `stock_level`, `margin_pct`, `prep_time_min`.
+7. Current Backend Endpoints
+- Health/menu/weather:
+  - `GET /health`
+  - `GET /menu`
+  - `GET /weather/context`
+- Signals/runs:
+  - `POST /signals`
+  - `GET /signals`
+  - `GET /signals/scenarios`
+  - `POST /agent/run/{signal_event_id}`
+  - `GET /agent/runs`
+  - `GET /agent/runs/{run_id}`
+  - `GET /agent/runs/{run_id}/trace`
+  - `GET /menu/before-after/{run_id}`
+- Approvals/notifications:
+  - `GET /approvals`
+  - `POST /approvals/{id}/approve`
+  - `POST /approvals/{id}/reject`
+  - `GET /notifications`
+- Auth/settings:
+  - `POST /auth/signup`
+  - `POST /auth/login`
+  - `GET /auth/profile`
+  - `GET/PUT /settings/profile`
+  - `GET/PUT /settings/notifications`
+  - `GET/PUT /settings/ai-preferences`
+  - `GET /settings/security`
+  - `POST /settings/security/password`
+  - `POST /settings/security/2fa`
+- Audit/analytics:
+  - `GET /audit-log`
+  - `GET /audit-log/{entry_id}`
+  - `GET /analytics/throughput`
+  - `GET /analytics/signals`
+  - `GET /analytics/recommendations`
+  - `POST /analytics/recommendations/{id}/execute`
+  - `POST /analytics/recommendations/{id}/dismiss`
+  - `GET /analytics/interpretation`
+- Demo:
+  - `POST /demo/reset`
 
-8. Planner Behavior
-- Gemini is the preferred real planner when `GEMINI_API_KEY` exists.
-- The project now uses Gemini REST `generateContent`, not the deprecated `google.generativeai` SDK.
-- Default model: `gemini-2.5-flash`.
-- Default timeout: 35 seconds.
-- Safety fallback remains intentionally, but it is clearly labeled and is not allowed to pretend to be Gemini.
-- The frontend no longer contains hardcoded demo planning logic.
-
-9. AgentPlan Contract
-- Planner returns:
+8. AgentPlan Contract
+- Gemini/fallback returns a structured plan with:
   - `signal_summary`
   - `extracted_facts`
   - `insight`
@@ -97,9 +118,9 @@ Purpose of this file
   - `reason`
   - `primary_action`
   - `secondary_actions`
-- Trace is judge-facing evidence of autonomy.
+- Frontend should display this; frontend should not invent business logic.
 
-10. Tool Registry
+9. Tool Registry
 - Allowed tools in `backend/tools.py`:
   - `update_menu_availability`
   - `adjust_item_price`
@@ -110,144 +131,157 @@ Purpose of this file
   - `create_customer_notice`
   - `estimate_revenue_impact`
   - `crisis_response`
-- Future tools should be added to the registry; do not let Gemini execute arbitrary code.
+- Gemini is never allowed to execute arbitrary code.
+- New actions must be added to the registry with validation.
 
-11. Safety Rules
+10. Safety and Ethics Guardrails
 - Crisis signals require approval.
 - Price increases above 15% require approval.
-- Public-stress situations such as heatwaves, marathons, strikes, blocked roads, emergencies, or protests must not raise prices.
-- Public-stress upward price actions are converted into promotions.
-- Supply shocks with buffer stock should extend prep time instead of disabling the item.
-- Routine supply, weather, competitor, and event actions may execute automatically when safe.
+- Public-stress situations must not trigger surge pricing:
+  - heatwave
+  - marathon/event crowd
+  - flood
+  - strike/hartal
+  - blocked roads
+  - emergency/protest
+- If Gemini proposes upward pricing during public stress, backend converts it to promotion.
+- If supplier disruption exists but buffer stock is enough, agent can extend prep time rather than hide the item.
+- Fallback planner is allowed only as resilience; it must be trace-labeled as fallback.
 
-12. Key Problems Fixed
-- Replaced fake-looking frontend demo planner with real backend calls.
-- Removed manual Demo Mode toggle because it confused real AI with simulation.
-- Removed `Analyze Signal` wording and replaced it with `Run live agent`.
-- Rebuilt UI from a blue/glass AI-looking dashboard into a cleaner operations console.
-- Added business insight, impact, primary action, menu changes, messages, and collapsible audit trace.
-- Confirmed browser run can show `Planner: Gemini live`.
-- Replaced deprecated Gemini Python SDK with official REST API call.
-- Raised Gemini timeout to 35 seconds.
-- Added robust JSON extraction and parsing.
-- Added policy override to clear false approval flags for routine supply actions.
-- Added policy override to force approval for crisis signals.
-- Added public-stress pricing guardrail.
-- Added PWA manifest and service worker.
-- Added lightweight browser voice input to Signal Intake. It uses the browser speech recognizer when available, requires no separate API key, fills the textarea, and never auto-runs the agent.
-- Added lightweight browser TTS for completed runs. It uses browser speech synthesis, requires no separate API key, and reads only a compact result summary when the user clicks `Speak result`.
-- Added `.aiignore`, `.cursorignore`, `.geminiignore`, `.gitignore`, and `AGENTS.md` to reduce context waste.
-- Compressed older proposal/debate markdown files.
+11. Frontend State Today
+- Current frontend is a Next.js operations dashboard, not the older Vite UI.
+- Main pages:
+  - Operations
+  - Approvals
+  - Audit Log
+  - Intelligence / Analytics
+  - Inventory
+  - AI Logs
+  - Settings
+  - Login / Signup
+- The uploaded frontend originally had merge conflicts and wrong API paths.
+- Carl fixed package conflicts and wired `frontend/src/lib/api.ts` to FastAPI.
+- Signal input now calls the real backend flow:
+  `POST /signals` -> `POST /agent/run/{id}` -> fetch run/trace/diff/approvals/notifications/menu.
+- Old fake endpoint `localhost:3001/api/agents/simulate-signal` was removed.
+- Socket.IO dependency was removed because backend does not run Socket.IO.
+- UI currently polls backend instead of receiving WebSocket pushes.
 
-13. Current Frontend State
-- Main screen:
-  - Header with planner status.
-  - Signal intake textarea.
-  - `Speak signal` mic button for browser voice transcription when supported.
-  - `Run live agent` button.
-  - `Reset state` button.
-  - Preset buttons that only fill the textarea, not execute hidden logic.
-  - Menu state panel.
-  - Decision section after a run.
-  - `Speak result` button after a run for browser text-to-speech when supported.
-  - Audit trace in a collapsed details block.
-- The frontend does not decide business logic.
-- The frontend calls the backend and displays the backend result.
-- Current bundle after cleanup: about 203 kB JS gzip source bundle output was reduced from the older larger UI path.
+12. Login and Settings Status
+- Login/signup are now real backend routes using `user_accounts` and `auth_sessions`.
+- Passwords are stored as salted PBKDF2 hashes, not plain text.
+- Settings page is now backed by `user_settings`, not only frontend memory.
+- There is still a demo token fallback for convenience; do not treat this as production-grade authentication.
+- Supabase Auth was discussed but not implemented because backend auth was faster and lower-risk.
 
-14. Current Backend State
-- `backend/main.py` exposes routes and seed scenarios.
-- `backend/agent.py` owns observe/reason/policy/execute/finalize.
-- `backend/llm_adapter.py` owns Gemini REST planning and safety fallback planning.
-- `backend/tools.py` owns actual state mutations and simulated notifications.
-- `backend/database.py` supports SQLite by default and `DATABASE_URL` if supplied.
-- `backend/requirements.txt` no longer needs `google-generativeai`.
+13. Analytics and Audit Status
+- Audit log now reads real stored `agent_trace` records.
+- Analytics now reads real stored agent runs/signals/recommendations/interpretation.
+- This is much more real than the earlier synthesized-only dashboard.
+- Remaining limitation: analytics are simple operational metrics, not a full BI warehouse.
+- Recommended later improvement: add hourly/daily rollups and event outcome metrics.
 
-15. Supabase Status
-- Supabase project exists and is connected through MCP.
-- Project: `MenuMind`, active healthy, region `ap-south-1`.
-- Cloud tables:
-  - `public.menu_items`: 4 rows.
-  - `public.agent_logs`: 0 rows.
-  - `public.pending_approvals`: 0 rows.
-- Migration added: unique constraint on `menu_items.name` for Make upsert.
-- Current Supabase schema does not match local SQLAlchemy schema.
-- Do not point local `DATABASE_URL` at current Supabase until schemas are aligned.
-- RLS is disabled on public tables; this is not production-safe.
-- Do not expose service role or secret keys in frontend.
+14. Make.com Integration Status
+- Make webhook is configured locally in `backend/.env`:
+  `MAKE_WEBHOOK_URL=https://hook.eu1.make.com/jopk3sh1fkwezon596fzlczge791cova`
+- `.env` is ignored by Git; `.env.example` has placeholder fields.
+- Backend dispatches structured JSON to Make when:
+  - staff alert tool runs
+  - customer notice tool runs
+  - crisis response tool runs
+  - any agent run completes
+- Verified on 2026-05-20:
+  - backend health says `make_webhook: configured`
+  - live agent run sent Make webhook
+  - Make returned `200 Accepted`
+- For deployed backend, add `MAKE_WEBHOOK_URL` as a backend environment variable.
 
-16. Make.com Status
-- There is no native Make.com plugin in this environment.
-- Carl cannot directly inspect Make internals unless using browser screenshots/session or Make execution logs.
-- Make can still connect through webhooks and HTTP calls.
-- Current Make screenshot shows:
-  - Webhook
-  - HTTP GET Supabase menu_items
-  - Google Gemini AI
-  - HTTP POST Supabase menu_items upsert
-- Best role for Make: external signal collector / cloud workflow proof, not the main agent brain.
+15. Slack and WhatsApp Status
+- Slack webhook support is not fully implemented yet, but Make can forward MenuMind events to Slack.
+- Direct Slack webhook would need `SLACK_WEBHOOK_URL` from a Slack app/workspace.
+- WhatsApp Cloud API was attempted by user but OTP/verification failed.
+- Skip WhatsApp for now; use Make as future bridge to WhatsApp when Meta verification works.
+- WhatsApp would require Meta access token, phone number ID, and verified recipient/test number.
 
-17. Recommended Make Integration
-- Preferred Make -> MenuMind flow:
-  1. Make Custom Webhook receives a supplier/weather/event/competitor signal.
-  2. Make HTTP module calls public/deployed MenuMind `POST /signals`.
-  3. Make HTTP module calls `POST /agent/run/{signal_id}`.
-  4. Make reads `GET /agent/runs/{run_id}`, `/trace`, `/menu/before-after/{run_id}`, `/notifications`, or `/approvals`.
-- Make cannot call `localhost`; expose FastAPI through deployment or a demo tunnel.
-- Stable inbound payload:
-  - `source_type`: supplier/weather/competitor/event/manual.
-  - `raw_text`: the messy signal text.
-  - Optional metadata can stay in Make/Supabase logs.
-- For hackathon demo, local FastAPI remains the real autonomous agent. Make/Supabase can be shown as external automation proof.
+16. Supabase Status
+- Supabase project exists and was previously connected/inspected through Supabase MCP.
+- Project: MenuMind, region was noted as `ap-south-1`.
+- Cloud tables existed:
+  - `menu_items`
+  - `agent_logs`
+  - `pending_approvals`
+- A unique constraint on `menu_items.name` was added earlier for Make upsert.
+- Current FastAPI backend still uses SQLite locally unless `DATABASE_URL` is set.
+- Current local SQLAlchemy schema differs from the earlier Supabase tables.
+- Do not point backend to Supabase until schemas are migrated/aligned.
+- RLS was noted as disabled earlier; fix before any public production use.
 
-18. Mobile App / APK Requirement
-- Challenge notes say a working prototype with mobile app is mandatory.
-- Current app is mobile-first React and has PWA support.
-- Best 48-hour APK path: Capacitor Android wrapper around existing Vite app.
-- Do not rewrite in Expo or FlutterFlow now; that creates too much risk.
-- PWA remains backup evidence, not the strongest APK proof.
-- `API_URL` is configurable through frontend `VITE_API_URL` because `localhost` inside an APK means the phone, not the laptop.
-- For Android emulator use `http://10.0.2.2:8000`.
-- For physical phone use laptop LAN IP, e.g. `http://192.168.x.x:8000`, same Wi-Fi.
+17. Weather Integration
+- Backend includes no-key Open-Meteo weather context.
+- Agent traces include weather context during observe/reasoning.
+- Weather affects planning for heatwave/event demand and risk interpretation.
+- No paid weather API is required for the current demo.
 
-19. Clean Demo Scenarios
-- Supply shock:
-  - Signal: Roman Urdu chicken delivery failure.
-  - Expected: hide Chicken Wrap if stock low, promote Beef Wrap, staff alert.
-- Heatwave:
-  - Signal: Islamabad 44C heat advisory.
-  - Expected: promote Iced Mint Lemonade, staff prep alert.
-- Competitor price attack:
-  - Signal: competitor drops burger price.
-  - Expected: avoid destructive price war, promote/discount within safe limits.
-- Crisis guardrail:
-  - Signal: strike/blocked roads/delivery freeze.
-  - Expected: no surge pricing, approval required.
-- Contradiction:
-  - Signal: supplier says unavailable but inventory buffer exists.
-  - Expected: conserve availability or extend prep time.
-- Marathon/event:
-  - Signal: G-13 marathon or hot event near cafe.
-  - Expected: promote healthy cold drink, staff alert, strategic advice.
+18. WebSocket Decision
+- No real WebSocket is implemented.
+- Current behavior: frontend polls every few seconds for updates.
+- WebSocket difference:
+  - polling = browser asks backend repeatedly
+  - WebSocket = backend pushes instantly to browser
+- WebSocket is nice but not required for the hackathon demo.
+- Adding it means extra deployment/debug work and is lower priority than APK/deployment stability.
 
-20. Verification Already Done
-- Backend Python compile passes.
-- Frontend production build passes.
-- Browser UI check passes.
-- Live Gemini REST smoke test returned real plan.
-- Browser live run verified `Planner: Gemini live`.
-- Local UI displays Business Insight, Impact, Primary Action, Recommended Actions, Menu Changes, Messages, Audit Trace.
-- Supabase MCP connection verified.
+19. Mobile / APK Plan
+- Mobile APK is still pending.
+- Current frontend is responsive and can be wrapped later.
+- Important: APK cannot call `localhost` for backend unless backend runs on the phone.
+- Real APK should call deployed backend URL:
+  `NEXT_PUBLIC_API_URL=https://your-backend-url`
+- Recommended path:
+  1. Deploy backend to Render/Railway/Fly with env vars.
+  2. Deploy or build frontend with `NEXT_PUBLIC_API_URL` pointing to backend.
+  3. Decide APK wrapper approach.
+- Capacitor is still likely path, but Next static export/dynamic routes must be handled carefully.
+- If APK becomes urgent, simplest fallback is PWA proof plus Android wrapper after removing/downgrading dynamic Next routes.
 
-21. Current Known Risks
-- Make.com internals cannot be inspected without browser/session/log screenshots.
-- Supabase RLS is disabled; do not treat current cloud tables as production-secure.
-- Local and Supabase schemas differ.
-- APK not yet generated.
-- Backend must be reachable from APK/mobile device.
-- API keys previously appeared in chat/screenshots; rotate exposed keys before public sharing.
+20. Deployment Notes
+- Vercel should host frontend only.
+- FastAPI backend should be hosted separately, e.g. Render/Railway/Fly.
+- Frontend env:
+  - `NEXT_PUBLIC_API_URL=https://your-backend-domain`
+- Backend env:
+  - `GEMINI_API_KEY=...`
+  - `GEMINI_MODEL=gemini-2.5-flash`
+  - `GEMINI_TIMEOUT_SECONDS=35`
+  - `MAKE_WEBHOOK_URL=https://hook.eu1.make.com/...`
+  - optional `DATABASE_URL=...`
+- Never put Gemini key, service role key, Slack webhook, or WhatsApp token in frontend env.
 
-22. How To Run Locally
+21. Important Problems Already Fixed
+- Replaced fake/static-feeling frontend logic with real backend agent calls.
+- Removed dependency on dummy `localhost:3001` API.
+- Fixed uploaded frontend merge conflicts in package files.
+- Restored backend after teammate force-pushed and deleted backend from GitHub.
+- Pushed restored backend + integrated Next frontend to GitHub.
+- Added real backend auth, settings, analytics, audit, and Make webhook dispatch.
+- Verified frontend build succeeds.
+- Verified backend compile succeeds.
+- Verified local backend health works.
+- Verified live agent run works and Make receives webhook.
+- Reduced code/context noise earlier via ignore files and cleanup.
+
+22. GitHub / Commits
+- Repository: `https://github.com/ImmadMansoor/autonomous-agent-system.git`
+- Important commits:
+  - `e188819 Add real auth analytics settings and Make webhook`
+  - `93b86a6 Restore backend and integrate Next frontend`
+  - `538e664 Remove tracked Python cache files`
+  - `be4afd5 Remove obsolete root scaffold`
+  - `cb82e3c Add MenuMind autonomous agent prototype`
+  - `eec6a12 feat(backend): implement async execution, tool validation, and robust error handling`
+- Current main branch is pushed after the auth/analytics/Make changes.
+
+23. Local Run Commands
 - Backend:
   `cd backend`
   `python -m pip install -r requirements.txt`
@@ -256,41 +290,77 @@ Purpose of this file
   `cd frontend`
   `npm install`
   `npm run dev`
-- Health:
-  Open `http://127.0.0.1:8000/health`.
-- UI:
-  Open `http://127.0.0.1:5173/`.
+- Open:
+  - Backend health: `http://127.0.0.1:8000/health`
+  - Frontend: `http://127.0.0.1:5173/`
 
-23. How To Build Frontend
-- `cd frontend`
-- `npm run build`
-- Output goes to `frontend/dist`.
+24. Current Verification Snapshot
+- Backend compile: passed.
+- Frontend build: passed.
+- Health endpoint: `status: ok`, planner `gemini`, model `gemini-2.5-flash`, Make webhook configured.
+- Auth smoke test: signup created a user and token.
+- Settings smoke test: notification settings returned from backend.
+- Analytics smoke test: interpretation returned latest run insight.
+- Audit smoke test: audit log returned stored trace count.
+- Make smoke test: live run returned Make trace output `{"status":"sent","target":"make","status_code":200,"body":"Accepted"}`.
 
-24. How To Build APK Next
-- Add configurable API URL first.
-- Install Capacitor packages in `frontend`.
-- Create `capacitor.config`.
-- Build Vite.
-- Add Android platform.
-- Sync Capacitor.
-- Build debug APK with Android Studio or Gradle.
-- Test on emulator or phone using reachable backend URL.
+25. Clean Demo Scenarios
+- Marathon/event:
+  - Input: marathon near G-13 with warm weather.
+  - Expected: promote hydration/healthy cold drinks, prepare staff/stock, produce strategic advice.
+- Supplier shock:
+  - Input: chicken delivery failed.
+  - Expected: update availability or prep time based on stock, alert staff, suggest substitute.
+- Heatwave:
+  - Input: 43C/44C heatwave near restaurant.
+  - Expected: promote Iced Mint Lemonade or cold drinks, staff prep alert.
+- Competitor price attack:
+  - Input: nearby cafe cuts prices.
+  - Expected: margin-aware promotion, not reckless price war.
+- Crisis guardrail:
+  - Input: flood/strike/road blockage.
+  - Expected: no surge pricing, approval required, customer/staff message.
+- Contradiction:
+  - Input: supplier says unavailable but inventory has buffer.
+  - Expected: conserve/extend prep time instead of unnecessary hiding.
 
-25. Collaboration Notes
-- Carl: current coding agent / implementation lead.
-- Matt: mobile APK reviewer; recommends Capacitor Android.
-- Gemini: Make/Supabase reviewer; recommends Make as external signal collector, not brain.
-- Carb: documentation reviewer; recommends compact source-of-truth history under 1000 lines.
-- Future docs should use `Carl:` when recording this assistant's ideas in cross-model brainstorming.
+26. Current Known Risks
+- `.env` contains local secrets and is not committed; deployment env must be set manually.
+- Supabase schema is not yet aligned with backend schema.
+- Supabase RLS/security needs review before public production.
+- WhatsApp verification failed; skip for demo.
+- No WebSocket yet; polling is stable.
+- APK not built yet.
+- Some UI pages are now backed by real endpoints but still simple in depth.
+- Uploaded folder `autonomous-agent-system-main (4)` and zip are local artifacts and should not be committed unless needed.
+- Some unrelated local markdown/UI working-tree changes may exist; avoid committing them without review.
 
-26. Rules For Future AI Sessions
-- Read `AGENTS.md` first, then this file, then only relevant runtime files.
-- Do not read PDFs, screenshots, logs, databases, `node_modules`, `.venv`, or `dist` unless specifically needed.
-- Preserve the working signal -> planner -> policy -> tools -> state -> trace -> UI loop.
-- Keep safety fallback, but label it honestly.
-- Do not reintroduce frontend hardcoded planning.
-- Do not pivot architecture unless user explicitly asks.
-- Prefer small verified fixes.
-- Run backend compile and frontend build after code changes.
-- For Supabase tasks, use Supabase MCP and surface RLS risks.
-- For Make tasks, use webhook tests, screenshots, and Supabase results because no native Make plugin exists.
+27. Recommended Next Steps
+- High priority:
+  1. Deploy FastAPI backend to Render/Railway/Fly.
+  2. Set backend env vars: Gemini key and Make webhook.
+  3. Deploy frontend to Vercel with `NEXT_PUBLIC_API_URL` pointing to backend.
+  4. Test live hosted flow end-to-end.
+  5. Prepare APK/PWA plan based on deployed backend URL.
+- Medium priority:
+  1. Align Supabase schema with SQLAlchemy if cloud DB is required.
+  2. Add Slack webhook via Make or direct `SLACK_WEBHOOK_URL`.
+  3. Add daily/hourly analytics rollups.
+  4. Improve auth security if public users will use it.
+- Low priority:
+  1. Add WebSocket/SSE for instant updates.
+  2. Add WhatsApp once Meta verification works.
+  3. Add more premium UI animations only after deployment is stable.
+
+28. Rules For Future AI Sessions
+- Read `AGENTS.md`, then this file, then only relevant code.
+- Do not load PDFs/screenshots/old brainstorm files unless specifically needed.
+- Do not reintroduce hardcoded frontend planning.
+- Keep Gemini planner server-side.
+- Keep fallback planner honest and trace-labeled.
+- Preserve policy guardrails.
+- Do not put secrets in frontend or Git.
+- Run `python -m compileall backend` after backend edits.
+- Run `npm run build` in `frontend` after frontend edits.
+- Prefer small verified changes over architecture pivots.
+- In shared docs, refer to this assistant as Carl, not Codex.

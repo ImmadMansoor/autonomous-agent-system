@@ -64,9 +64,9 @@
   --background: #f7f9fb;
   --on-background: #191c1e;
 
-  /* Typography */
-  --font-headline: "Segoe UI", Arial, sans-serif;
-  --font-body: "Segoe UI", Arial, sans-serif;
+  /* Typography - defined in layout.tsx via next/font */
+  /* --font-headline is set by Plus_Jakarta_Sans */
+  /* --font-body is set by Inter */
 
   /* Typography Sizes */
   --font-size-label-md: 12px;

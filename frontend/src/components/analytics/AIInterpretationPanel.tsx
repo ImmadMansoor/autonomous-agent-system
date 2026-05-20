@@ -292,7 +292,7 @@ export function AIInterpretationPanel({
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.MD }}>
             {activeRecommendations.map((rec) => {
-              const Icon = typeIcons[rec.type];
+              const Icon = typeIcons[rec.type] || Lightbulb;
               return (
                 <motion.div
                   key={rec.id}
