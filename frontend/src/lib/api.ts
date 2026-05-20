@@ -48,6 +48,15 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   return response.json();
 }
 
+async function optionalRequest<T>(endpoint: string, fallback: T): Promise<T> {
+  try {
+    return await request<T>(endpoint);
+  } catch (error) {
+    console.warn(`Optional API request failed: ${endpoint}`, error);
+    return fallback;
+  }
+}
+
 function parseDecision(run: AnyRecord | null): AnyRecord {
   if (!run?.final_decision) return {};
   try {
@@ -79,13 +88,13 @@ function menuStatus(item: AnyRecord): string {
 }
 
 async function getFullRun(runId: number): Promise<AnyRecord> {
-  const [run, trace, diff, approvals, notifications, menu] = await Promise.all([
-    request<AnyRecord>(`/agent/runs/${runId}`),
-    request<AnyRecord[]>(`/agent/runs/${runId}/trace`),
-    request<AnyRecord>(`/menu/before-after/${runId}`),
-    request<AnyRecord[]>(`/approvals?run_id=${runId}`),
-    request<AnyRecord[]>(`/notifications?run_id=${runId}`),
-    request<AnyRecord[]>('/menu'),
+  const run = await request<AnyRecord>(`/agent/runs/${runId}`);
+  const [trace, diff, approvals, notifications, menu] = await Promise.all([
+    optionalRequest<AnyRecord[]>(`/agent/runs/${runId}/trace`, []),
+    optionalRequest<AnyRecord>(`/menu/before-after/${runId}`, { before: {}, after: {}, changes: [] }),
+    optionalRequest<AnyRecord[]>(`/approvals?run_id=${runId}`, []),
+    optionalRequest<AnyRecord[]>(`/notifications?run_id=${runId}`, []),
+    optionalRequest<AnyRecord[]>('/menu', []),
   ]);
 
   lastRun = { run, trace, diff, approvals, notifications, menu, plan: parseDecision(run) };

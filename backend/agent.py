@@ -22,8 +22,8 @@ PUBLIC_STRESS_KEYWORDS = [
 def log_trace(db: Session, run_id: int, step: str, message: str):
     trace = models.AgentTrace(
         agent_run_id=run_id,
-        step=step,
-        message=message
+        step=str(step or "agent"),
+        message=str(message or "")
     )
     db.add(trace)
     db.commit()

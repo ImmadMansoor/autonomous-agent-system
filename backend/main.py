@@ -183,9 +183,20 @@ def seeded_menu(chicken_stock: int):
         ))
     return rows
 
+def ensure_demo_menu(db: Session):
+    if db.query(models.MenuItem).count() == 0:
+        db.add_all(seeded_menu(chicken_stock=50))
+        db.commit()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all for local dev (http://localhost:5173, etc)
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app|https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -202,6 +213,14 @@ def health_check():
         "timeout_seconds": GEMINI_TIMEOUT_SECONDS,
         "make_webhook": "configured" if os.environ.get("MAKE_WEBHOOK_URL") else "not_configured",
     }
+
+@app.on_event("startup")
+def seed_demo_data_on_startup():
+    db = next(get_db())
+    try:
+        ensure_demo_menu(db)
+    finally:
+        db.close()
 
 @app.post("/auth/signup", response_model=schemas.AuthResponse)
 def signup(payload: schemas.SignupRequest, db: Session = Depends(get_db)):
@@ -315,6 +334,7 @@ def toggle_2fa(payload: dict, user: models.UserAccount = Depends(current_user), 
 
 @app.get("/menu", response_model=list[schemas.MenuItem])
 def read_menu(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    ensure_demo_menu(db)
     items = db.query(models.MenuItem).offset(skip).limit(limit).all()
     return items
 
@@ -344,6 +364,7 @@ def list_signals(limit: int = 25, db: Session = Depends(get_db)):
 
 @app.post("/agent/run/{signal_event_id}")
 def run_agent(signal_event_id: int, db: Session = Depends(get_db)):
+    ensure_demo_menu(db)
     run_id = agent.run_agent_pipeline(signal_event_id, db)
     if not run_id:
         raise HTTPException(status_code=404, detail="Signal event not found")
@@ -357,10 +378,22 @@ def get_run(run_id: int, db: Session = Depends(get_db)):
 def list_runs(limit: int = 25, db: Session = Depends(get_db)):
     return db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).limit(limit).all()
 
-@app.get("/agent/runs/{run_id}/trace", response_model=list[schemas.AgentTrace])
+@app.get("/agent/runs/{run_id}/trace")
 def get_trace(run_id: int, db: Session = Depends(get_db)):
     traces = db.query(models.AgentTrace).filter(models.AgentTrace.agent_run_id == run_id).all()
-    return traces
+    return [
+        {
+            "id": trace.id,
+            "agent_run_id": trace.agent_run_id,
+            "step": trace.step or "agent",
+            "message": trace.message or "",
+            "tool_name": trace.tool_name,
+            "tool_input_json": trace.tool_input_json,
+            "tool_output_json": trace.tool_output_json,
+            "created_at": trace.created_at or datetime.utcnow(),
+        }
+        for trace in traces
+    ]
 
 @app.get("/menu/before-after/{run_id}")
 def get_before_after(run_id: int, db: Session = Depends(get_db)):
