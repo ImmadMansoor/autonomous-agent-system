@@ -55,36 +55,20 @@ export default function PlannerPage() {
   
   const [latestRun, setLatestRun] = useState<any | null>(null);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
+  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const saved = localStorage.getItem('menumind_completed_ops_tasks');
+      return saved ? JSON.parse(saved) : {};
+    } catch (err) {
+      console.error('Failed to load completed tasks from localStorage', err);
+      return {};
+    }
+  });
   const activeRunId = latestRun?.run?.id ? String(latestRun.run.id) : 'no-run';
   
   // Custom signal input fields to run pipeline directly from Planner
   const [customSignal, setCustomSignal] = useState('');
-  // Load completed tasks state from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('menumind_completed_ops_tasks');
-        if (saved) {
-          setCompletedTasks(JSON.parse(saved));
-        }
-      } catch (err) {
-        console.error('Failed to load completed tasks from localStorage', err);
-      }
-    }
-  }, []);
-
-  // Save completed tasks state to localStorage
-  const persistCompletedTasks = (updated: Record<string, boolean>) => {
-    setCompletedTasks(updated);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('menumind_completed_ops_tasks', JSON.stringify(updated));
-      } catch (err) {
-        console.error('Failed to save completed tasks to localStorage', err);
-      }
-    }
-  };
 
   // Main data loader function
   const loadData = useCallback(async (showLoading = true) => {
@@ -92,18 +76,13 @@ export default function PlannerPage() {
       if (showLoading) setIsLoading(true);
       setError(null);
 
-      // Fetch the latest run trace and all signals in parallel
-      const [runData, allSignals] = await Promise.all([
-        api.operations.getLatestRun(),
-        api.operations.getSignals()
-      ]);
+      // getLatestRun hydrates trace, approvals, notifications, menu diff, and matching signal text.
+      const runData = await api.operations.getLatestRun();
 
       if (runData) {
         setLatestRun(runData);
         
-        // Find matching signal event text to pass to theme analyzer
-        const matchingSignal = allSignals.find(s => Number(s.id) === Number(runData.run?.signal_event_id));
-        const signalText = matchingSignal?.message || '';
+        const signalText = runData.signalText || runData.signal?.raw_text || '';
 
         // Extract before/after state changes
         const changes = runData.diff?.changes || [];
@@ -140,11 +119,20 @@ export default function PlannerPage() {
   // Handle task checklist tick
   const handleToggleTask = (taskId: string) => {
     const scopedTaskId = `${activeRunId}:${taskId}`;
-    const updated = {
-      ...completedTasks,
-      [scopedTaskId]: !completedTasks[scopedTaskId]
-    };
-    persistCompletedTasks(updated);
+    setCompletedTasks((current) => {
+      const updated = {
+        ...current,
+        [scopedTaskId]: !current[scopedTaskId]
+      };
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('menumind_completed_ops_tasks', JSON.stringify(updated));
+        } catch (err) {
+          console.error('Failed to save completed tasks to localStorage', err);
+        }
+      }
+      return updated;
+    });
   };
 
   // Run a signal pipeline E2E right from the Planner
