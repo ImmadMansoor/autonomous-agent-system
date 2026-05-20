@@ -31,6 +31,7 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "icon": ["icons/icon.ico"],
     "publisher": "MenuMind",
     "shortDescription": "Autonomous cafe operations agent",
     "longDescription": "MenuMind turns restaurant signals into operational recommendations, menu actions, and audit traces."
