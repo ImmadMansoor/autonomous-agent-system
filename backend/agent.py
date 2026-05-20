@@ -162,6 +162,17 @@ def log_strategic_intelligence(db: Session, run_id: int, plan):
             f"Estimated extra units {projection.get('estimated_extra_units', 0)}, estimated profit {projection.get('estimated_profit_pkr', 0)} PKR.",
         )
 
+def plan_trace_summary(plan_dict: dict) -> str:
+    primary_action = plan_dict.get("primary_action") or {}
+    action_tool = primary_action.get("tool") or "no direct tool action"
+    signal_summary = plan_dict.get("signal_summary") or plan_dict.get("insight") or "Agent plan prepared"
+    recommended = plan_dict.get("recommended_actions") or []
+    approval = "requires approval" if plan_dict.get("requires_approval") else "safe to execute"
+    return (
+        f"{signal_summary} Primary action: {str(action_tool).replace('_', ' ')}. "
+        f"Recommendations: {len(recommended)}. Policy status: {approval}."
+    )
+
 def execute_action(db: Session, run_id: int, action, requires_approval: bool):
     if not action:
         return
@@ -257,7 +268,7 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
         log_trace(db, agent_run.id, "policy_guard", "Action is within safe bounds. Proceeding.")
         
     plan_dict = plan.dict() if hasattr(plan, "dict") else plan.model_dump()
-    log_trace(db, agent_run.id, "plan", f"Formulated execution plan: {json.dumps(plan_dict)}")
+    log_trace(db, agent_run.id, "plan", plan_trace_summary(plan_dict))
 
     # Execute plan safely
     run_failed = False

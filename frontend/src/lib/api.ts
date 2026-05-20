@@ -1,4 +1,18 @@
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const getApiBase = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return 'https://menumind-backend.onrender.com';
+    }
+  }
+  return 'http://127.0.0.1:8000';
+};
+
+const API_BASE = getApiBase().replace(/\/$/, '');
+
 
 type AnyRecord = Record<string, any>;
 type NotificationSettings = {
@@ -87,6 +101,54 @@ function menuStatus(item: AnyRecord): string {
   return 'FIXED';
 }
 
+function categoryForTrace(step = ''): string {
+  const value = step.toLowerCase();
+  if (value.includes('price') || value.includes('policy') || value.includes('approval')) return 'Pricing Logic';
+  if (value.includes('inventory') || value.includes('tool') || value.includes('menu')) return 'Inventory';
+  if (value.includes('staff')) return 'Staffing';
+  if (value.includes('campaign') || value.includes('recommendation') || value.includes('bundle')) return 'Upsell Engine';
+  return 'Demand Forecast';
+}
+
+function titleForTrace(step = ''): string {
+  return step.replaceAll('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase()) || 'Agent Step';
+}
+
+function formatAction(action: AnyRecord | null | undefined): string {
+  if (!action?.tool) return 'No direct tool action';
+  const tool = String(action.tool).replaceAll('_', ' ');
+  const item = action.args?.item_id ? ` for ${String(action.args.item_id).replaceAll('_', ' ')}` : '';
+  return `${tool}${item}`;
+}
+
+function summarizeTraceMessage(trace: AnyRecord, plan: AnyRecord): string {
+  const step = String(trace.step || '').toLowerCase();
+  const message = String(trace.message || '');
+
+  if (step === 'plan') {
+    return [
+      plan.signal_summary || plan.insight || 'Execution plan prepared.',
+      `Primary action: ${formatAction(plan.primary_action)}.`,
+      plan.requires_approval ? 'Human approval required.' : 'Safe to execute.',
+    ].filter(Boolean).join(' ');
+  }
+
+  if (message.startsWith('Formulated execution plan:')) {
+    return [
+      plan.signal_summary || 'Execution plan prepared.',
+      `Primary action: ${formatAction(plan.primary_action)}.`,
+      `Recommendations: ${(plan.recommended_actions || []).length}.`,
+    ].join(' ');
+  }
+
+  return message.replace(/^\[Action \d+\]\s*/, '').replace(/^\[Task \d+\]\s*/, '');
+}
+
+function runConfidence(plan: AnyRecord): number {
+  const confidence = Number(plan?.confidence ?? 0.82);
+  return Math.max(0, Math.min(100, Math.round(confidence * 100)));
+}
+
 async function getFullRun(runId: number): Promise<AnyRecord> {
   const run = await request<AnyRecord>(`/agent/runs/${runId}`);
   const [trace, diff, approvals, notifications, menu] = await Promise.all([
@@ -94,6 +156,23 @@ async function getFullRun(runId: number): Promise<AnyRecord> {
     optionalRequest<AnyRecord>(`/menu/before-after/${runId}`, { before: {}, after: {}, changes: [] }),
     optionalRequest<AnyRecord[]>(`/approvals?run_id=${runId}`, []),
     optionalRequest<AnyRecord[]>(`/notifications?run_id=${runId}`, []),
+    optionalRequest<AnyRecord[]>('/menu', []),
+  ]);
+
+  lastRun = { run, trace, diff, approvals, notifications, menu, plan: parseDecision(run) };
+  return lastRun;
+}
+
+async function getLatestRunWithTrace(): Promise<AnyRecord | null> {
+  const runs = await request<AnyRecord[]>('/agent/runs?limit=1');
+  const run = runs[0];
+  if (!run) return null;
+
+  const [trace, diff, approvals, notifications, menu] = await Promise.all([
+    optionalRequest<AnyRecord[]>(`/agent/runs/${run.id}/trace`, []),
+    optionalRequest<AnyRecord>(`/menu/before-after/${run.id}`, { before: {}, after: {}, changes: [] }),
+    optionalRequest<AnyRecord[]>(`/approvals?run_id=${run.id}`, []),
+    optionalRequest<AnyRecord[]>(`/notifications?run_id=${run.id}`, []),
     optionalRequest<AnyRecord[]>('/menu', []),
   ]);
 
@@ -182,14 +261,15 @@ export const api = {
     },
     createSignal: runSignalFlow,
     getReasoning: async () => {
-      const cached = await latestRunOrEmpty();
+      const cached = (await latestRunOrEmpty()) || (await getLatestRunWithTrace());
       if (!cached?.trace?.length) return [];
-      return cached.trace.slice(-8).map((t: AnyRecord) => ({
+      const plan = cached.plan || {};
+      return cached.trace.slice(-10).reverse().map((t: AnyRecord) => ({
         id: String(t.id),
-        type: t.step,
-        title: String(t.step || 'agent').replaceAll('_', ' '),
-        description: t.message,
-        confidence: Math.round((cached.plan?.confidence || 0.82) * 100),
+        type: categoryForTrace(t.step),
+        title: titleForTrace(t.step),
+        description: summarizeTraceMessage(t, plan),
+        confidence: runConfidence(plan),
         timestamp: t.created_at,
       }));
     },
