@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, 
+  CheckSquare,
   CheckCircle, 
   BarChart3, 
   Package,
@@ -19,6 +20,7 @@ import { useAuth } from '@/lib/auth';
 
 const mainNavItems = [
   { icon: <LayoutDashboard size={20} />, label: 'Operations', href: '/' },
+  { icon: <CheckSquare size={20} />, label: 'Planner', href: '/planner' },
   { icon: <CheckCircle size={20} />, label: 'Approvals', href: '/approvals' },
   { icon: <ClipboardList size={20} />, label: 'Audit Log', href: '/audit-log' },
   { icon: <BarChart3 size={20} />, label: 'Intelligence', href: '/analytics' },

@@ -2,10 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, CheckCircle, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, CheckCircle, BarChart3, Settings } from 'lucide-react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Ops', href: '/', activeIcon: true },
+  { icon: CheckSquare, label: 'Planner', href: '/planner', activeIcon: false },
   { icon: CheckCircle, label: 'Approve', href: '/approvals', activeIcon: false },
   { icon: BarChart3, label: 'Intel', href: '/analytics', activeIcon: false },
   { icon: Settings, label: 'Settings', href: '/settings', activeIcon: false },

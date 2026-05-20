@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sidebar, Navbar, MobileNav, AddSignalModal, ProtectedRoute } from '@/components/layout';
-import { SystemThroughput, SignalsFeed, AIInterpretationPanel } from '@/components/analytics';
+import { SystemThroughput, SignalsFeed, AIInterpretationPanel, BusinessImpact } from '@/components/analytics';
 import { STAGGER_CONTAINER } from '@/lib/animations';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 import { SPACING, COLORS, RADIUS, SHADOWS } from '@/lib/constants';
 import { Skeleton } from '@/components/skeletons';
 import { Plus } from 'lucide-react';
+import { api } from '@/lib/api';
 
 function AnalyticsSkeleton() {
   return (
@@ -88,6 +89,7 @@ function AnalyticsSkeleton() {
 
 export default function AnalyticsPage() {
   const [isSignalModalOpen, setIsSignalModalOpen] = useState(false);
+  const [latestRun, setLatestRun] = useState<any | null>(null);
   const {
     signals,
     selectedSignalId,
@@ -105,6 +107,27 @@ export default function AnalyticsPage() {
     stats,
     addSignal,
   } = useAnalyticsData();
+
+  useEffect(() => {
+    let isActive = true;
+    const fetchLatestRun = async () => {
+      try {
+        const runData = await api.operations.getLatestRun();
+        if (isActive) {
+          setLatestRun(runData);
+        }
+      } catch (err) {
+        console.error('Failed to load latest run in Analytics:', err);
+      }
+    };
+    
+    fetchLatestRun();
+    const interval = setInterval(fetchLatestRun, 8000);
+    return () => {
+      isActive = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <ProtectedRoute>
@@ -139,6 +162,9 @@ export default function AnalyticsPage() {
             >
             {/* System Throughput Section */}
             <SystemThroughput data={throughputData} />
+
+            {/* Business Impact Section */}
+            <BusinessImpact latestRun={latestRun} />
             
             {/* Two Column Content Grid */}
             <div style={{

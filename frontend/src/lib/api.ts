@@ -176,15 +176,27 @@ async function getFullRun(runId: number): Promise<AnyRecord> {
 
 async function hydrateRun(run: AnyRecord): Promise<AnyRecord> {
   const runId = run.id;
-  const [trace, diff, approvals, notifications, menu] = await Promise.all([
+  const [trace, diff, approvals, notifications, menu, signals] = await Promise.all([
     optionalRequest<AnyRecord[]>(`/agent/runs/${runId}/trace`, []),
     optionalRequest<AnyRecord>(`/menu/before-after/${runId}`, { before: {}, after: {}, changes: [] }),
     optionalRequest<AnyRecord[]>(`/approvals?run_id=${runId}`, []),
     optionalRequest<AnyRecord[]>(`/notifications?run_id=${runId}`, []),
     optionalRequest<AnyRecord[]>('/menu', []),
+    optionalRequest<AnyRecord[]>('/signals?limit=50', []),
   ]);
 
-  lastRun = { run, trace, diff, approvals, notifications, menu, plan: parseDecision(run) };
+  const signal = signals.find((item) => Number(item.id) === Number(run.signal_event_id)) || null;
+  lastRun = {
+    run,
+    trace,
+    diff,
+    approvals,
+    notifications,
+    menu,
+    signal,
+    signalText: signal?.raw_text || '',
+    plan: parseDecision(run),
+  };
   return lastRun;
 }
 
@@ -273,6 +285,7 @@ export const api = {
       return [...weatherSignal, ...current];
     },
     createSignal: runSignalFlow,
+    getLatestRun: getLatestRunWithTrace,
     getReasoning: async () => {
       const cached = (await latestRunOrEmpty()) || (await getLatestRunWithTrace());
       if (!cached?.trace?.length) return [];
