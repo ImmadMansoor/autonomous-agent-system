@@ -254,10 +254,12 @@ def execute_action(db: Session, run_id: int, action, requires_approval: bool):
         log_trace(db, run_id, "tool_call", f"Tool {tool_name} failed: {result.get('message')}")
     return result
 
-def run_agent_pipeline(signal_event_id: int, db: Session):
+def run_agent_pipeline(signal_event_id: int, db: Session, ai_preferences: dict | None = None):
     signal = db.query(models.SignalEvent).filter(models.SignalEvent.id == signal_event_id).first()
     if not signal:
         return
+    ai_preferences = ai_preferences or {}
+    decision_speed = str(ai_preferences.get("decisionSpeed") or "fast").lower()
     
     agent_run = models.AgentRun(signal_event_id=signal.id, status="running")
     db.add(agent_run)
@@ -282,10 +284,15 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
     planner_used = "unknown"
     if os.environ.get("GEMINI_API_KEY"):
         try:
-            planner = GeminiPlanner()
+            planner = GeminiPlanner(decision_speed=decision_speed)
             plan = planner.plan(signal.raw_text, before_state, weather_context)
-            planner_used = "gemini"
-            log_trace(db, agent_run.id, "interpret", "Gemini 2.5 Flash semantic planner produced structured plan.")
+            planner_used = f"gemini:{planner.model}"
+            log_trace(
+                db,
+                agent_run.id,
+                "interpret",
+                f"{planner.model} semantic planner produced structured plan in {decision_speed} mode.",
+            )
         except Exception as e:
             planner_used = "safety_fallback"
             log_trace(db, agent_run.id, "interpret", f"Semantic planner unavailable ({type(e).__name__}); safety fallback planner selected.")

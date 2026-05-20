@@ -68,7 +68,7 @@ DEFAULT_NOTIFICATIONS = {
     "weeklyDigest": True,
 }
 DEFAULT_AI_PREFERENCES = {
-    "autoApproveThreshold": 0.7,
+    "autoApproveThreshold": 70,
     "riskTolerance": "balanced",
     "decisionSpeed": "fast",
     "humanOverride": True,
@@ -149,6 +149,24 @@ def current_user(
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
+def optional_user_from_authorization(authorization: Optional[str], db: Session):
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return None
+    token = authorization.split(" ", 1)[1].strip()
+    if token == "demo-token":
+        return db.query(models.UserAccount).filter_by(email="demo@menumind.ai").first()
+    session = db.query(models.AuthSession).filter_by(token=token).first()
+    if not session:
+        return None
+    return db.query(models.UserAccount).filter_by(id=session.user_id).first()
+
+def load_ai_preferences_for_request(authorization: Optional[str], db: Session):
+    user = optional_user_from_authorization(authorization, db)
+    if not user:
+        return normalize_ai_preferences(DEFAULT_AI_PREFERENCES)
+    settings = get_or_create_settings(db, user.id)
+    return normalize_ai_preferences(load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES))
+
 def get_or_create_settings(db: Session, user_id: int):
     row = db.query(models.UserSetting).filter_by(user_id=user_id).first()
     if row:
@@ -171,6 +189,18 @@ def load_json(value: Optional[str], fallback: dict):
         return {**fallback, **json.loads(value)}
     except json.JSONDecodeError:
         return dict(fallback)
+
+def normalize_ai_preferences(preferences: dict):
+    current = dict(preferences)
+    try:
+        threshold = float(current.get("autoApproveThreshold", DEFAULT_AI_PREFERENCES["autoApproveThreshold"]))
+    except (TypeError, ValueError):
+        threshold = DEFAULT_AI_PREFERENCES["autoApproveThreshold"]
+    if 0 < threshold <= 1:
+        threshold *= 100
+    current["autoApproveThreshold"] = max(0, min(100, round(threshold)))
+    current["decisionSpeed"] = str(current.get("decisionSpeed") or "fast").lower()
+    return current
 
 def seeded_menu(chicken_stock: int):
     rows = []
@@ -328,13 +358,14 @@ def update_notification_settings(payload: dict, user: models.UserAccount = Depen
 @app.get("/settings/ai-preferences")
 def get_ai_preferences(user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
     settings = get_or_create_settings(db, user.id)
-    return load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES)
+    return normalize_ai_preferences(load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES))
 
 @app.put("/settings/ai-preferences")
 def update_ai_preferences(payload: dict, user: models.UserAccount = Depends(current_user), db: Session = Depends(get_db)):
     settings = get_or_create_settings(db, user.id)
     current = load_json(settings.ai_preferences_json, DEFAULT_AI_PREFERENCES)
     current.update(payload)
+    current = normalize_ai_preferences(current)
     settings.ai_preferences_json = json.dumps(current)
     db.commit()
     return current
@@ -400,9 +431,14 @@ def list_signals(limit: int = 25, db: Session = Depends(get_db)):
     return db.query(models.SignalEvent).order_by(models.SignalEvent.id.desc()).limit(limit).all()
 
 @app.post("/agent/run/{signal_event_id}")
-def run_agent(signal_event_id: int, db: Session = Depends(get_db)):
+def run_agent(
+    signal_event_id: int,
+    authorization: Optional[str] = Header(default=None),
+    db: Session = Depends(get_db),
+):
     ensure_demo_menu(db)
-    run_id = agent.run_agent_pipeline(signal_event_id, db)
+    ai_preferences = load_ai_preferences_for_request(authorization, db)
+    run_id = agent.run_agent_pipeline(signal_event_id, db, ai_preferences=ai_preferences)
     if not run_id:
         raise HTTPException(status_code=404, detail="Signal event not found")
     return {"status": "success", "agent_run_id": run_id}

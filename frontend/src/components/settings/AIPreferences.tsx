@@ -7,6 +7,19 @@ import { REVEAL_UP } from '@/lib/animations';
 import { RippleButton, useToast } from '@/components/layout';
 import { api } from '@/lib/api';
 
+const DECISION_SPEED_OPTIONS = [
+  { id: 'fast', label: 'Fast', model: 'Gemini 2.5 Flash' },
+  { id: 'balanced', label: 'Balanced', model: 'Gemini 2.5 Pro' },
+  { id: 'thorough', label: 'Thorough', model: 'Gemini 3 Flash Preview' },
+];
+
+function normalizeThreshold(value: unknown) {
+  const number = Number(value ?? 95);
+  if (!Number.isFinite(number)) return 95;
+  if (number > 0 && number <= 1) return Math.round(number * 100);
+  return Math.max(0, Math.min(100, Math.round(number)));
+}
+
 export function AIPreferences() {
   const { showToast } = useToast();
   const [preferences, setPreferences] = useState({
@@ -26,7 +39,7 @@ export function AIPreferences() {
       .then(res => {
         if (active) {
           setPreferences({
-            autoApproveThreshold: res.autoApproveThreshold ?? 95,
+            autoApproveThreshold: normalizeThreshold(res.autoApproveThreshold),
             riskTolerance: res.riskTolerance ?? 'medium',
             decisionSpeed: res.decisionSpeed ?? 'balanced',
             humanOverride: res.humanOverride ?? true,
@@ -216,26 +229,36 @@ export function AIPreferences() {
               </span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-sm)' }}>
-              {['fast', 'balanced', 'thorough'].map((speed) => (
+              {DECISION_SPEED_OPTIONS.map((option) => (
                 <button
-                  key={speed}
+                  key={option.id}
                   type="button"
-                  onClick={() => setPreferences({ ...preferences, decisionSpeed: speed })}
+                  onClick={() => setPreferences({ ...preferences, decisionSpeed: option.id })}
                   style={{
                     padding: 'var(--space-md)',
-                    background: preferences.decisionSpeed === speed ? 'var(--primary)' : 'var(--surface-container)',
-                    color: preferences.decisionSpeed === speed ? 'var(--on-primary)' : 'var(--on-surface)',
+                    background: preferences.decisionSpeed === option.id ? 'var(--primary)' : 'var(--surface-container)',
+                    color: preferences.decisionSpeed === option.id ? 'var(--on-primary)' : 'var(--on-surface)',
                     border: 'none',
                     borderRadius: 'var(--radius-lg)',
                     cursor: 'pointer',
                     fontFamily: 'var(--font-label)',
                     fontSize: 'var(--font-size-label-md)',
                     fontWeight: 600,
-                    textTransform: 'capitalize',
                     transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '2px',
                   }}
                 >
-                  {speed}
+                  <span>{option.label}</span>
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    opacity: 0.78,
+                  }}>
+                    {option.model}
+                  </span>
                 </button>
               ))}
             </div>

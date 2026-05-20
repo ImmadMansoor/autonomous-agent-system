@@ -14,11 +14,29 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_TIMEOUT_SECONDS = int(os.environ.get("GEMINI_TIMEOUT_SECONDS", "35"))
 GEMINI_ENDPOINT = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+GEMINI_SPEED_PROFILES = {
+    "fast": {
+        "model": os.environ.get("GEMINI_FAST_MODEL", "gemini-2.5-flash"),
+        "timeout_seconds": int(os.environ.get("GEMINI_FAST_TIMEOUT_SECONDS", "35")),
+    },
+    "balanced": {
+        "model": os.environ.get("GEMINI_BALANCED_MODEL", "gemini-2.5-pro"),
+        "timeout_seconds": int(os.environ.get("GEMINI_BALANCED_TIMEOUT_SECONDS", "60")),
+    },
+    "thorough": {
+        "model": os.environ.get("GEMINI_THOROUGH_MODEL", "gemini-3-flash-preview"),
+        "timeout_seconds": int(os.environ.get("GEMINI_THOROUGH_TIMEOUT_SECONDS", "90")),
+    },
+}
 
 if GEMINI_API_KEY:
     print(f"[SUCCESS] GEMINI_API_KEY loaded successfully. Using real AI ({GEMINI_MODEL}).")
 else:
     print("[WARNING] GEMINI_API_KEY NOT FOUND! Using safety fallback.")
+
+def get_gemini_profile(decision_speed: str | None = None) -> dict:
+    speed = (decision_speed or "fast").lower()
+    return GEMINI_SPEED_PROFILES.get(speed, GEMINI_SPEED_PROFILES["fast"])
 
 def action(tool: str, **args) -> PlannedAction:
     return PlannedAction(tool=tool, args=args)
@@ -58,7 +76,10 @@ def to_int(value, default=5):
     except (TypeError, ValueError):
         return default
 
-def call_gemini(prompt: str) -> str:
+def call_gemini(prompt: str, model: str | None = None, timeout_seconds: int | None = None) -> str:
+    active_model = model or GEMINI_MODEL
+    endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{active_model}:generateContent"
+    timeout = timeout_seconds or GEMINI_TIMEOUT_SECONDS
     payload = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -67,7 +88,7 @@ def call_gemini(prompt: str) -> str:
         },
     }
     request = urllib.request.Request(
-        GEMINI_ENDPOINT,
+        endpoint,
         data=json.dumps(payload).encode("utf-8"),
         headers={
             "Content-Type": "application/json",
@@ -76,7 +97,7 @@ def call_gemini(prompt: str) -> str:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=GEMINI_TIMEOUT_SECONDS) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
             data = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
@@ -408,6 +429,12 @@ Think critically like a business strategist.
 
 You MUST respond with ONLY valid JSON. No markdown, no explanation outside the JSON."""
 
+    def __init__(self, decision_speed: str | None = None):
+        self.decision_speed = (decision_speed or "fast").lower()
+        profile = get_gemini_profile(self.decision_speed)
+        self.model = profile["model"]
+        self.timeout_seconds = profile["timeout_seconds"]
+
     def _build_prompt(self, raw_signal: str, before_state: dict, weather_context: dict | None = None) -> str:
         menu_summary = ""
         for item_id, info in before_state.items():
@@ -538,9 +565,11 @@ Use null for primary_action when the signal needs clarification and no safe acti
 
         prompt = self._build_prompt(raw_signal, before_state, weather_context)
         try:
-            text = call_gemini(prompt).strip()
+            text = call_gemini(prompt, model=self.model, timeout_seconds=self.timeout_seconds).strip()
         except Exception as exc:
-            raise TimeoutError(f"Gemini planner request failed or timed out after {GEMINI_TIMEOUT_SECONDS} seconds") from exc
+            raise TimeoutError(
+                f"Gemini planner request failed or timed out after {self.timeout_seconds} seconds using {self.model}"
+            ) from exc
 
         # Strip markdown code blocks if present
         if text.startswith("```json"):
