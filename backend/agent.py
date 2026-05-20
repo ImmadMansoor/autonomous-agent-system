@@ -19,6 +19,8 @@ PUBLIC_STRESS_KEYWORDS = [
     "flood", "strike", "hartal", "blocked", "emergency", "protest",
 ]
 
+PROMOTION_KEYWORDS = ["promote", "promotion", "feature", "push", "highlight", "hydration", "marathon", "heat", "hot"]
+
 def log_trace(db: Session, run_id: int, step: str, message: str):
     trace = models.AgentTrace(
         agent_run_id=run_id,
@@ -173,6 +175,62 @@ def plan_trace_summary(plan_dict: dict) -> str:
         f"Recommendations: {len(recommended)}. Policy status: {approval}."
     )
 
+def infer_executable_action_from_strategy(db: Session, run_id: int, raw_signal: str, before_state: dict, plan):
+    if plan.primary_action or not before_state:
+        return plan
+
+    text = " ".join([
+        raw_signal,
+        plan.insight or "",
+        plan.reason or "",
+        " ".join(plan.recommended_actions or []),
+    ]).lower()
+    forecast = plan.demand_forecast or {}
+    priority_items = list(forecast.get("priority_items") or [])
+    priority_items.extend(
+        item_id
+        for bundle in (plan.bundle_recommendations or [])
+        for item_id in (bundle.get("items") or [])
+    )
+
+    selected_item = next(
+        (
+            item_id for item_id in priority_items
+            if item_id in before_state and before_state[item_id].get("available", True)
+        ),
+        None,
+    )
+    if not selected_item:
+        selected_item = next(
+            (
+                item_id for item_id, item in before_state.items()
+                if item.get("available", True)
+                and any(word in str(item.get("name", "")).lower() for word in ["lemonade", "iced", "juice", "smoothie", "mint"])
+            ),
+            None,
+        )
+
+    should_promote = any(keyword in text for keyword in PROMOTION_KEYWORDS) or forecast.get("overall_demand_lift_pct", 0) > 0
+    if selected_item and should_promote:
+        item_name = before_state[selected_item].get("name", selected_item)
+        reason = (
+            f"Inferred from strategic plan: promote {item_name} because demand forecast and recommendations "
+            "prioritize this item for the current signal."
+        )
+        plan.primary_action = PlannedAction(
+            tool="set_item_promotion",
+            args={"item_id": selected_item, "promoted": True, "reason": reason},
+        )
+        plan.simulated_execution = plan.simulated_execution or {}
+        plan.simulated_execution["after"] = f"Promote {item_name}"
+        plan.recommended_actions = [
+            f"Promote {item_name} as the primary operational action.",
+            *(plan.recommended_actions or []),
+        ]
+        log_trace(db, run_id, "action_inference", f"Converted recommendation into executable action: promote {item_name}.")
+
+    return plan
+
 def execute_action(db: Session, run_id: int, action, requires_approval: bool):
     if not action:
         return
@@ -241,6 +299,7 @@ def run_agent_pipeline(signal_event_id: int, db: Session):
 
     intelligence = build_strategic_intelligence(signal.raw_text, before_state, weather_context)
     plan = enrich_plan(plan, intelligence)
+    plan = infer_executable_action_from_strategy(db, agent_run.id, signal.raw_text, before_state, plan)
     plan = apply_policy_overrides(db, agent_run.id, signal.raw_text, before_state, plan)
 
     # Log extracted facts as reasoning chain
