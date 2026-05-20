@@ -9,12 +9,14 @@ When recording cross-model discussion in markdown, refer to this assistant as Ca
 - Product: MenuMind, Challenge 1 autonomous content-to-action agent.
 - Backend: `backend/main.py` FastAPI API, `backend/agent.py` pipeline, `backend/tools.py` tool registry.
 - Planner: `backend/llm_adapter.py` uses Gemini REST when available and a clearly labeled safety fallback when Gemini fails.
-- Frontend: `frontend/src/App.jsx` mobile-first React/Vite operations console.
-- Mobile: PWA exists, but the next target is a Capacitor Android APK.
+- Frontend: active app is Next.js under `frontend/src/app`; legacy `frontend/src/App.jsx` is not the live Vercel surface.
+- Live frontend: Vercel at `https://menumind-nu.vercel.app`.
+- Live backend: Render at `https://menumind-backend.onrender.com`.
+- Mobile: Capacitor files exist, but APK workflow still needs review because older docs/scripts mention Vite-era settings.
 
 ## Read Only When Needed
 
-- `PROJECT_HISTORY_A_TO_Z.txt` is the durable full handoff.
+- `PROJECT_HISTORY.md` is the durable compact project history.
 - `SHARED_PLAN.md` is the concise current plan.
 - `SHARED_BRAINSTORMING.md` is a short strategy summary, not a debate log.
 - Extracted PDF markdown files were compressed into summaries; use the PDFs only if exact challenge wording is needed.
