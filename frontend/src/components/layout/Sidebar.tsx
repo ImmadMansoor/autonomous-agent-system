@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
@@ -32,6 +32,7 @@ const bottomNavItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout } = useAuth();
 
   return (
@@ -169,7 +170,7 @@ export function Sidebar() {
           {...BUTTON_ANIMATION}
           onClick={() => {
             logout();
-            window.location.href = '/login';
+            router.push('/login');
           }}
           style={{
             display: 'flex',

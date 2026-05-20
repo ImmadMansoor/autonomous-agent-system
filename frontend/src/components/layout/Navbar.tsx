@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Bell, Activity, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 import { BUTTON_ANIMATION } from '@/lib/animations';
 import { useAuth } from '@/lib/auth';
@@ -19,6 +20,7 @@ export function Navbar({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string | number, message: string, time: string, read: boolean }>>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -29,12 +31,13 @@ export function Navbar({
         const readIds = typeof window !== 'undefined'
           ? JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]')
           : [];
+        const readIdsStrings = Array.isArray(readIds) ? readIds.map(String) : [];
         
         setNotifications(signals.slice(0, 5).map(s => ({
           id: s.id,
           message: s.message,
           time: new Date(s.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          read: readIds.includes(String(s.id)),
+          read: readIdsStrings.includes(String(s.id)),
         })));
       } catch (err) {
         console.error('Failed to load notifications:', err);
@@ -75,9 +78,10 @@ export function Navbar({
     if (typeof window !== 'undefined') {
       try {
         const readIds = JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]');
-        if (!readIds.includes(String(id))) {
-          readIds.push(String(id));
-          localStorage.setItem('menumind_read_notifications', JSON.stringify(readIds));
+        const readIdsStrings = Array.isArray(readIds) ? readIds.map(String) : [];
+        if (!readIdsStrings.includes(String(id))) {
+          readIdsStrings.push(String(id));
+          localStorage.setItem('menumind_read_notifications', JSON.stringify(readIdsStrings));
         }
       } catch (e) {
         console.error('Error saving read notification to localStorage:', e);
@@ -90,12 +94,13 @@ export function Navbar({
     if (typeof window !== 'undefined') {
       try {
         const readIds = JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]');
+        const readIdsStrings = Array.isArray(readIds) ? readIds.map(String) : [];
         notifications.forEach(n => {
-          if (!readIds.includes(String(n.id))) {
-            readIds.push(String(n.id));
+          if (!readIdsStrings.includes(String(n.id))) {
+            readIdsStrings.push(String(n.id));
           }
         });
-        localStorage.setItem('menumind_read_notifications', JSON.stringify(readIds));
+        localStorage.setItem('menumind_read_notifications', JSON.stringify(readIdsStrings));
       } catch (e) {
         console.error('Error saving read notifications to localStorage:', e);
       }
@@ -106,7 +111,7 @@ export function Navbar({
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    router.push('/login');
   };
 
   return (
