@@ -17,6 +17,7 @@ ios/
 .gradle/
 *.apk
 frontend/src-tauri/target/
+frontend/src-tauri/gen/
 
 artifacts/
 GITHUB REPO/
