@@ -378,7 +378,11 @@ export const api = {
           description: `${item.category} - ${item.prep_time_min} min prep - stock ${item.stock_level}`,
           price: item.current_price,
           basePrice: item.base_price,
-          image: '',
+          image: item.id === 'chicken_wrap' ? '/chicken_wrap.png' :
+                 item.id === 'beef_wrap' ? '/beef_wrap.png' :
+                 item.id === 'club_sandwich' ? '/club_sandwich.png' :
+                 item.id === 'iced_lemonade' ? '/iced_lemonade.png' :
+                 item.id === 'hot_coffee' ? '/hot_coffee.png' : '',
           status: menuStatus(item),
           aiStatus: item.is_promoted ? 'AI_MANAGED' : 'MANUAL',
           isManaged: true,
