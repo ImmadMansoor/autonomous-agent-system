@@ -1,0 +1,1387 @@
+﻿=== Google Antigravity Hackathon - Challenges.pdf pages 17 chars 20166 ===
+Challenge  1:  Autonomous  Content-to-Action  Agent  (Insight  ΓåÆ  Action  
+System)
+ 
+Challenge  Overview  
+In  todayΓÇÖs  world,  organizations  are  flooded  with  unstructured  information  ΓÇö  reports,  news,  
+dashboards,
+ 
+policy
+ 
+updates
+ 
+ΓÇö
+ 
+but
+ 
+most
+ 
+AI
+ 
+systems
+ 
+stop
+ 
+at
+ 
+summarization
+ 
+or
+ 
+analysis
+.
+ 
+Real-world  systems  must  go  further.  
+They  must:  ΓùÅ  understand  information  ΓùÅ  extract  insights  ΓùÅ  make  decisions  ΓùÅ  and  take  action  
+  
+Problem  Statement  
+Build  an  Agentic  AI  System  that  transforms  unstructured  content  into  actionable  outcomes .  
+Your  system  must:  1.  Ingest  unstructured  input  (text,  reports,  articles,  dashboards)  2.  Extract  key  insights  3.  Analyze  implications  4.  Generate  recommended  actions  5.  Simulate  execution  of  at  least  one  action  6.  Show  the  resulting  system  state  or  outcome  
+  
+Mandatory  Requirement:  Google  Antigravity  
+Teams  MUST  use  Google  Antigravity  as  the  core  development  platform  to:  ΓùÅ  orchestrate  agent  workflows  ΓùÅ  manage  reasoning  and  planning  ΓùÅ  integrate  tools/APIs  ΓùÅ  handle  execution  of  actions  
+Use  of  additional  LLMs  is  allowed,  but  Antigravity  must  be  central  to  system  logic .  
+  
+Example  Use  Cases  Teams  may  choose  any  domain  such  as:  ΓùÅ  Business  operations  ΓùÅ  Public  policy  ΓùÅ  Logistics  /  supply  chain  ΓùÅ  Financial  insights  ΓùÅ  News  analysis  ΓùÅ  Urban  systems  
+  
+Example  Scenario  1:  Business  Insight  
+Input:  A  sales  report  showing  declining  orders  in  a  region  
+Output:  Insight :  Orders  declined  by  25%  in  Lahore  Impact :  Revenue  loss  expected  Recommended  Action :  Launch  regional  discount  campaign  Simulated  Execution :  -  Campaign  created  -  Notification  generated  Result :  Projected  reach:  5,000  users  
+  
+Example  Scenario  2:  Policy  /  News  
+Input:  
+News  article  about  fuel  price  increase  
+Output:  Insight :  Fuel  prices  rising  Impact :  Delivery  costs  increasing  Recommended  Action :  Update  delivery  pricing  Simulated  Execution :  -  Pricing  table  updated  -  Customer  notification  drafted  Result :  New  delivery  cost  applied  in  checkout  simulation  
+  
+System  Requirements  
+Your  solution  must  include:  
+1.  Content  Understanding  ΓùÅ  Process  unstructured  input  (text,  PDF,  website,  new  article  etc.)  ΓùÅ  Extract  key  facts  and  signals  
+2.  Insight  Extraction  ΓùÅ  Identify  meaningful  patterns  or  insights  ΓùÅ  Avoid  generic  summarization  
+3.  Impact  Analysis  ΓùÅ  Explain  why  the  insight  matters  ΓùÅ  Connect  insight  to  real-world  consequences  
+4.  Action  Generation  ΓùÅ  Generate  clear,  actionable  recommendations  ΓùÅ  Must  be  realistic  and  domain-relevant  
+5.  Action  Simulation  (CRITICAL  REQUIREMENT)  
+You  must  simulate  execution  of  at  least  one  action .  
+Simulation  can  include:  ΓùÅ  Mock  API  call  ΓùÅ  Dashboard  update  ΓùÅ  CRM  /  spreadsheet  update  ΓùÅ  Notification  system  ΓùÅ  Email/SMS  generation  ΓùÅ  Workflow  trigger  
+6.  Outcome  Visualization  
+Show:  ΓùÅ  before  vs  after  state  ΓùÅ  logs  of  action  execution  ΓùÅ  resulting  system  change  
+  
+7.  Agentic  Workflow  Your  system  must  demonstrate:  ΓùÅ  multiple  agents  OR  structured  reasoning  steps  ΓùÅ  planning  and  execution  flow  ΓùÅ  traceable  decision-making  
+  
+Deliverables  Teams  must  submit:  1.  Working  Prototype  with  Mobile  App  (MUST)  and  Web  App  (Optional)  2.  Demo  Video  (3ΓÇô5  minutes)  Must  clearly  show:  ┬╖
+        
+input  ΓåÆ  insight  ΓåÆ  action  ΓåÆ  simulation  ΓåÆ  result  3.  Agent  Trace  /  Logs  from  Antigravity  ┬╖
+        
+Workplan  ┬╖
+        
+Tasks  Plan  ┬╖
+        
+reasoning  steps  ┬╖
+        
+decision  flow  ┬╖
+        
+action  execution  4.  Documentation  (README)  Include:  ┬╖
+        
+architecture  overview  ┬╖
+        
+tools/APIs  used  ┬╖
+        
+how  Antigravity  is  used  ┬╖
+        
+assumptions  
+  
+Evaluation  Criteria  1.  Use  of  Google  Antigravity  ΓÇö  25%  ┬╖
+        
+Antigravity  used  in  core  orchestration  ┬╖
+        
+Effective  handling  of  reasoning  and  tool  execution  ┬╖
+        
+Not  used  superficially  2.  Agentic  Reasoning  &  Workflow  ΓÇö  20%  ┬╖
+        
+Clear  multi-step  reasoning  ┬╖
+        
+Logical  flow:  insight  ΓåÆ  action  ΓåÆ  execution  ┬╖
+        
+Evidence  of  autonomy  3.  Insight  &  Decision  Quality  ΓÇö  20%  ┬╖
+        
+Insights  are  meaningful  and  non-trivial  ┬╖
+        
+Strong  reasoning  behind  actions  ┬╖
+        
+Outputs  are  structured  and  clear  4.  Action  Simulation  &  Outcome  ΓÇö  15%  ┬╖
+        
+Action  is  realistically  simulated  ┬╖
+        
+Clear  demonstration  of  system  state  change  ┬╖
+        
+End-to-end  execution  visible  5.  Technical  Implementation  ΓÇö  10%  ┬╖
+        
+Clean  architecture  ┬╖
+        
+Tool/API  integration  ┬╖
+        
+Robustness  and  handling  of  edge  cases  6.  Innovation  &  UX  ΓÇö  10%  ┬╖
+        
+Creative  approach  ┬╖
+        
+Intuitive  interface  ┬╖
+        
+Clear  and  compelling  demo  
+  
+Important  Guidelines  ΓùÅ  This  is  NOT  a  summarization  tool  ΓùÅ  Systems  must  demonstrate  action-oriented  intelligence  ΓùÅ  At  least  one  action  must  be  executed  in  simulation  ΓùÅ  Use  of  real-world  inspired  scenarios  is  encouraged  ΓùÅ  No  sensitive  or  real  personal  data  should  be  used  
+  
+ Challenge  2:  AI  Service  Orchestrator  for  Informal  Economy  
+Challenge  Overview  
+Informal  economy,  including  plumbers,  electricians,  tutors,  beauticians,  and  home  service  
+providers,
+ 
+operates
+ 
+largely
+ 
+through:
+ ΓùÅ  WhatsApp  messages  ΓùÅ  phone  calls  ΓùÅ  informal  referrals  
+This  results  in:  ΓùÅ  inefficient  service  matching  ΓùÅ  missed  opportunities  ΓùÅ  lack  of  automation  ΓùÅ  poor  user  experience  
+At  the  same  time,  users  struggle  to  find:  ΓùÅ  reliable  services  quickly  ΓùÅ  availability  in  real  time  ΓùÅ  trusted  providers  nearby  
+Problem  Statement  
+Build  an  Agentic  AI  System  that  automates  the  end-to-end  lifecycle  of  a  service  request  ΓÇö  
+from
+ 
+user
+ 
+intent
+ 
+to
+ 
+booking
+ 
+and
+ 
+follow-up.
+ 
+Your  system  must:  1.  Understand  user  service  requests  (in  natural  language)  2.  Identify  relevant  providers  using  location/context  3.  Select  or  recommend  the  best  provider  4.  Simulate  booking  and  confirmation  5.  Handle  follow-up  interactions  6.  Show  complete  reasoning  and  workflow  execution  
+  
+Mandatory  Requirement:  Google  Antigravity  
+Teams  MUST  use  Google  Antigravity  as  the  core  platform  to:  ΓùÅ  orchestrate  agent  workflows  ΓùÅ  manage  multi-step  reasoning  ΓùÅ  integrate  tools  (Maps,  Search,  APIs)  ΓùÅ  execute  actions  (booking,  notifications,  etc.)  
+Use  of  external  LLMs  is  allowed,  but  Antigravity  must  be  central  to  system  logic  and  
+orchestration
+.
+ Example  User  Scenario  
+User  input  (Roman  Urdu  /  Urdu  /  English):  
+ΓÇ£Mujhe  kal  subah  G-13  mein  AC  technician  chahiyeΓÇ¥  
+  
+Expected  Output  Service  Request:  AC  Technician  Location:  G-13  Time:  Tomorrow  morning  Recommended  Provider:  Ali  AC  Services  (2.1  km  away)  Reasoning:  Closest  available  provider  with  high  rating  Simulated  Booking:  -  Slot  booked:  10:00  AM  -  Confirmation  sent  Follow-up:  Reminder  scheduled  1  hour  before  appointment  
+System  Requirements  
+1.  Intent  Understanding  ΓùÅ  Process  natural  language  input  ΓùÅ  Support:  
+┬º
+  
+Urdu  ┬º
+  
+Roman  Urdu  ┬º
+  
+English  ΓùÅ  Extract:  
+┬º
+  
+service  type  ┬º
+  
+location  ┬º
+  
+time  
+2.  Provider  Discovery  ΓùÅ  Use:  
+┬º
+  
+mock  dataset  OR  ┬º
+  
+Google  Maps  /  Places  APIs  ΓùÅ  Identify:  ┬º
+  
+nearby  providers  ┬º
+  
+service  category  match  
+3.  Matching  &  Ranking  ΓùÅ  Rank  providers  based  on:  
+┬º
+  
+distance  ┬º
+  
+availability  ┬º
+  
+rating  (simulated  or  real)  ΓùÅ  Provide  clear  reasoning  for  selection  
+4.  Decision  &  Recommendation  ΓùÅ  Select  best  provider  OR  show  top  options  ΓùÅ  Explain  decision  in  simple  terms  
+5.  Action  Simulation  (CRITICAL  REQUIREMENT)  
+System  must  simulate:  ΓùÅ  booking  confirmation  ΓùÅ  provider  assignment  ΓùÅ  scheduling  
+Simulation  can  include:  ΓùÅ  updating  a  mock  booking  system  ΓùÅ  creating  a  confirmation  message  ΓùÅ  writing  to  a  database/spreadsheet  ΓùÅ  generating  a  booking  receipt  
+6.  Follow-Up  Automation  ΓùÅ  Simulate:  
+┬º
+  
+reminders  ┬º
+  
+status  updates  ┬º
+  
+completion  confirmation  
+7.  Agentic  Workflow  (MANDATORY)  
+System  must  demonstrate:  ΓùÅ  multiple  agents  OR  structured  reasoning  pipeline  ΓùÅ  planning  ΓåÆ  decision  ΓåÆ  action  ΓåÆ  follow-up  ΓùÅ  traceable  logs  of:  
+┬º
+  
+decisions  ┬º
+  
+tool  usage  ┬º
+  
+action  execution  Deliverables  
+1.  Working  Prototype  with  Mobile  App  (MUST)  and  Web  App  (Optional)  
+2.  Demo  Video  (3ΓÇô5  minutes)  
+Must  clearly  show:  ΓùÅ  user  input  ΓùÅ  system  understanding  ΓùÅ  provider  matching  ΓùÅ  booking  simulation  ΓùÅ  follow-up  workflow  
+3.  Agent  Trace  /  Logs  ΓùÅ  reasoning  steps  ΓùÅ  agent  interactions  ΓùÅ  action  execution  logs  
+4.  Documentation  (README)  
+Include:  ΓùÅ  system  architecture  ΓùÅ  how  Antigravity  is  used  ΓùÅ  APIs/tools  used  ΓùÅ  assumptions  and  limitations  
+  
+ Evaluation  Criteria  
+1.  Use  of  Google  Antigravity  ΓÇö  25%  ΓùÅ  Core  orchestration  handled  via  Antigravity  ΓùÅ  Effective  use  of  tools  (Maps,  APIs)  ΓùÅ  Demonstrates  planning  +  execution  
+2.  Agentic  Reasoning  &  Workflow  ΓÇö  20%  ΓùÅ  Multi-step  reasoning  ΓùÅ  Logical  flow  from  request  ΓåÆ  decision  ΓåÆ  action  ΓùÅ  Evidence  of  autonomy  
+3.  Matching  Quality  &  Decision  Logic  ΓÇö  20%  ΓùÅ  Relevant  provider  selection  ΓùÅ  Clear  ranking  criteria  ΓùÅ  Strong  reasoning  behind  decisions  
+4.  Action  Simulation  &  Execution  ΓÇö  15%  ΓùÅ  Booking  process  realistically  simulated  ΓùÅ  Clear  system  state  change  (confirmation,  scheduling)  ΓùÅ  End-to-end  workflow  demonstrated  
+5.  Technical  Implementation  ΓÇö  10%  ΓùÅ  Clean  architecture  ΓùÅ  API/tool  integration  ΓùÅ  Robust  handling  of  edge  cases  
+6.  Innovation  &  UX  ΓÇö  10%  ΓùÅ  Creative  approach  ΓùÅ  Intuitive  interface  ΓùÅ  Clear  and  engaging  demo  
+Important  Guidelines  ΓùÅ  This  is  NOT  a  simple  listing  or  booking  app  ΓùÅ  Focus  on  agentic  automation,  not  UI  complexity  ΓùÅ  At  least  one  booking  must  be  simulated  end-to-end  ΓùÅ  Must  demonstrate  reasoning  +  decision-making  ΓùÅ  Use  mock  data  if  real  APIs  are  unavailable  ΓùÅ  Avoid  use  of  real  personal/sensitive  data  
+  
+   
+  Challenge  3:  Crisis  Intelligence  &  Response  Orchestrator  (CIRO)  
+Challenge  Overview  
+Metropolitans,  globally  and  in  Pakistan,  frequently  faces  localized  crises  such  as:  ΓùÅ  urban  flooding  ΓùÅ  heatwaves  ΓùÅ  road  blockages  ΓùÅ  accidents  ΓùÅ  infrastructure  failures  
+However,  response  systems  are:  ΓùÅ  fragmented  ΓùÅ  reactive  ΓùÅ  slow  to  coordinate  
+Critical  signals  (social  media,  maps,  weather,  reports)  exist  ΓÇö  but  are  not  converted  into  
+actionable
+ 
+decisions
+ 
+in
+ 
+real
+ 
+time
+.
+ 
+  
+Problem  Statement  
+Build  an  Agentic  AI  System  that:  1.  Ingests  multi-source  signals  2.  Detects  emerging  crisis  situations  3.  Generates  coordinated  response  actions  4.  Simulates  execution  of  those  actions  5.  Shows  impact  of  decisions  
+  
+Mandatory  Requirement:  Google  Antigravity  
+Teams  MUST  use  Google  Antigravity  to:  ΓùÅ  orchestrate  multi-agent  workflows  ΓùÅ  plan  and  execute  decisions  ΓùÅ  integrate  tools  (Maps,  Search,  APIs)  ΓùÅ  simulate  coordinated  actions  
+Example  Scenario  
+Input  Signals:  ΓùÅ  Social  media:  
+ΓÇ£Flash  flood  happening  at  George  Town  for  past  30  mins"  OR   ΓÇ£G-10  mein  pani  bhar  gaya  hai,  gaariyan  phans  gayi  hainΓÇ¥  
+ ΓùÅ  Weather:  
+┬º
+  
+heavy  rainfall  alert  ΓùÅ  Maps:  
+┬º
+  
+traffic  congestion  spike  
+Expected  Output  Detected  Situation :  Urban  flooding  (G-10/  George  Town)  Confidence :  High  Impact :  -  Traffic  blocked  -  Vehicles  stranded  Recommended  Actions :  -  Redirect  traffic  via  alternate  routes  -  Dispatch  emergency  services  Simulated  Execution :  -  Route  updated  on  map  -  Alert  sent  to  users  -  Emergency  ticket  created  Outcome :  Reduced  congestion  in  simulation  
+System  Requirements  1.  Multi-Source  Input  Processing  ┬╖
+        
+Accept:  ┬º
+  
+text  inputs  (complaints,  posts)  ┬º
+  
+simulated  APIs  (weather,  traffic)  ┬╖
+        
+Handle  noisy,  informal  language  2.  Event  Detection  ┬╖
+        
+Identify:  ┬º
+  
+anomalies  ┬º
+  
+clusters  ┬º
+  
+crisis  signals  3.  Reasoning  &  Situation  Analysis  ┬╖
+        
+Combine  signals  to:  ┬º
+  
+infer  situation  ┬º
+  
+estimate  severity  ┬╖
+        
+Provide  confidence  level  +  explanation  4.  Action  Planning  ┬╖
+        
+Generate  coordinated  response  actions:  ┬º
+  
+routing  ┬º
+  
+alerts  ┬º
+  
+resource  allocation  5.  Action  Simulation  (CRITICAL)  System  must  simulate:  ┬╖
+        
+traffic  rerouting  ┬╖
+        
+emergency  dispatch  ┬╖
+        
+alerts/notifications  Simulation  examples:  ┬╖
+        
+updating  mock  map  routes  ┬╖
+        
+generating  emergency  tickets  ┬╖
+        
+sending  simulated  alerts  ┬╖
+        
+updating  system  status  6.  Outcome  Visualization  Show:  ┬╖
+        
+before  vs  after  scenario  ┬╖
+        
+impact  of  actions  ┬╖
+        
+system  logs  7.  Agentic  Workflow  (MANDATORY)  System  must  demonstrate:  ┬╖
+        
+multiple  agents  OR  structured  reasoning  pipeline  ┬╖
+        
+interaction  between  agents  ┬╖
+        
+planning  ΓåÆ  decision  ΓåÆ  execution  
+Deliverables  1.  Working  Prototype  with  Mobile  App  (MUST)  and  Web  App  (Optional)   2.  Demo  Video  (3ΓÇô5  minutes)  Must  show:  ┬╖
+        
+multi-source  input  ┬╖
+        
+detected  crisis  ┬╖
+        
+action  planning  ┬╖
+        
+simulated  response  ┬╖
+        
+outcome  3.  Agent  Trace  /  Logs  ┬╖
+        
+reasoning  steps  ┬╖
+        
+agent  decisions  ┬╖
+        
+action  execution  4.  Documentation  (README)  Include:  ┬╖
+        
+system  architecture  ┬╖
+        
+Antigravity  usage  ┬╖
+        
+tools/APIs  used  ┬╖
+        
+assumptions  Evaluation  Criteria  1.  Use  of  Google  Antigravity  ΓÇö  25%  ┬╖
+        
+Core  orchestration  handled  via  Antigravity  ┬╖
+        
+Multi-agent  planning  +  execution  ┬╖
+        
+Tool  integration  2.  Agentic  Reasoning  &  Coordination  ΓÇö  20%  ┬╖
+        
+Multi-agent  interaction  ┬╖
+        
+Logical  reasoning  ┬╖
+        
+Decision-making  quality  3.  Situation  Detection  &  Analysis  ΓÇö  20%  ┬╖
+        
+Accuracy  of  event  detection  ┬╖
+        
+Quality  of  insights  ┬╖
+        
+Clear  explanations  4.  Action  Planning  &  Simulation  ΓÇö  15%  ┬╖
+        
+Realistic  response  actions  ┬╖
+        
+Effective  simulation  ┬╖
+        
+Clear  system  state  change  5.  Technical  Implementation  ΓÇö  10%  ┬╖
+        
+Clean  architecture  ┬╖
+        
+API  integration  ┬╖
+        
+robustness  6.  Innovation  &  UX  ΓÇö  10%  ┬╖
+        
+creativity  ┬╖
+        
+usability  ┬╖
+        
+demo  clarity  
+Important  Guidelines  ΓùÅ  Use  simulated  datasets/APIs  where  needed  ΓùÅ  Avoid  real  sensitive  data  ΓùÅ  Focus  on  decision-making,  not  just  visualization  ΓùÅ  Must  show  end-to-end  workflow  
+ 
+  
+ Challenge  4:  The  Mobile  App  Alchemy:  Agentic  Game  Quest  (Genre-Agnostic:  Hyper-Casual  /  RPG  /  Puzzle  /  Strategy/  Single/  Multiplayer)  
+  
+Challenge  Overview  
+Mobile  gaming  is  evolving  beyond  static  loops  and  predictable  mechanics.  The  most  compelling  
+games
+ 
+today
+ 
+aren't
+ 
+just
+ 
+played;
+ 
+they
+ 
+are
+ 
+experienced
+ 
+through
+ 
+systems
+ 
+that
+ 
+learn,
+ 
+adapt,
+ 
+and
+ 
+surprise.
+ 
+This
+ 
+challenge
+ 
+invites
+ 
+you
+ 
+to
+ 
+build
+ 
+a
+ 
+next-generation
+ 
+mobile
+ 
+game
+ 
+that
+ 
+leverages
+ 
+Agentic
+ 
+AI
+ 
+to
+ 
+create
+ 
+a
+ 
+deeply
+ 
+engaging,
+ 
+"just-one-more-round"
+ 
+experience.
+ 
+Whether  your  game  is  a  60-second  puzzle,  a  deep-state  strategy  sim,  or  an  immersive  RPG,  the  
+goal
+ 
+is
+ 
+to
+ 
+build
+ 
+a
+ 
+core
+ 
+loop
+ 
+so
+ 
+seamless
+ 
+and
+ 
+rewarding
+ 
+that
+ 
+players
+ 
+find
+ 
+it
+ 
+impossible
+ 
+to
+ 
+put
+ 
+down.
+ 
+  
+Problem  Statement  
+Build  a  mobile  game  across  any  genre  powered  by  Google  Antigravity  where:  
+ΓùÅ  Dynamic  Flow:  The  game  adapts  its  difficulty,  narrative,  or  environment  in  real-time  
+based
+ 
+on
+ 
+player
+ 
+behavior.
+ ΓùÅ  Intelligent  Mechanics:  Use  AI  to  move  beyond  basic  scripts,  creating  "living"  game  
+systems
+ 
+that
+ 
+respond
+ 
+uniquely
+ 
+to
+ 
+every
+ 
+session.
+ ΓùÅ  High  Retention  Loop:  Design  a  gameplay  cycleΓÇö Action  ΓåÆ  Feedback  ΓåÆ  
+Reward
+ΓÇöthat
+ 
+is
+ 
+polished,
+ 
+responsive,
+ 
+and
+ 
+keeps
+ 
+the
+ 
+player
+ 
+coming
+ 
+back.
+ ΓùÅ  Optional  Innovations:  While  not  mandatory,  you  are  encouraged  to  experiment  with  
+multimodal
+ 
+inputs
+ 
+(camera/audio)
+ 
+or
+ 
+social/multiplayer
+ 
+features
+ 
+if
+ 
+they
+ 
+enhance
+ 
+the
+ 
+core
+ 
+loop.
+   
+Core  Requirement:  Google  Antigravity  
+Teams  MUST  use  Google  Antigravity  as  the  primary  orchestrator  to:  
+ΓùÅ  Drive  Gameplay  Logic:  Manage  the  "brain"  of  the  game,  including  NPC  behavior,  level  
+generation,
+ 
+or
+ 
+rule-setting.
+ ΓùÅ  Agentic  Reasoning:  Use  structured  agent  workflows  to  handle  complex  game  states  
+(e.g.,
+ 
+an
+ 
+AI
+ 
+"Dungeon
+ 
+Master"
+ 
+or
+ 
+a
+ 
+"Smart
+ 
+Rival").
+ ΓùÅ  State  Management:  Ensure  game  progression,  scoring,  and  rewards  are  handled  
+securely
+ 
+and
+ 
+intelligently
+ 
+within
+ 
+the
+ 
+Antigravity
+ 
+environment.
+   
+The  "Agentic"  Edge  
+What  makes  your  game  different?  Use  Agentic  AI  to  solve  common  gaming  hurdles:  ΓùÅ  Infinite  Variety:  Instead  of  10  handcrafted  levels,  use  agents  to  generate  endless,  
+balanced
+ 
+challenges.
+ ΓùÅ  Personalized  Rivalry:  Create  AI  opponents  that  learn  from  the  playerΓÇÖs  specific  tactics  
+and
+ 
+force
+ 
+them
+ 
+to
+ 
+evolve.
+ ΓùÅ  Living  Narratives:  In  RPGs  or  adventures,  let  agents  drive  dialogue  and  world  events  
+that
+ 
+aren't
+ 
+hard-coded.
+   
+System  Requirements  
+1.  The  "Core  Loop"  Engine  
+ΓùÅ  The  game  must  demonstrate  a  clear  and  rewarding  primary  action  (e.g.,  matching  tiles,  
+clearing
+ 
+a
+ 
+room,
+ 
+managing
+ 
+resources).
+ ΓùÅ  The  transition  between  rounds  or  levels  must  be  fluid  and  encouraging.  2.  Agentic  Workflow  (MANDATORY)  
+ΓùÅ  The  system  must  show  structured  reasoning.  You  should  be  able  to  demonstrate  how  
+the
+ 
+AI
+ 
+"decided"
+ 
+to
+ 
+change
+ 
+a
+ 
+difficulty
+ 
+setting,
+ 
+generate
+ 
+a
+ 
+specific
+ 
+item,
+ 
+or
+ 
+move
+ 
+an
+ 
+NPC.
+ 3.  Visual  Feedback  &  State  
+ΓùÅ  Real-time  updates  to  scores,  leaderboards,  or  player  attributes.  ΓùÅ  High-quality  UI/UX  that  feels  responsive  to  user  input.  4.  Validation  &  Fair  Play  
+ΓùÅ  The  AI  agent  must  act  as  a  "referee,"  ensuring  that  logic  is  followed  and  rewards  are  
+earned
+ 
+fairly.
+   
+Deliverables  
+1.  Working  Prototype:  A  Mobile  Gaming  App.  2.  Demo  Video  (3  mins):  Focus  on  the  gameplay  experience  and  how  the  AI  makes  it  
+uniquely
+ 
+engaging.
+ 3.  Architecture  Map:  A  breakdown  of  your  Antigravity  workflows  and  agent  roles.  4.  README:  Explanation  of  the  gameΓÇÖs  "hook"  what  makes  the  gameplay  loop  rewarding?    
+Evaluation  Criteria  
+Criteria  Weight  Description  
+Antigravity  Execution  
+30%  Deep  integration  of  Antigravity  for  core  logic  and  agent  workflows.  
+Gameplay  Engagement  
+25%  How  compelling  is  the  game?  Is  the  core  loop  rewarding  and  polished?  Agentic  Innovation  20%  Does  the  AI  feel  "smart"?  Does  it  add  value  beyond  traditional  coding?  
+Technical  Polish  15%  Stability,  UI/UX  fluidity,  and  overall  performance.  
+Concept  &  Originality  
+10%  Creativity  in  using  AI  to  reinvent  a  genre  or  create  a  new  one.  
+  
+Important  Guidelines  
+ΓùÅ  Focus  on  the  Hook:  Prioritize  a  smooth,  rewarding  user  experience  over  complex  
+secondary
+ 
+features.
+ ΓùÅ  Agentic  Transparency:  Be  prepared  to  show  your  agent  traces,  we  want  to  see  the  
+"thinking"
+ 
+behind
+ 
+the
+ 
+fun.
+  
+ 
+
+=== MenuMind_Project_Proposal_Final.pdf pages 7 chars 12769 ===
+CHALLENGE 1: AUTONOMOUS CONTENT-TO-ACTION
+MENUMIND: Autonomous Cafe Operations
+Agent
+A Zero-Code Operations Engine Built for Small Food Businesses
+Platform: #AISeekho 2026 Phase II ┬á|┬á Submission Date: May 2026 ┬á|┬á Build Timeline: 72 Hours
+1. Executive Summary
+In todayΓÇÖs fast-paced food and beverage industry, small eateries and cafes operate on exceptionally thin margins.
+Managers are constantly flooded with disorganized, unstructured operational signals, ranging from informal supplier
+WhatsApp messages ("chicken short out of stock today") to volatile weather alerts and competitor pricing shifts.
+Standard AI tools fail here because they stop at summarization or passive analysis. 
+MenuMind is an autonomous operational agent designed to protect small businesses from supply shocks, demand
+surges,  and  pricing  volatility.  Built  entirely  over  a  72-hour  period  using  free  visual  tools,  MenuMind  reads
+unstructured inputs, extracts core business insights, reasons through the direct operational impact, and executes
+real-time system state changes. It automatically hides unavailable items, ethically adjusts menu prices, updates the
+live backend database, and alerts kitchen staffΓÇöall without requiring a single line of custom code. 
+2. Alignment with Challenge 1 Requirements
+MenuMind strictly fulfills all evaluation parameters laid out in the official Challenge 1: Autonomous Content-to-
+Action Agent (Insight ΓåÆ Action System) specification: 
+Content Understanding: Ingests messy, unstructured text formats, including multi-lingual Roman Urdu/English
+supplier messages and automated live weather API strings via Make.com.
+Insight Extraction: Isolates meaningful patterns (e.g., critical supply breaks or impending storms) rather than
+providing generic summaries.
+Impact Analysis: Explicitly evaluates real-world consequences, tracking how inventory loss translates to
+customer disappointment, kitchen chaos, and projected revenue loss.
+Action Generation: Programmatically devises a clear, logical cascade of actions (e.g., Hide primary item ΓåÆ
+Promote high-margin alternative ΓåÆ Adjust combo prices).
+Action Simulation (Critical Requirement): Directly triggers live backend adjustments by updating database
+values, executing automated mock API tasks, and updating communication channels instantly.
+Outcome Visualization: Visually reflects the "Before vs. After" state change cleanly on a real-time mobile
+interface, backed by transparent execution logs and immediate business ROI tracking.
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Challenge 1 Page 13. The 3-Layer Zero-Code Stack Architecture
+The system relies on a modular, decoupled stack designed to maximize robustness and prevent execution latency
+under strict hackathon constraints: 
+Layer Free Visual Tool Functional Responsibility
+Brain Google Antigravity Acts as the central reasoning engine. Processes raw text,
+checks for underlying contradictions, scores business impact,
+verifies ethical boundaries, and outputs clean, structured
+JSON payloads. Called exactly once per event.
+Bridge Make.com (Free Tier) Orchestrates input ingestion, parses Antigravity's JSON,
+applies numeric/date validation thresholds, routes workflows
+based on confidence thresholds, and handles secondary
+executions (Slack, EmailJS).
+Body Supabase + FlutterFlow Supabase: Houses live menu items, agent trace history, and
+approval queues. 
+FlutterFlow: Renders a responsive mobile application with
+real-time operational metrics and an active approval gate.
+4. Google Antigravity Integration & Credit Mitigation
+Google Antigravity serves as the core orchestration brain. To guarantee the solution fits within the strict  50-call
+hackathon credit limit, MenuMind employs a strict Single-Pass Architecture: 
+All algorithmic filters, conditional branches (e.g., if price_change > 20%), basic date math, and string
+concatenation are handled off-brain via Make.com or Supabase formula fields. This keeps Antigravity calls to
+exactly 0 for non-semantic logic.
+The "Dev Mode" Router: To facilitate hundreds of frontend and database tests without exhausting tokens, a
+conditional switch is built into Make.com. If the incoming payload contains the keyword TEST_MODE, the system
+bypasses Antigravity entirely and feeds a static, well-formed mock JSON structure to the downstream database
+layers, enabling free end-to-end frontend refinement.
+5. The Master System Prompt
+This  structured  prompt  is  loaded  into  the  Google  Antigravity  system  instruction  field  to  ensure  deterministic,
+structured reasoning paths: 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Challenge 1 Page 2You are MenuMind, an autonomous cafe operations agent. Your task is to transform unstructured 
+business signals into a structured action plan. You must NOT summarize. You must REASON and 
+ACT.
+INPUT FORMAT:
+You will receive a text block containing 1-3 signals: Supplier messages (English/Roman Urdu), 
+Weather alerts, or Competitor price updates.
+REASONING CHAIN (Log each step in 'agent_trace'):
+1. PARSER: Extract item_name, issue_type, severity, and time_sensitivity.
+2. CONTRADICTION CHECK: If multiple signals conflict, trust the most recent/specific source. 
+Explain weighting in one sentence.
+3. IMPACT SCORER: Rate business impact from 1-10 considering revenue loss, customer 
+disappointment, and kitchen chaos.
+4. ETHICAL GUARD: If signals contain crisis keywords ("flood", "disaster", "strike"), REFUSE 
+surge pricing. Recommend cost absorption or portion reduction.
+5. CASCADE PLANNER: Generate one primary action and up to two coordinated secondary actions.
+6. CONFIDENCE: Assign score from 0.0 to 1.0. If below 0.70, set requires_approval: true.
+OUTPUT FORMAT:
+Return STRICT JSON format only. No markdown formatting, no conversational text.
+{
+  "agent_trace": [
+    {"step": "parser", "finding": "..."},
+    {"step": "contradiction", "finding": "..."},
+    {"step": "impact", "score": 8, "reason": "..."},
+    {"step": "ethical", "decision": "..."}
+  ],
+  "primary_action": {
+    "type": "hide_item | price_change | extend_prep | alert_staff | no_action",
+    "item_id": "string",
+    "new_value": "string_or_number",
+    "reason": "string"
+  },
+  "secondary_actions": [
+    {"type": "...", "item_id": "...", "new_value": "...", "reason": "..."}
+  ],
+  "confidence": 0.94,
+  "requires_approval": false,
+  "revenue_impact_pct": -12,
+  "customer_message": "..."
+}
+6. Detailed 3-Day Build & Execution Plan
+The blueprint is specifically structured to achieve full deployment safely within the standard 72-hour hackathon
+timeline: 
+#AISeekho 2026 Phase II - Challenge 1 Page 3Phase / Day Hours Core Focus & Tasks Tools Involved
+Day 1:
+Ingestion &
+Skeleton
+0 - 4 Provision Google Antigravity environment.
+Draft, lock, and isolate the Master System
+Prompt. Set up local workspace.
+Antigravity
+4 - 8 Initialize Supabase. Build 3 core data
+models: menu_items, agent_logs, and 
+pending_approvals. Populate with 20
+structural mock rows.
+Supabase
+8 - 12 Construct structural layouts in FlutterFlow
+(Live Dashboard, Approval Gate, Trace
+Terminal View).
+FlutterFlow, Canva
+Day 2:
+Automation
+& Logic
+12 - 16 Construct Make.com Ingestion Pipeline.
+Establish webhooks and connect raw input
+models directly to Antigravity.
+Make.com, Webhooks
+16 - 20 Build the Executor Pipeline in Make.com.
+Set up automatic string cleaning via regex
+parsers to safely extract and format
+incoming JSON arrays.
+Make.com, Regex
+20 - 24 Bind automated notification tasks: route
+immediate staff alerts to Slack and map
+consumer notice workflows via EmailJS.
+Slack, EmailJS
+Day 3:
+Validation &
+Demo
+24 - 28 Map FlutterFlow fields to active Supabase
+records. Configure the Typewriter text effect
+for streaming reasoning data in the Trace
+view.
+FlutterFlow, Supabase
+28 - 32 Execute 5 end-to-end integration scenarios.
+Perform defensive self-healing pipeline drills
+(e.g., breaking API URLs to test error
+catches).
+All Systems
+32 - 36 Record a clear 4-minute split-screen
+walkthrough video using Loom. Package
+and push standard documentation and
+schemas to GitHub.
+Loom, GitHub
+#AISeekho 2026 Phase II - Challenge 1 Page 47. Complete Free Tool Stack Limits & Integration Details
+Tool Category Selected Vendor Free Tier ConstraintsIntegration Method
+AI Brain Google AntigravityHackathon Allocation Inbound HTTP POST / Outbound
+structured JSON
+Live Database Supabase 500 MB Storage Native REST API & FlutterFlow Direct
+Integration
+Automation CoreMake.com 1,000 operations / monthWebhook Triggers & Visual Routing
+Arrays
+UI Application FlutterFlow Free / Student Tier Visual layout canvas with live
+database sync
+Staff Alerts Slack Free Workspace Incoming Slack Webhook Nodes via
+Make.com
+External Signals OpenWeatherMap1,000 API calls / day Make.com HTTP GET Request
+Modules
+8. Innovation & UI "Wow Factors"
+1. Real-Time Agent Trace Terminal: Instead of hiding the AI's internal process, MenuMind features an
+aesthetic terminal screen in FlutterFlow. It parses the agent_trace array and uses a typewriter effect to
+show the step-by-step reasoning (e.g., "Checking contradictions... none found. Checking ethical guardrails...
+alert detected, surge pricing blocked."). This directly guarantees a high score on the Agentic Reasoning
+evaluation rubric. 
+2. Human-in-the-Loop Guardrail Gate: High-risk modifications (e.g., price swings exceeding 20%) are held
+in an isolated approval queue inside Supabase. Managers receive a push notice and can swipe to approve or
+reject the action inside the mobile app, providing complete human oversight for sensitive business decisions. 
+3. Instant Financial ROI Indicators: When an automated system update goes live, the manager's dashboard
+displays a high-visibility badge: ΓÜí Saved: $120 in lost refunds & 45 min of labor
+. This shifts the project from a
+tech concept to a highly practical, commercially valuable asset. 
+9. Demo Video Storyboard (4-Minute Breakdown)
+Constructed to hit every specific evaluation metric within the requested 3-to-5 minute window: 
+#AISeekho 2026 Phase II - Challenge 1 Page 5Timestamp Active Screen Setup Narrative & Action Sequence Rubric Target
+0:00 - 0:45 Split Screen: Input Form +
+Kitchen Chaos Graphic
+Establish the operational challenge. Paste a
+chaotic, raw Roman Urdu supplier text
+message: "Aziiz bhai, gari kharab ho gayi
+hai, aaj chicken nahi pohnche ga."
+Content Ingestion
+0:45 - 1:30 Mobile App: Agent Trace
+Terminal View
+Show the typewriter effect outputting the
+reasoning logs. Highlight the agent parsing
+the language, identifying the supply block,
+and calculating the commercial outcome.
+Agentic Reasoning
+(20%)
+1:30 - 2:15 Mobile App Dashboard
+Live Menu Screen
+Demonstrate the automated system shift.
+Show the "Chicken Wrap" instantly flipping
+to "Unavailable" while the high-margin "Beef
+Wrap" moves to the top recommendation
+spot.
+Action Simulation
+(15%)
+2:15 - 3:00 Mobile App: Human-in-
+the-Loop Panel
+Simulate a crisis signal (e.g., localized
+flooding). Show Antigravity triggering the
+Ethical Guard, blocking automatic surge
+pricing, and routing a swipe-card approval
+request to the manager instead.
+Edge-Case
+Handling & Ethics
+3:00 - 4:00 Make.com Workspace
+View & Summary
+Display the clean, visual execution pipeline.
+Walk through the Single-Pass design
+structure that preserves credit limits, and
+showcase the fallback mechanisms. Fade to
+black.
+Technical Polish &
+Architecture
+10. Operational Survival Rules & Submission Checklist
+Non-Technical Team Strategy Rules:
+Deterministic JSON Safeguard: If Antigravity appends conversational text to the payload, place the instruction 
+"Output strict JSON only. No markdown formatting." at the very top of your prompt block.
+Operation Conservation: Testing end-to-end logic inside Make.com consumes 3 distinct operations per run.
+Use the manual "Run Once" execution toggle with direct text injections during development instead of leaving
+active schedules on.
+UI Layout Fixes: Avoid spending limited hours customizing complex CSS tables inside FlutterFlow. Utilize the
+native "Admin Dashboard" card components and replace placeholder elements with text objects.
+Final Checklist Before Submission:
+Verify Google Antigravity workspace is initialized and the system prompt is completely locked.
+Ensure Supabase contains 3 active, accessible tables populated with a minimum of 10 test rows.
+Confirm Make.com handles incoming payloads, cleans formatting irregularities, and pushes values smoothly.
+ΓÇó 
+ΓÇó 
+ΓÇó 
+1. 
+2. 
+3. 
+#AISeekho 2026 Phase II - Challenge 1 Page 6Confirm the FlutterFlow mobile interface displays active state modifications and prints step logs clearly.
+Validate that the final demo video fits inside the mandatory 3-to-5 minute window and excludes any sensitive
+personal data.
+4. 
+5. 
+#AISeekho 2026 Phase II - Challenge 1 Page 7
+
+=== MenuMind_Simulation_Ledger.pdf pages 4 chars 5825 ===
+CHALLENGE 1: EXECUTION WORKBOOK
+MenuMind Simulation Ledger
+Multi-Scenario Operational Analysis Mapping Unstructured Content to Automated System Change
+Following the classic framework defined in your architectural planning notes (Get Data ΓåÆ Decision ΓåÆ Struct/
+Database  Update  ΓåÆ  Action/Teach),  this  simulation  ledger  provides  four  comprehensive,  multi-domain  test
+scenarios.  Each  walkthrough  demonstrates  how  the  zero-code  architecture  handles  semantic  reasoning  and
+physical state changes under variable operational environments. 
+Operational Execution Walkthroughs
+Scenario 1: Supply Disruption Shock (The Local Inbound Logistics Failure)
+Context Trigger: A sudden message is forwarded to the main line from a poultry distribution agent in the
+field regarding market access variables. 
+1. GET DATA (INGEST)2. DECISION (REASON) 3. COURSE STRUCT (DB)4. TEACH (EXECUTE)
+Source: WhatsApp
+paste template.
+Raw Text Ingested:
+"Assalam-o-Alaikum
+mian saab, gari ka axle
+toot gaya hai mandi k
+paas. Aaj chicken
+delivery nahi hosakti,
+sab ruk gaya hai."
+Engine: Antigravity Brain.
+Trace Assessment:
+Identified entity: 
+chicken_wrap
+Contradiction:
+Overrides baseline
+supplier schedules.
+Ethical Filter: Regular
+operational fault.
+Safe.
+Confidence: 0.98
+Target Struct:
+menu_items
+Mutation Executed:
+UPDATE menu_items 
+SET is_available = 
+false, 
+shipping_buffer_days 
+= 1 
+WHERE id = 
+'chicken_wrap';
+Downstream
+Actions:
+FlutterFlow
+App:
+Automatically
+removes
+Chicken Wrap
+from active
+customer
+views; moves
+Beef Wrap to
+top feature
+placeholder.
+Slack Alerts:
+Fired notice to
+back-of-house
+kitchen
+monitors: "Stop
+prep on item
+chicken_wrap
+immediately."
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Autonomous Content-to-Action Scenario Workbook | Page 1Scenario 2: Environmental Surges (The Regional Thermal Warning)
+Context Trigger: The automated OpenWeatherMap scenario observer catches an intensive local climate
+variable that drastically impacts immediate dine-in product behavior. 
+1. GET DATA (INGEST)2. DECISION (REASON) 3. COURSE STRUCT (DB)4. TEACH (EXECUTE)
+Source:
+OpenWeatherMap
+JSON Polling API.
+Raw Context Strings:
+"weather.main":
+"Clear", "temp":
+"44┬░C", "alert":
+"Extreme Heat
+Advisory
+Islamabad"
+Engine: Antigravity
+Brain.
+Trace Assessment:
+Identified demand
+pivot: High
+ambient heat
+suppresses hot
+beverage traction;
+drives high cold
+drink
+requirements.
+Impact Score:
+7/10
+Confidence: 0.91
+Target Struct:
+menu_items
+Mutation Executed:
+UPDATE menu_items 
+SET current_price = 
+base_price * 0.80 
+WHERE category = 
+'hot_brew';
+UPDATE menu_items 
+SET is_promoted = 
+true 
+WHERE category = 
+'iced_blend';
+Downstream Actions:
+FlutterFlow
+App: Displays
+cooling themes.
+Shifting "Iced
+Mint
+Lemonades"
+and "Cold
+Brews" to
+category priority
+1.
+Kitchen Alerts:
+Fires Slack
+notification: 
+"Heat threshold
+crossed.
+Prepare extra
+ice bins and
+configure
+cooling
+machinery."
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Autonomous Content-to-Action Scenario Workbook | Page 2Scenario 3: Competitive Action (The Hyper-Local Pricing Clash)
+Context Trigger: A digital flyer caption is uploaded from a nearby storefront trying to capture local lunch
+traffic through pricing adjustments. 
+1. GET DATA (INGEST)2. DECISION (REASON) 3. COURSE STRUCT (DB)4. TEACH (EXECUTE)
+Source: Manager
+competitor logging form.
+Raw Text Ingested:
+"Cafe alternative across
+the street is offering a
+flash blowout discount:
+All premium burgers
+slashed to 350 PKR for
+today's lunch window."
+Engine: Antigravity
+Brain.
+Trace Assessment:
+Identified target
+threat: Premium
+Burger lines.
+Strategy: Avoid
+matching direct
+margin loss-
+leader. Launch
+high-margin
+combo alternative
+to dilute
+competitor
+volume.
+Confidence: 0.89
+Target Struct:
+menu_items
+Mutation Executed:
+UPDATE menu_items 
+SET current_price = 
+base_price * 0.85 
+WHERE id = 
+'club_sandwich_meal';
+Downstream
+Actions:
+FlutterFlow
+App:
+Reconfigures
+the homepage
+to display a
+prominent
+discount badge
+over the
+signature Club
+Sandwich Meal
+package.
+Customer
+Notices:
+Make.com
+passes data
+arrays to
+EmailJS,
+running a
+targeted lunch-
+hour special
+announcement
+to nearby
+subscribers.
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Autonomous Content-to-Action Scenario Workbook | Page 3Scenario 4: Macro Crisis Protection (The Regional Civil Disruption)
+Context Trigger: Regional news monitors and transit updates detect major gridlocks and infrastructure
+disruptions due to civil strikes. 
+1. GET DATA (INGEST)2. DECISION (REASON) 3. COURSE STRUCT (DB)4. TEACH (EXECUTE)
+Source: Public news
+API ingestion dump.
+Raw Text Ingested:
+"Faizabad interchange
+blocked completely due
+to ongoing massive sit-
+in strike. Heavy traffic
+standstills, delivery lines
+frozen across sectors."
+Engine: Antigravity
+Brain.
+Trace Assessment:
+Keyword found: 
+strike
+Ethical Pricing
+Guard:
+Triggered. All
+surge pricing
+models are
+immediately
+frozen to prevent
+crisis exploitation.
+Requires
+Approval: true
+(Impact 9/10).
+Target Struct:
+pending_approvals
+Mutation Executed:
+INSERT INTO 
+pending_approvals 
+(type, data_payload, 
+reason) 
+VALUES 
+('buffer_time', 
+'{"delay_mins": 
+40}', 
+'Faizabad strike 
+blockade');
+Downstream
+Actions:
+Approval
+Gate: Holds
+action
+execution until
+manager logs
+in and swipes
+the approval
+card on the
+dashboard.
+Post-Approval
+Gate: Live
+menu states
+inject delivery
+time warning
+banners; alerts
+delivery
+personnel to
+circumvent
+unsafe routes.
+System Scalability Summary
+By executing these scenarios across the structured four-step loop, MenuMind establishes that unstructured real-
+world  data  can  be  handled  safely  without  code.  The  framework  guarantees  that  logic  parameters  remain
+deterministic, while credit budgets are tightly managed via off-loaded database computations. 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+#AISeekho 2026 Phase II - Autonomous Content-to-Action Scenario Workbook | Page 4
+
+=== MenuMind_Technical_DataFlow_Architecture.pdf pages 3 chars 5956 ===
+DATA ARCHITECTURE & INGESTION BLUEPRINT
+MenuMind: Complete End-to-End Operational Lifecycle
+Mapping Unstructured External Signals to Autonomous Database States and Live Mobile Executions
+1. Introduction & Core Concept Model
+The MenuMind engine fulfills the strict mandates of  Challenge 1: Autonomous Content-to-Action Agent by
+translating real-time business chaos into immediate, rule-governed menu adjustments. This architectural guide
+breaks down exactly where data is harvested, how logic transitions across system layers, how the underlying data
+structures (the struct schemas) are mutated, and how final executions are visually dispatched. 
+Your structural planning notes outline a classical computer science linear progression pattern. The system matches
+that lifecycle precisely: 
+1. Ingest Data Source
+WhatsApp / OpenWeather APIΓåÆ
+2. Context Decision
+Google Antigravity ReasoningΓåÆ
+3. Update System Struct
+Supabase Table MutationsΓåÆ
+4. Execute Action
+Live Menu / Slack Alerts
+2. Data Ingestion Architecture: Where Data is Fetched From
+To ensure complete operational insight without expensive corporate integrations, MenuMind isolates three primary
+external operational data streams: 
+MenuMindΓäó End-to-End Technical Blueprint Page 1Data Source Stream Fetch MechanismRaw Formats IngestedOperational Relevance
+Supplier
+Communications
+Manual paste form /
+Inbound HTTP
+Webhooks
+Unstructured text strings,
+mixed English and Roman
+Urdu (e.g., "Aziiz bhai,
+chicken short hai market
+me today.")
+Identifies physical product stock
+outages, quality rejections, or
+immediate wholesale delivery
+distribution failures.
+Environmental ContextAutomated API Call
+(OpenWeatherMap)
+Structured JSON streams
+extracted automatically via
+Make.com timed scenario
+nodes.
+Tracks critical heat waves,
+monsoonal flash flood warnings,
+or storms impacting customer
+seating footprints.
+Competitive IntelligenceManual text logging
+/ Captioned images
+Pasted text references or
+competitor digital flyers
+detailing sudden price
+inflation.
+Signals major local market price
+movements, preventing margin
+loss when supply chain costs
+spike across town.
+3. The Orchestration Brain: Google Antigravity Logic
+Once Make.com aggregates the active operational inputs, it compiles them into a unified execution payload. This
+consolidated text block is transmitted via an HTTP POST request to the  Google Antigravity Brain for deep
+semantic reasoning. The agent performs a single-pass execution to evaluate data meaning through a series of
+logical modules: 
+Entity Parser Module: Strips colloquialisms and extracts core operational tokens (e.g., identifies that "chicken
+wrap" is the active target item).
+Contradiction Engine: cross-references incoming notifications against current states to resolve conflicts. For
+example, if a supplier states an item is unavailable, but local inventory tools show a physical buffer stock, it
+computes whether to execute immediate caution or allow short-term sales.
+Ethical Safety Shield: If keywords corresponding to crises (e.g., *flood, strike, municipal disaster*) are
+discovered, the brain enforces a zero-surge pricing constraint, ensuring brand reputation protection.
+Cascade Planner: Generates a primary task alongside up to two coordinated supporting tasks to maintain
+operational harmony.
+4. The System Struct: Database Models & Schemas
+Following the precise model outlined in your planning notes, the data passes from the Decision Engine directly into
+database  models.  These  represent  the  structured  schema  (struct)  inside  Supabase that  governs  the  live
+application frontend: 
+1. 
+2. 
+3. 
+4. 
+MenuMindΓäó End-to-End Technical Blueprint Page 2Table 1: Menu Items Schema (`struct menu_items`)
+CREATE TABLE menu_items (
+    id VARCHAR PRIMARY KEY,            -- E.g., 'chicken_wrap'
+    name VARCHAR NOT NULL,             -- Item display name
+    base_price NUMERIC(10,2),          -- Baseline price
+    current_price NUMERIC(10,2),       -- Adaptive operational price
+    is_available BOOLEAN DEFAULT true, -- Active availability switch
+    shipping_buffer_days INT,          -- Operational restock lag time
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+Table 2: Agent Orchestration History (`struct agent_logs`)
+CREATE TABLE agent_logs (
+    id BIGSERIAL PRIMARY KEY,
+    timestamp TIMESTAMP DEFAULT NOW(),
+    raw_signals TEXT,                  -- Incoming unstructured string dump
+    reasoning_trace JSONB,             -- Step-by-step trace array output
+    confidence_score NUMERIC(3,2),     -- Confidence coefficient (0.00 to 1.00)
+    requires_approval BOOLEAN          -- Safety validation queue flag
+);
+5. Execution Phase: Downstream Action Simulation
+The final leg of the system transforms the mutated database models into physical business updates. Make.com
+watches for changes in the Supabase state variables and handles the following automated actions: 
+Live Dashboard Updates: The FlutterFlow mobile interface re-renders automatically as it listens to active
+Supabase stream triggers. Unavailable items disappear cleanly, or modified prices show an immediate visual
+adjustment badge.
+Kitchen Notification Dispatches: An inbound webhook fires an instantaneous alert directly into the back-of-
+house Slack team channel, alerting line cooks regarding immediate recipe modifications or item suspensions.
+Customer Notice Automations: Transactional emails dispatch via EmailJS templates to alert delivery
+customers of sudden menu adjustments, proactively offering automated alternatives to protect sales volume.
+Technical Polish Summary: By partitioning the system into clear stepsΓÇöIngest (Make.com API layers),
+Reason (Google Antigravity Single-Pass), Struct (Supabase relational data arrays), and Execute (FlutterFlow
+state views and notifications)ΓÇöthe build remains incredibly stable, robust against edge cases, and completely
+executable inside a standard 3-day hackathon sprint. 
+ΓÇó 
+ΓÇó 
+ΓÇó 
+MenuMindΓäó End-to-End Technical Blueprint Page 3
+
