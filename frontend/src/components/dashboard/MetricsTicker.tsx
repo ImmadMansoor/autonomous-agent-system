@@ -25,10 +25,7 @@ const glassCardStyle: React.CSSProperties = {
 };
 
 export function MetricsTicker({ metrics, liveSignals }: MetricsTickerProps) {
-  const liveSignalMessage = liveSignals
-    .slice(0, 3)
-    .map(s => s.message)
-    .join(' | ');
+  const liveSignalMessage = liveSignals[0]?.message || 'No active signals';
 
   return (
     <motion.section
@@ -120,12 +117,14 @@ export function MetricsTicker({ metrics, liveSignals }: MetricsTickerProps) {
             fontSize: 'var(--font-size-label-md)',
             color: 'var(--on-surface-variant)',
             overflow: 'hidden',
-            height: '24px',
+            minHeight: '24px',
             display: 'flex',
             alignItems: 'center',
+            lineHeight: 1.35,
+            whiteSpace: 'normal',
           }}
         >
-          {liveSignalMessage || 'No active signals'}
+          {liveSignalMessage}
         </motion.div>
       </motion.div>
     </motion.section>

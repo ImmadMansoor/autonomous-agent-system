@@ -121,6 +121,14 @@ function formatAction(action: AnyRecord | null | undefined): string {
   return `${tool}${item}`;
 }
 
+function humanizeRecommendation(message = ''): string {
+  const promotionMatch = message.match(/set_item_promotion\s+on\s+([\w-]+)/i);
+  if (promotionMatch) {
+    return `Promote ${promotionMatch[1].replaceAll('_', ' ')} across the menu.`;
+  }
+  return message.replaceAll('_', ' ');
+}
+
 function summarizeTraceMessage(trace: AnyRecord, plan: AnyRecord): string {
   const step = String(trace.step || '').toLowerCase();
   const message = String(trace.message || '');
@@ -235,10 +243,18 @@ export const api = {
       };
     },
     getSignals: async () => {
-      const [signals, scenarios] = await Promise.all([
+      const [signals, weather] = await Promise.all([
         request<AnyRecord[]>('/signals?limit=10').catch(() => []),
-        request<AnyRecord[]>('/signals/scenarios'),
+        optionalRequest<AnyRecord | null>('/weather/context', null),
       ]);
+      const weatherSignal = weather ? [{
+        id: 'weather-context',
+        type: 'weather',
+        source: weather.source || 'Open-Meteo',
+        message: `Weather: ${weather.summary}`,
+        priority: Array.isArray(weather.risks) && weather.risks.length ? 'high' : 'medium',
+        createdAt: new Date().toISOString(),
+      }] : [];
       const current = signals.map((signal) => ({
         id: String(signal.id),
         type: signal.source_type || 'web',
@@ -247,17 +263,7 @@ export const api = {
         priority: signal.status === 'processed' ? 'medium' : 'high',
         createdAt: signal.created_at || new Date().toISOString(),
       }));
-      return [
-        ...current,
-        ...scenarios.map((s) => ({
-          id: `scenario-${s.id}`,
-          type: sourceFromText(s.raw_text),
-          source: 'preset',
-          message: s.raw_text,
-          priority: 'medium',
-          createdAt: new Date().toISOString(),
-        })),
-      ];
+      return [...weatherSignal, ...current];
     },
     createSignal: runSignalFlow,
     getReasoning: async () => {
@@ -293,8 +299,8 @@ export const api = {
       const plan = lastRun?.plan || {};
       const recommendations = Array.isArray(plan.recommended_actions) ? plan.recommended_actions : [];
       return recommendations.slice(0, 4).map((message: string, index: number) => ({
-        id: `suggestion-${index}`,
-        message,
+        id: `run-${lastRun?.run?.id || 'latest'}-suggestion-${index}`,
+        message: humanizeRecommendation(message),
         category: 'agent',
         confidence: Math.round((plan.confidence || 0.8) * 100),
       }));

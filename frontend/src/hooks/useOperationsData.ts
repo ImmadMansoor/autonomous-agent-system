@@ -5,6 +5,37 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { CafeData, LiveSignal, ReasoningItem, AttentionItem, AISuggestion } from '@/data';
 
+const HIDDEN_SUGGESTIONS_KEY = 'menumind_hidden_suggestions';
+
+function getHiddenSuggestionIds(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    return new Set(JSON.parse(localStorage.getItem(HIDDEN_SUGGESTIONS_KEY) || '[]'));
+  } catch {
+    return new Set();
+  }
+}
+
+function suggestionGroupId(id: string): string {
+  if (id.includes('-suggestion-')) {
+    return id.replace(/-suggestion-\d+$/, '-suggestion-*');
+  }
+  if (id.startsWith('suggestion-')) return 'suggestion-*';
+  return id;
+}
+
+function isSuggestionHidden(id: string, hidden: Set<string>): boolean {
+  return hidden.has(id) || hidden.has(suggestionGroupId(id));
+}
+
+function rememberHiddenSuggestion(id: string) {
+  if (typeof window === 'undefined' || id === 'default') return;
+  const hidden = getHiddenSuggestionIds();
+  hidden.add(id);
+  hidden.add(suggestionGroupId(id));
+  localStorage.setItem(HIDDEN_SUGGESTIONS_KEY, JSON.stringify([...hidden].slice(-50)));
+}
+
 function calculateRelativeTime(timestamp: string | Date): string {
   const now = new Date();
   const time = new Date(timestamp);
@@ -48,7 +79,10 @@ export function useOperationsData() {
       const signals = signalsRes.status === 'fulfilled' ? signalsRes.value : [];
       const reasoning = reasoningRes.status === 'fulfilled' ? reasoningRes.value : [];
       const attention = attentionRes.status === 'fulfilled' ? attentionRes.value : [];
-      const suggestions = suggestionsRes.status === 'fulfilled' ? suggestionsRes.value : [];
+      const hiddenSuggestionIds = getHiddenSuggestionIds();
+      const suggestions = suggestionsRes.status === 'fulfilled'
+        ? suggestionsRes.value.filter((suggestion) => !isSuggestionHidden(suggestion.id, hiddenSuggestionIds))
+        : [];
       const metrics = metricsRes.status === 'fulfilled' ? metricsRes.value : [];
 
       setData({
@@ -268,6 +302,8 @@ export function useOperationsData() {
   const updateAISuggestion = useCallback(async (suggestion: Partial<AISuggestion>) => {
     if (!data) return;
     const currentId = data.aiSuggestion.id;
+    rememberHiddenSuggestion(currentId);
+    suppressRefreshUntil.current = Date.now() + 2500;
     
     setData(prev => {
       if (!prev) return prev;
@@ -289,6 +325,8 @@ export function useOperationsData() {
             ...prev.aiSuggestion,
             ...suggestion,
             id: 'default',
+            message: suggestion.message || 'Applied successfully.',
+            category: suggestion.category || prev.aiSuggestion.category,
             timestamp: new Date(),
           },
           reasoningItems: [newReasoningItem, ...prev.reasoningItems.slice(0, 4)],
@@ -301,6 +339,7 @@ export function useOperationsData() {
           ...prev.aiSuggestion,
           ...suggestion,
           id: 'default',
+          message: suggestion.message || 'Applied successfully.',
           timestamp: new Date(),
         },
       };
@@ -318,6 +357,8 @@ export function useOperationsData() {
   const dismissAISuggestion = useCallback(async () => {
     if (!data) return;
     const currentId = data.aiSuggestion.id;
+    rememberHiddenSuggestion(currentId);
+    suppressRefreshUntil.current = Date.now() + 2500;
     
     setData(prev => {
       if (!prev) return prev;

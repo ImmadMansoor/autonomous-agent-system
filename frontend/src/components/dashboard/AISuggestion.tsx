@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lightbulb, Sparkles } from 'lucide-react';
+import { Check, Lightbulb, Sparkles } from 'lucide-react';
 import { REVEAL_UP } from '@/lib/animations';
 import { AISuggestion as AISuggestionType } from '@/data';
 
@@ -23,6 +24,18 @@ const getCategoryColor = (category: string) => categoryColors[category] || 'var(
 
 
 export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionProps) {
+  const [isApplied, setIsApplied] = useState(false);
+
+  useEffect(() => {
+    setIsApplied(false);
+  }, [suggestion.id, suggestion.message]);
+
+  const handleApply = () => {
+    if (isApplied) return;
+    setIsApplied(true);
+    window.setTimeout(() => onApply?.(), 650);
+  };
+
   return (
     <motion.div
       variants={REVEAL_UP}
@@ -76,9 +89,12 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
           gap: 'var(--space-sm)',
         }}>
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onApply}
+            whileHover={isApplied ? undefined : { scale: 1.02 }}
+            whileTap={isApplied ? undefined : { scale: 0.96 }}
+            animate={isApplied ? { scale: [1, 1.08, 1], backgroundColor: '#0f8f70' } : { scale: 1 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 16 }}
+            onClick={handleApply}
+            disabled={isApplied}
             style={{
               padding: 'var(--space-xs) var(--space-md)',
               background: getCategoryColor(suggestion.category),
@@ -87,10 +103,16 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
               border: 'none',
               fontWeight: 600,
               fontSize: 'var(--font-size-body-sm)',
-              cursor: 'pointer',
+              cursor: isApplied ? 'default' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              minWidth: '76px',
+              justifyContent: 'center',
             }}
           >
-            Apply
+            {isApplied ? <Check size={14} /> : null}
+            {isApplied ? 'Applied' : 'Apply'}
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }}
