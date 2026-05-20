@@ -60,7 +60,7 @@ Do not pivot to Supabase, FlutterFlow, Make.com, or n8n now. Supabase/Make can b
 
 ## What Future AI Sessions Should Read
 
-Start with `AGENTS.md`, then `PROJECT_HISTORY.md`, then this file, then only the runtime files needed for the task. Do not read historical PDFs, extracted proposal docs, logs, `node_modules`, `.venv`, `dist`, or database files unless specifically needed.
+Start with `AGENTS.md`, then `PROJECT_HISTORY_A_TO_Z.txt`, then this file, then only the runtime files needed for the task. Do not read historical PDFs, extracted proposal docs, logs, `node_modules`, `.venv`, `dist`, or database files unless specifically needed.
 
 ## Voice + APK track (2-day)
 

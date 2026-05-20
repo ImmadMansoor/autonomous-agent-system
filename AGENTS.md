@@ -16,7 +16,7 @@ When recording cross-model discussion in markdown, refer to this assistant as Ca
 
 ## Read Only When Needed
 
-- `PROJECT_HISTORY.md` is the durable compact project history.
+- `PROJECT_HISTORY_A_TO_Z.txt` is the durable compact project history.
 - `SHARED_PLAN.md` is the concise current plan.
 - `SHARED_BRAINSTORMING.md` is a short strategy summary, not a debate log.
 - Extracted PDF markdown files were compressed into summaries; use the PDFs only if exact challenge wording is needed.
