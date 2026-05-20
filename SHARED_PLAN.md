@@ -53,7 +53,7 @@ Do not pivot to Supabase, FlutterFlow, Make.com, or n8n now. Supabase/Make can b
 3. Do not start APK work until Android environment is verified. Current check found bundled OpenJDK but did not find `adb`, `gradle`, or the default Android SDK path.
 4. If Android Studio/SDK are available, add Capacitor Android wrapper and build debug APK with a strict 2-hour timebox.
 5. If the Android toolchain is not ready, use the PWA/mobile browser install as the mobile prototype fallback and record it cleanly.
-6. Test mobile with `VITE_API_URL` pointed at a reachable backend. Emulator uses `http://10.0.2.2:8000`; real phone should use HTTPS tunnel if possible.
+6. Test mobile/API wiring with the active Next.js environment variable `NEXT_PUBLIC_API_URL` pointed at a reachable backend. Emulator uses `http://10.0.2.2:8000`; real phone should use HTTPS tunnel if possible.
 7. Keep backend and UI stable; avoid broad refactors unless they directly protect the demo.
 8. Record a clean 3-5 minute demo showing voice/manual signal -> insight -> action -> spoken result -> simulation/result.
 9. Show Antigravity screenshots/workplan and optional Make/Supabase workflow proof as support, not as the core live path.
@@ -64,7 +64,7 @@ Start with `AGENTS.md`, then `PROJECT_HISTORY_A_TO_Z.txt`, then this file, then 
 
 ## Voice + APK track (2-day)
 
-- Day 1: Capacitor android shell, `VITE_API_URL` for emulator/LAN.
+- Day 1: Capacitor android shell, `NEXT_PUBLIC_API_URL` for emulator/LAN.
 - Day 2: `@capacitor-community/speech-recognition` + `text-to-speech`, sync APK, E2E demo + video.
 - Do not integrate OpenJarvis or copy `GITHUB REPO/` into app — npm packages only.
 - Web mic and web TTS already in `App.jsx`; missing native APK voice fallbacks.
