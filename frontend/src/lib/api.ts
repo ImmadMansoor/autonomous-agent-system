@@ -36,6 +36,14 @@ type SecuritySettings = {
   lastPasswordChange: string;
 };
 
+const MENU_IMAGES: Record<string, string> = {
+  chicken_wrap: '/chicken_wrap.png',
+  beef_wrap: '/beef_wrap.png',
+  club_sandwich: '/club_sandwich.png',
+  iced_lemonade: '/iced_lemonade.png',
+  hot_coffee: '/hot_coffee.png',
+};
+
 let lastRun: AnyRecord | null = null;
 
 function getAuthToken(): string | null {
@@ -71,13 +79,17 @@ async function optionalRequest<T>(endpoint: string, fallback: T): Promise<T> {
   }
 }
 
-function parseDecision(run: AnyRecord | null): AnyRecord {
-  if (!run?.final_decision) return {};
+function parseJson<T>(value: string | null | undefined, fallback: T): T {
+  if (!value) return fallback;
   try {
-    return JSON.parse(run.final_decision);
+    return JSON.parse(value);
   } catch {
-    return {};
+    return fallback;
   }
+}
+
+function parseDecision(run: AnyRecord | null): AnyRecord {
+  return parseJson(run?.final_decision, {});
 }
 
 function actionLabel(action: AnyRecord | null | undefined): string {
@@ -159,6 +171,11 @@ function runConfidence(plan: AnyRecord): number {
 
 async function getFullRun(runId: number): Promise<AnyRecord> {
   const run = await request<AnyRecord>(`/agent/runs/${runId}`);
+  return hydrateRun(run);
+}
+
+async function hydrateRun(run: AnyRecord): Promise<AnyRecord> {
+  const runId = run.id;
   const [trace, diff, approvals, notifications, menu] = await Promise.all([
     optionalRequest<AnyRecord[]>(`/agent/runs/${runId}/trace`, []),
     optionalRequest<AnyRecord>(`/menu/before-after/${runId}`, { before: {}, after: {}, changes: [] }),
@@ -175,17 +192,7 @@ async function getLatestRunWithTrace(): Promise<AnyRecord | null> {
   const runs = await request<AnyRecord[]>('/agent/runs?limit=1');
   const run = runs[0];
   if (!run) return null;
-
-  const [trace, diff, approvals, notifications, menu] = await Promise.all([
-    optionalRequest<AnyRecord[]>(`/agent/runs/${run.id}/trace`, []),
-    optionalRequest<AnyRecord>(`/menu/before-after/${run.id}`, { before: {}, after: {}, changes: [] }),
-    optionalRequest<AnyRecord[]>(`/approvals?run_id=${run.id}`, []),
-    optionalRequest<AnyRecord[]>(`/notifications?run_id=${run.id}`, []),
-    optionalRequest<AnyRecord[]>('/menu', []),
-  ]);
-
-  lastRun = { run, trace, diff, approvals, notifications, menu, plan: parseDecision(run) };
-  return lastRun;
+  return hydrateRun(run);
 }
 
 async function runSignalFlow(data: { type?: string; message: string; priority?: string }): Promise<AnyRecord> {
@@ -288,7 +295,7 @@ export const api = {
         description: a.reason || 'Policy guardrail paused this action for review.',
         priority: 'high',
         confidence: Math.round((lastRun?.plan?.confidence || 0.78) * 100),
-        recommendation: actionLabel({ tool: a.action_type, args: JSON.parse(a.payload_json || '{}') }),
+        recommendation: actionLabel({ tool: a.action_type, args: parseJson(a.payload_json, {}) }),
       }));
     },
     handleAttentionAction: async (id: string, action: string) => {
@@ -325,10 +332,10 @@ export const api = {
         signalType: a.action_type?.includes('price') ? 'Pricing Signal' : 'Menu Signal',
         title: 'Approval gate triggered',
         confidence: Math.round((lastRun?.plan?.confidence || 0.78) * 100),
-        recommendation: actionLabel({ tool: a.action_type, args: JSON.parse(a.payload_json || '{}') }),
+        recommendation: actionLabel({ tool: a.action_type, args: parseJson(a.payload_json, {}) }),
         recommendationIcon: 'trending_up',
         description: a.reason,
-        context: JSON.parse(a.payload_json || '{}'),
+        context: parseJson(a.payload_json, {}),
         createdAt: a.created_at,
       }));
     },
@@ -384,11 +391,7 @@ export const api = {
           description: `${item.category} - ${item.prep_time_min} min prep - stock ${item.stock_level}`,
           price: item.current_price,
           basePrice: item.base_price,
-          image: item.id === 'chicken_wrap' ? '/chicken_wrap.png' :
-                 item.id === 'beef_wrap' ? '/beef_wrap.png' :
-                 item.id === 'club_sandwich' ? '/club_sandwich.png' :
-                 item.id === 'iced_lemonade' ? '/iced_lemonade.png' :
-                 item.id === 'hot_coffee' ? '/hot_coffee.png' : '',
+          image: MENU_IMAGES[item.id] || '',
           status: menuStatus(item),
           aiStatus: item.is_promoted ? 'AI_MANAGED' : 'MANUAL',
           isManaged: true,

@@ -290,8 +290,8 @@ export function useOperationsData() {
 
       try {
         await api.operations.handleAttentionAction(id, actionType);
-      } catch (apiErr) {
-        console.log('API call failed, using mock action only');
+      } catch {
+        // Keep the optimistic UI responsive if an approval endpoint is unavailable.
       }
     } catch (err) {
       console.error('Failed to handle attention action:', err);

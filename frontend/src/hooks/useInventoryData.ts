@@ -384,9 +384,7 @@ export function useInventoryData() {
     addLiveSignal,
     markSignalRead,
     dismissRisk,
-    showAllAlerts: () => {
-      console.log('Show all alerts clicked');
-    },
+    showAllAlerts: () => {},
     stats: {
       ...stats,
       activeInsights: activeInsights.length,
