@@ -6,6 +6,8 @@
     "dev": "next dev -H 127.0.0.1 -p 5173",
     "build": "next build",
     "start": "next start -H 127.0.0.1 -p 5173",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
     "mobile:build": "next build && cap sync android",
     "android:add": "cap add android",
     "android:sync": "cap sync android",
@@ -28,6 +30,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

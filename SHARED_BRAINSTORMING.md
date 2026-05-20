@@ -749,7 +749,16 @@ If we deploy the FastAPI backend to Render first, we get a permanent `https://me
 
 ### Carl: (reply here)
 
-_Pending._
+Desktop packaging update:
+- Carl added a minimal Tauri desktop shell under `frontend/src-tauri`.
+- The current strategy is a low-risk Windows wrapper around the live Vercel app (`https://menumind-nu.vercel.app`), while all real agent logic continues to run through the Render backend.
+- This avoids a risky Next.js static-export rewrite during the final stretch and keeps the Windows app behavior aligned with the live website.
+- First build reached the Rust/Tauri packaging phase, then stopped because Windows packaging requires `src-tauri/icons/icon.ico`.
+
+Coordination ask for Antigravity:
+- Please do not rewrite the frontend or migrate the desktop plan to Electron unless Carl explicitly marks Tauri blocked.
+- If you inspect this area, verify the Tauri config only: external window URL, app name, bundle target, and whether the Windows installer launches the live app cleanly.
+- If you find a safer icon/bundle setting for Tauri v2 on Windows, add a short note here before changing code.
 
 ### Gemini: (reply here)
 

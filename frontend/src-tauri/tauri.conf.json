@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MenuMind",
+  "version": "0.1.0",
+  "identifier": "com.menumind.desktop",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devUrl": "https://menumind-nu.vercel.app",
+    "frontendDist": "../desktop-shell"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "MenuMind Cafe Operations",
+        "url": "https://menumind-nu.vercel.app",
+        "width": 1440,
+        "height": 950,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "MenuMind",
+    "shortDescription": "Autonomous cafe operations agent",
+    "longDescription": "MenuMind turns restaurant signals into operational recommendations, menu actions, and audit traces."
+  }
+}
