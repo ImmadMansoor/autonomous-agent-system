@@ -49,6 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const storedToken = localStorage.getItem('auth_token');
     const storedUser = localStorage.getItem('auth_user');
+    const loggedOut = localStorage.getItem('menumind_logged_out') === 'true';
     
     if (storedToken && storedUser) {
       try {
@@ -57,16 +58,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
-        localStorage.setItem('auth_token', 'demo-token');
-        localStorage.setItem('auth_user', JSON.stringify(DEMO_USER));
-        setToken('demo-token');
-        setUser(DEMO_USER);
+        setToken(null);
+        setUser(null);
       }
-    } else {
+    } else if (!loggedOut) {
       localStorage.setItem('auth_token', 'demo-token');
       localStorage.setItem('auth_user', JSON.stringify(DEMO_USER));
       setToken('demo-token');
       setUser(DEMO_USER);
+    } else {
+      setToken(null);
+      setUser(null);
     }
     setIsLoading(false);
   }, []);
@@ -77,6 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     localStorage.setItem('auth_token', response.token);
     localStorage.setItem('auth_user', JSON.stringify(response.user));
+    localStorage.removeItem('menumind_logged_out');
     
     setToken(response.token);
     setUser(response.user);
@@ -88,16 +91,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     localStorage.setItem('auth_token', response.token);
     localStorage.setItem('auth_user', JSON.stringify(response.user));
+    localStorage.removeItem('menumind_logged_out');
     
     setToken(response.token);
     setUser(response.user);
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.setItem('auth_token', 'demo-token');
-    localStorage.setItem('auth_user', JSON.stringify(DEMO_USER));
-    setToken('demo-token');
-    setUser(DEMO_USER);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    localStorage.setItem('menumind_logged_out', 'true');
+    setToken(null);
+    setUser(null);
   }, []);
 
   return (

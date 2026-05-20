@@ -219,6 +219,22 @@ def seed_demo_data_on_startup():
     db = next(get_db())
     try:
         ensure_demo_menu(db)
+        
+        # Ensure demo user exists with password "demo"
+        user = db.query(models.UserAccount).filter_by(email="demo@menumind.ai").first()
+        if not user:
+            user = models.UserAccount(
+                email="demo@menumind.ai",
+                password_hash=hash_password("demo"),
+                full_name="MenuMind Demo Owner",
+                cafe_name="MenuMind Cafe",
+                role="owner",
+                location=DEFAULT_LOCATION,
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            get_or_create_settings(db, user.id)
     finally:
         db.close()
 
@@ -244,7 +260,28 @@ def signup(payload: schemas.SignupRequest, db: Session = Depends(get_db)):
 
 @app.post("/auth/login", response_model=schemas.AuthResponse)
 def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(models.UserAccount).filter_by(email=payload.email.lower().strip()).first()
+    email = payload.email.lower().strip()
+    if email == "demo@menumind.ai":
+        if payload.password != "demo":
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        user = db.query(models.UserAccount).filter_by(email="demo@menumind.ai").first()
+        if not user:
+            user = models.UserAccount(
+                email="demo@menumind.ai",
+                password_hash=hash_password("demo"),
+                full_name="MenuMind Demo Owner",
+                cafe_name="MenuMind Cafe",
+                role="owner",
+                location=DEFAULT_LOCATION,
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            get_or_create_settings(db, user.id)
+        return {"user": serialize_user(user), "token": "demo-token"}
+
+    user = db.query(models.UserAccount).filter_by(email=email).first()
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = create_session(db, user)

@@ -419,6 +419,20 @@ export default function LoginPage() {
                   {isSubmitting ? 'Signing In...' : 'Sign In'}
                 </motion.button>
 
+                <div style={{
+                  background: 'rgba(74, 222, 128, 0.08)',
+                  border: '1px dashed rgba(74, 222, 128, 0.3)',
+                  borderRadius: RADIUS.LG,
+                  padding: SPACING.SM,
+                  textAlign: 'center',
+                  fontSize: '12px',
+                  color: COLORS.ON_SURFACE,
+                  fontFamily: TYPOGRAPHY.FONT_BODY,
+                  marginTop: SPACING.XS,
+                }}>
+                  💡 <strong>Demo Mode:</strong> Use <strong style={{ color: COLORS.PRIMARY }}>demo@menumind.ai</strong> with password <strong>demo</strong>
+                </div>
+
                 <div style={{ position: 'relative', padding: `${SPACING.SM} 0`, textAlign: 'center' }}>
                   <div style={{
                     position: 'absolute',
