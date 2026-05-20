@@ -26,11 +26,15 @@ export function Navbar({
         const { api } = await import('@/lib/api');
         const signals = await api.operations.getSignals();
         
+        const readIds = typeof window !== 'undefined'
+          ? JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]')
+          : [];
+        
         setNotifications(signals.slice(0, 5).map(s => ({
           id: s.id,
           message: s.message,
           time: new Date(s.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          read: false,
+          read: readIds.includes(String(s.id)),
         })));
       } catch (err) {
         console.error('Failed to load notifications:', err);
@@ -68,10 +72,34 @@ export function Navbar({
     setNotifications(notifications.map(n => 
       n.id === id ? { ...n, read: true } : n
     ));
+    if (typeof window !== 'undefined') {
+      try {
+        const readIds = JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]');
+        if (!readIds.includes(String(id))) {
+          readIds.push(String(id));
+          localStorage.setItem('menumind_read_notifications', JSON.stringify(readIds));
+        }
+      } catch (e) {
+        console.error('Error saving read notification to localStorage:', e);
+      }
+    }
   };
 
   const markAllAsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
+    if (typeof window !== 'undefined') {
+      try {
+        const readIds = JSON.parse(localStorage.getItem('menumind_read_notifications') || '[]');
+        notifications.forEach(n => {
+          if (!readIds.includes(String(n.id))) {
+            readIds.push(String(n.id));
+          }
+        });
+        localStorage.setItem('menumind_read_notifications', JSON.stringify(readIds));
+      } catch (e) {
+        console.error('Error saving read notifications to localStorage:', e);
+      }
+    }
   };
 
   const { logout } = useAuth();
@@ -138,7 +166,13 @@ export function Navbar({
         <div ref={notificationRef} style={{ position: 'relative' }}>
           <motion.button
             {...BUTTON_ANIMATION}
-            onClick={() => setShowNotifications(!showNotifications)}
+            onClick={() => {
+              const nextState = !showNotifications;
+              setShowNotifications(nextState);
+              if (nextState) {
+                markAllAsRead();
+              }
+            }}
             style={{
               background: 'transparent',
               border: 'none',
