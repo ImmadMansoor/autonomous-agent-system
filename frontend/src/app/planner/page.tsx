@@ -721,7 +721,7 @@ export default function PlannerPage() {
                           fontSize: '12px',
                           border: '1px dashed var(--outline-variant)',
                           borderRadius: 'var(--radius-lg)',
-                          background: 'rgba(255,255,255,0.2)',
+                          background: 'var(--surface-container-lowest)',
                         }}>
                           No immediate actions.
                         </div>
@@ -777,7 +777,7 @@ export default function PlannerPage() {
                           fontSize: '12px',
                           border: '1px dashed var(--outline-variant)',
                           borderRadius: 'var(--radius-lg)',
-                          background: 'rgba(255,255,255,0.2)',
+                          background: 'var(--surface-container-lowest)',
                         }}>
                           No upcoming tasks queued.
                         </div>
@@ -829,7 +829,7 @@ export default function PlannerPage() {
                           fontSize: '12px',
                           border: '1px dashed var(--outline-variant)',
                           borderRadius: 'var(--radius-lg)',
-                          background: 'rgba(255,255,255,0.2)',
+                          background: 'var(--surface-container-lowest)',
                         }}>
                           No blocked or approval-gated tasks!
                         </div>
@@ -842,10 +842,10 @@ export default function PlannerPage() {
 
                 {/* Column 4: Done */}
                 <div style={{
-                  background: 'rgba(0, 104, 95, 0.02)',
+                  background: 'var(--surface-container-low)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-md)',
-                  border: '1px solid rgba(0, 104, 95, 0.15)',
+                  border: '1px solid var(--outline-variant)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 'var(--space-md)',

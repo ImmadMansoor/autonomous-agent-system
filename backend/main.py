@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
+from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import models, schemas, agent, tools
@@ -560,9 +560,14 @@ def audit_log(page: int = 1, pageSize: int = 10, action: Optional[str] = None, d
         .limit(pageSize)
         .all()
     )
+    run_ids = {trace.agent_run_id for trace in traces if trace.agent_run_id is not None}
+    runs_by_id = {
+        run.id: run
+        for run in db.query(models.AgentRun).filter(models.AgentRun.id.in_(run_ids)).all()
+    } if run_ids else {}
     entries = []
     for trace in traces:
-        run = db.query(models.AgentRun).filter_by(id=trace.agent_run_id).first()
+        run = runs_by_id.get(trace.agent_run_id)
         entries.append({
             "id": str(trace.id),
             "action": trace.step,
@@ -602,11 +607,18 @@ def audit_log_entry(entry_id: int, db: Session = Depends(get_db)):
 @app.get("/analytics/throughput")
 def analytics_throughput(db: Session = Depends(get_db)):
     runs = db.query(models.AgentRun).order_by(models.AgentRun.id.desc()).limit(12).all()
+    run_ids = [run.id for run in runs]
+    trace_counts = dict(
+        db.query(models.AgentTrace.agent_run_id, func.count(models.AgentTrace.id))
+        .filter(models.AgentTrace.agent_run_id.in_(run_ids))
+        .group_by(models.AgentTrace.agent_run_id)
+        .all()
+    ) if run_ids else {}
     return [
         {
             "id": str(run.id),
             "label": run.started_at.strftime("%H:%M") if run.started_at else f"Run {run.id}",
-            "value": db.query(models.AgentTrace).filter_by(agent_run_id=run.id).count(),
+            "value": trace_counts.get(run.id, 0),
             "timestamp": run.started_at,
         }
         for run in reversed(runs)
@@ -614,11 +626,15 @@ def analytics_throughput(db: Session = Depends(get_db)):
 
 @app.get("/analytics/signals")
 def analytics_signals(db: Session = Depends(get_db)):
-    rows = db.query(models.SignalEvent).all()
-    counts = {}
-    for row in rows:
-        counts[row.source_type or "unknown"] = counts.get(row.source_type or "unknown", 0) + 1
-    return [{"id": source, "source": source, "count": count} for source, count in counts.items()]
+    rows = (
+        db.query(models.SignalEvent.source_type, func.count(models.SignalEvent.id))
+        .group_by(models.SignalEvent.source_type)
+        .all()
+    )
+    return [
+        {"id": source or "unknown", "source": source or "unknown", "count": count}
+        for source, count in rows
+    ]
 
 @app.get("/analytics/recommendations")
 def analytics_recommendations(db: Session = Depends(get_db)):

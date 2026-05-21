@@ -101,8 +101,7 @@ export function ApprovalsQueue({
             alignItems: 'center',
             justifyContent: 'center',
             padding: 'var(--space-xl)',
-            background: 'rgba(255, 255, 255, 0.6)',
-            backdropFilter: 'blur(20px)',
+            background: 'var(--surface-container-low)',
             borderRadius: 'var(--radius-xl)',
             border: '1px dashed var(--outline-variant)',
             gap: 'var(--space-md)',
@@ -133,22 +132,18 @@ export function ApprovalsQueue({
           layout
           variants={REVEAL_UP}
           style={{
-            background: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: 'var(--surface)',
             borderRadius: 'var(--radius-xl)',
-            border: '1px solid #E2E8F0',
+            border: '1px solid var(--outline-variant)',
             overflow: 'hidden',
             cursor: 'pointer',
-            transition: 'border-color 0.2s, box-shadow 0.2s',
+            transition: 'border-color 0.2s',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--primary)';
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 104, 95, 0.12)';
+            e.currentTarget.style.borderColor = 'var(--outline)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = '#E2E8F0';
-            e.currentTarget.style.boxShadow = 'none';
+            e.currentTarget.style.borderColor = 'var(--outline-variant)';
           }}
           onClick={() => onViewDetails(item)}
         >
@@ -400,11 +395,9 @@ function QuickStatsSection({ pendingCount, stats }: { pendingCount: number; stat
     <motion.div
       variants={REVEAL_UP}
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        background: 'var(--surface)',
         borderRadius: 'var(--radius-xl)',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--outline-variant)',
         padding: 'var(--space-lg)',
       }}
     >

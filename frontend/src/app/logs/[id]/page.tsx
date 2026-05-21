@@ -228,8 +228,7 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
             <motion.div 
               variants={REVEAL_UP}
               style={{
-                background: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--surface)',
                 border: `2px solid ${style.border}`,
                 borderRadius: 'var(--radius-xl)',
                 padding: 'var(--space-xl)',
@@ -329,9 +328,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                 }}
@@ -360,9 +358,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                 }}
@@ -399,9 +396,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                   marginBottom: 'var(--space-lg)',
@@ -440,9 +436,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                   marginBottom: 'var(--space-lg)',
@@ -484,9 +479,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                   marginBottom: 'var(--space-lg)',
@@ -543,9 +537,8 @@ export default function LogDetailPage({ params }: { params: Promise<{ id: string
               <motion.div 
                 variants={REVEAL_UP}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid #E2E8F0',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--outline-variant)',
                   borderRadius: 'var(--radius-xl)',
                   padding: 'var(--space-lg)',
                 }}

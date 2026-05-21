@@ -213,21 +213,18 @@ export default function LogsPage() {
                   <motion.div
                     variants={REVEAL_UP}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      backdropFilter: 'blur(20px)',
-                      border: '1px solid #E2E8F0',
+                      background: 'var(--surface)',
+                      border: '1px solid var(--outline-variant)',
                       borderRadius: 'var(--radius-xl)',
                       padding: 'var(--space-lg)',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--primary)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 104, 95, 0.1)';
+                      e.currentTarget.style.borderColor = 'var(--outline)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#E2E8F0';
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = 'var(--outline-variant)';
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

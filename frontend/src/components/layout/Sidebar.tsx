@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { BUTTON_ANIMATION } from '@/lib/animations';
 import { useAuth } from '@/lib/auth';
+import { DotText } from '@/components/ui';
 
 const mainNavItems = [
   { icon: <LayoutDashboard size={20} />, label: 'Operations', href: '/' },
@@ -31,6 +32,25 @@ const mainNavItems = [
 const bottomNavItems = [
   { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },
 ];
+
+function normalizePath(path: string | null) {
+  if (!path || path === '/') {
+    return '/';
+  }
+
+  return path.replace(/\/+$/, '');
+}
+
+function isActivePath(pathname: string | null, href: string) {
+  const currentPath = normalizePath(pathname);
+  const targetPath = normalizePath(href);
+
+  if (targetPath === '/') {
+    return currentPath === '/';
+  }
+
+  return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -71,15 +91,9 @@ export function Sidebar() {
           <Brain size={20} color="var(--on-primary)" style={{ fontVariationSettings: "'FILL' 1" }} />
         </div>
         <div>
-          <h1 style={{
-            fontFamily: 'var(--font-headline)',
-            fontWeight: 700,
-            fontSize: '18px',
-            color: 'var(--primary)',
-            letterSpacing: '-0.02em',
-          }}>
+          <DotText as="h1" size="md" style={{ color: 'var(--text-display)' }}>
             MenuMind
-          </h1>
+          </DotText>
           <p style={{
             fontFamily: 'var(--font-label)',
             fontSize: 'var(--font-size-label-md)',
@@ -92,7 +106,7 @@ export function Sidebar() {
 
       <nav style={{ flex: 1, paddingTop: 'var(--space-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
         {mainNavItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = isActivePath(pathname, item.href);
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
               <motion.button
@@ -132,7 +146,7 @@ export function Sidebar() {
 
       <div style={{ paddingTop: 'var(--space-lg)', borderTop: '1px solid var(--outline-variant)', display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
         {bottomNavItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = isActivePath(pathname, item.href);
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
               <motion.button

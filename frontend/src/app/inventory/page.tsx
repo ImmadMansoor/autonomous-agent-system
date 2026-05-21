@@ -86,10 +86,8 @@ export default function InventoryPage() {
                   initial="hidden"
                   animate="visible"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: `1px solid ${COLORS.TERTIARY}20`,
+                    background: 'var(--surface)',
+                    border: '1px solid var(--outline-variant)',
                     borderRadius: RADIUS.XL,
                     padding: SPACING.LG,
                     display: 'flex',
@@ -97,7 +95,7 @@ export default function InventoryPage() {
                     justifyContent: 'space-between',
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: SHADOWS.CARD,
+                    boxShadow: 'none',
                     height: '100%',
                   }}
                 >

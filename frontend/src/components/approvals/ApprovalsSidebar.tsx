@@ -52,7 +52,7 @@ export function ApprovalsSidebar({
           borderRadius: 'var(--radius-xl)',
           border: '1px solid var(--outline-variant)',
           padding: 'var(--space-lg)',
-          boxShadow: 'var(--shadow-card)',
+          boxShadow: 'none',
         }}
       >
         <h3 style={{
@@ -210,9 +210,9 @@ export function ApprovalsSidebar({
         <div style={{
           marginTop: 'var(--space-lg)',
           padding: 'var(--space-md)',
-          background: 'rgba(255, 255, 255, 0.5)',
+          background: 'var(--surface-container-low)',
           borderRadius: 'var(--radius-lg)',
-          border: '1px solid rgba(188, 201, 198, 0.3)',
+          border: '1px solid var(--outline-variant)',
         }}>
           <p style={{
             fontFamily: 'var(--font-body)',

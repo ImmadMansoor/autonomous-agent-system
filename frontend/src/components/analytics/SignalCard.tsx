@@ -61,15 +61,13 @@ export function SignalCard({
         borderRadius: RADIUS.XL,
         padding: SPACING.LG,
         background: isSelected 
-          ? 'rgba(0, 131, 120, 0.08)' 
-          : 'rgba(255, 255, 255, 0.5)',
+          ? 'var(--surface-container-high)'
+          : 'var(--surface)',
         border: isSelected
-          ? `2px solid ${COLORS.PRIMARY}`
-          : `1px solid ${COLORS.OUTLINE_VARIANT}`,
+          ? `2px solid var(--primary)`
+          : `1px solid var(--outline-variant)`,
         cursor: 'pointer',
-        boxShadow: isSelected ? 'var(--shadow-card)' : 'none',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: 'none',
       }}
     >
       <div style={{

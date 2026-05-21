@@ -72,11 +72,11 @@ export function AIPreferences() {
   return (
     <motion.div variants={REVEAL_UP} initial="hidden" animate="visible">
       <div style={{
-        background: 'rgba(255, 255, 255, 0.8)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderRadius: 'var(--radius-xl)',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--outline-variant)',
         padding: 'var(--space-lg)',
         position: 'relative',
       }}>
@@ -84,7 +84,8 @@ export function AIPreferences() {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(255, 255, 255, 0.5)',
+            background: 'var(--surface)',
+            opacity: 0.8,
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
@@ -365,7 +366,7 @@ function ToggleOption({ label, description, checked, onChange }: ToggleOptionPro
           width: '20px',
           height: '20px',
           borderRadius: '10px',
-          background: 'white',
+          background: 'var(--surface)',
           transition: 'all 0.2s',
         }} />
       </button>

@@ -5,6 +5,7 @@ import { Sparkles, Bolt } from 'lucide-react';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY, FONT_SIZES, SHADOWS } from '@/lib/constants';
 import { REVEAL_UP, BUTTON_ANIMATION } from '@/lib/animations';
 import { useToast } from '@/components/layout/Toast';
+import { DotText } from '@/components/ui';
 
 interface AIInsightCardProps {
   id: string;
@@ -43,10 +44,8 @@ export function AIInsightCard({
       initial="hidden"
       animate="visible"
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(0, 98, 141, 0.2)',
+        background: 'var(--surface)',
+        border: '1px solid var(--outline-variant)',
         borderRadius: RADIUS.XL,
         padding: SPACING.LG,
         display: 'flex',
@@ -54,7 +53,7 @@ export function AIInsightCard({
         justifyContent: 'space-between',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: SHADOWS.CARD,
+        boxShadow: 'none',
         height: '100%',
       }}
     >
@@ -100,15 +99,9 @@ export function AIInsightCard({
           </span>
         </div>
         
-        <h2 style={{
-          fontFamily: TYPOGRAPHY.FONT_HEADLINE,
-          fontSize: FONT_SIZES.HEADLINE_MD,
-          fontWeight: 600,
-          color: COLORS.ON_SURFACE,
-          marginBottom: SPACING.MD,
-        }}>
+        <DotText as="h2" size="lg" style={{ marginBottom: SPACING.MD }}>
           {title}
-        </h2>
+        </DotText>
         
         <p style={{
           fontFamily: TYPOGRAPHY.FONT_BODY,
@@ -140,7 +133,7 @@ export function AIInsightCard({
             alignItems: 'center',
             gap: SPACING.SM,
             cursor: 'pointer',
-            boxShadow: SHADOWS.CARD,
+            boxShadow: 'none',
           }}
         >
           <Bolt size={18} style={{ fontVariationSettings: "'FILL' 1" }} />

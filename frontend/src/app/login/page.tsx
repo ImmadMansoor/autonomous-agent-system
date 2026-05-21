@@ -175,13 +175,11 @@ export default function LoginPage() {
           <motion.div
             variants={REVEAL_UP}
             style={{
-              background: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: `1px solid ${COLORS.TERTIARY}33`,
+              background: 'var(--surface)',
+              border: '1px solid var(--outline-variant)',
               borderRadius: RADIUS.XL,
               padding: SPACING.LG,
-              boxShadow: SHADOWS.CARD,
+              boxShadow: 'none',
               maxWidth: '380px',
             }}
           >

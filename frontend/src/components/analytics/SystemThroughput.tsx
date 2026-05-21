@@ -33,10 +33,8 @@ export function SystemThroughput({ data = defaultData }: SystemThroughputProps) 
         justifyContent: 'space-between',
         position: 'relative',
         overflow: 'hidden',
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid #E2E8F0',
+        background: 'var(--surface)',
+        border: '1px solid var(--outline-variant)',
       }}
     >
       <div style={{

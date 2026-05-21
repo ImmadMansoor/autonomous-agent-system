@@ -105,14 +105,23 @@ export function useOperationsData() {
           timeEstimate: 'Every 15m',
           scheduledAt: new Date(Date.now() + 15 * 60 * 1000),
         },
-        metrics: metrics.map((m, i) => ({
-          id: `metric-${i}`,
-          icon: 'trending_up',
-          label: m.label,
-          value: m.value,
-          changeType: m.trend as 'positive' | 'negative' | 'neutral',
-          color: 'var(--primary)',
-        })),
+        metrics: metrics.map((m, i) => {
+          let icon = 'trending-up';
+          const labelLower = m.label.toLowerCase();
+          if (labelLower.includes('planner')) {
+            icon = 'settings';
+          } else if (labelLower.includes('items')) {
+            icon = 'dollar-sign';
+          }
+          return {
+            id: `metric-${i}`,
+            icon,
+            label: m.label,
+            value: m.value,
+            changeType: m.trend as 'positive' | 'negative' | 'neutral',
+            color: 'var(--primary)',
+          };
+        }),
         liveSignals: signals.slice(0, 10).map((s, i) => ({
           id: s.id,
           type: s.type as LiveSignal['type'],

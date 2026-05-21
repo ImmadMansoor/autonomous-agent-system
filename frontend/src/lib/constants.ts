@@ -1,63 +1,64 @@
 // Color palette
+// Color palette
 export const COLORS = {
-  SURFACE: '#f7f9fb',
-  SURFACE_DIM: '#d8dadc',
-  SURFACE_BRIGHT: '#f7f9fb',
-  SURFACE_CONTAINER_LOWEST: '#ffffff',
-  SURFACE_CONTAINER_LOWest: '#ffffff',
-  SURFACE_CONTAINER_LOW: '#f2f4f6',
-  SURFACE_CONTAINER: '#eceef0',
-  SURFACE_CONTAINER_HIGH: '#e6e8ea',
-  SURFACE_CONTAINER_HIGHEST: '#e0e3e5',
-  SURFACE_VARIANT: '#e0e3e5',
+  SURFACE: 'var(--surface)',
+  SURFACE_DIM: 'var(--surface-dim)',
+  SURFACE_BRIGHT: 'var(--surface-bright)',
+  SURFACE_CONTAINER_LOWEST: 'var(--surface-container-lowest)',
+  SURFACE_CONTAINER_LOWest: 'var(--surface-container-lowest)',
+  SURFACE_CONTAINER_LOW: 'var(--surface-container-low)',
+  SURFACE_CONTAINER: 'var(--surface-container)',
+  SURFACE_CONTAINER_HIGH: 'var(--surface-container-high)',
+  SURFACE_CONTAINER_HIGHEST: 'var(--surface-container-highest)',
+  SURFACE_VARIANT: 'var(--surface-variant)',
 
-  ON_SURFACE: '#191c1e',
-  ON_SURFACE_VARIANT: '#3d4947',
-  INVERSE_SURFACE: '#2d3133',
-  INVERSE_ON_SURFACE: '#eff1f3',
+  ON_SURFACE: 'var(--on-surface)',
+  ON_SURFACE_VARIANT: 'var(--on-surface-variant)',
+  INVERSE_SURFACE: 'var(--inverse-surface)',
+  INVERSE_ON_SURFACE: 'var(--inverse-on-surface)',
 
-  OUTLINE: '#6d7a77',
-  OUTLINE_VARIANT: '#bcc9c6',
-  SURFACE_TINT: '#006a61',
+  OUTLINE: 'var(--outline)',
+  OUTLINE_VARIANT: 'var(--outline-variant)',
+  SURFACE_TINT: 'var(--surface-tint)',
 
-  PRIMARY: '#00685f',
-  PRIMARY_CONTAINER: '#008378',
-  ON_PRIMARY: '#ffffff',
-  ON_PRIMARY_CONTAINER: '#f4fffc',
-  INVERSE_PRIMARY: '#6bd8cb',
+  PRIMARY: 'var(--primary)',
+  PRIMARY_CONTAINER: 'var(--primary-container)',
+  ON_PRIMARY: 'var(--on-primary)',
+  ON_PRIMARY_CONTAINER: 'var(--on-primary-container)',
+  INVERSE_PRIMARY: 'var(--inverse-primary)',
 
-  SECONDARY: '#505f76',
-  SECONDARY_CONTAINER: '#d0e1fb',
-  ON_SECONDARY: '#ffffff',
-  ON_SECONDARY_CONTAINER: '#54647a',
+  SECONDARY: 'var(--secondary)',
+  SECONDARY_CONTAINER: 'var(--secondary-container)',
+  ON_SECONDARY: 'var(--on-secondary)',
+  ON_SECONDARY_CONTAINER: 'var(--on-secondary-container)',
 
-  TERTIARY: '#00628d',
-  TERTIARY_CONTAINER: '#007cb1',
-  ON_TERTIARY: '#ffffff',
-  ON_TERTIARY_CONTAINER: '#fcfcff',
+  TERTIARY: 'var(--tertiary)',
+  TERTIARY_CONTAINER: 'var(--tertiary-container)',
+  ON_TERTIARY: 'var(--on-tertiary)',
+  ON_TERTIARY_CONTAINER: 'var(--on-tertiary-container)',
 
-  ERROR: '#ba1a1a',
-  ERROR_CONTAINER: '#ffdad6',
-  ON_ERROR: '#ffffff',
-  ON_ERROR_CONTAINER: '#93000a',
+  ERROR: 'var(--error)',
+  ERROR_CONTAINER: 'var(--error-container)',
+  ON_ERROR: 'var(--on-error)',
+  ON_ERROR_CONTAINER: 'var(--on-error-container)',
 
-  PRIMARY_FIXED: '#89f5e7',
-  PRIMARY_FIXED_DIM: '#6bd8cb',
-  ON_PRIMARY_FIXED: '#00201d',
-  ON_PRIMARY_FIXED_VARIANT: '#005049',
+  PRIMARY_FIXED: 'var(--primary-container)',
+  PRIMARY_FIXED_DIM: 'var(--primary-container)',
+  ON_PRIMARY_FIXED: 'var(--on-primary-container)',
+  ON_PRIMARY_FIXED_VARIANT: 'var(--on-primary-container)',
 
-  SECONDARY_FIXED: '#d3e4fe',
-  SECONDARY_FIXED_DIM: '#b7c8e1',
-  ON_SECONDARY_FIXED: '#0b1c30',
-  ON_SECONDARY_FIXED_VARIANT: '#38485d',
+  SECONDARY_FIXED: 'var(--secondary-container)',
+  SECONDARY_FIXED_DIM: 'var(--secondary-container)',
+  ON_SECONDARY_FIXED: 'var(--on-secondary-container)',
+  ON_SECONDARY_FIXED_VARIANT: 'var(--on-secondary-container)',
 
-  TERTIARY_FIXED: '#c9e6ff',
-  TERTIARY_FIXED_DIM: '#89ceff',
-  ON_TERTIARY_FIXED: '#001e2f',
-  ON_TERTIARY_FIXED_VARIANT: '#004c6e',
+  TERTIARY_FIXED: 'var(--tertiary-container)',
+  TERTIARY_FIXED_DIM: 'var(--tertiary-container)',
+  ON_TERTIARY_FIXED: 'var(--on-tertiary-container)',
+  ON_TERTIARY_FIXED_VARIANT: 'var(--on-tertiary-container)',
 
-  BACKGROUND: '#f7f9fb',
-  ON_BACKGROUND: '#191c1e',
+  BACKGROUND: 'var(--background)',
+  ON_BACKGROUND: 'var(--on-background)',
 } as const;
 
 // Spacing scale
@@ -73,19 +74,19 @@ export const SPACING = {
 
 // Border radius
 export const RADIUS = {
-  SM: '4px',
-  MD: '8px',
-  LG: '12px',
-  XL: '16px',
-  FULL: '9999px',
+  SM: 'var(--radius-sm)',
+  MD: 'var(--radius-md)',
+  LG: 'var(--radius-lg)',
+  XL: 'var(--radius-xl)',
+  FULL: 'var(--radius-full)',
 } as const;
 
 // Typography
 export const TYPOGRAPHY = {
-  FONT_HEADLINE: "'Plus Jakarta Sans', system-ui, sans-serif",
-  FONT_BODY: "'Inter', system-ui, sans-serif",
-  FONT_MONO: "'Inter', monospace",
-  FONT_LABEL: "'Inter', system-ui, sans-serif",
+  FONT_HEADLINE: "var(--font-headline), system-ui, sans-serif",
+  FONT_BODY: "var(--font-body), system-ui, sans-serif",
+  FONT_MONO: "var(--font-mono), monospace",
+  FONT_LABEL: "var(--font-label), monospace",
 } as const;
 
 // Font sizes
@@ -108,15 +109,15 @@ export const LAYOUT = {
 
 // Shadows
 export const SHADOWS = {
-  CARD: '0px 4px 12px rgba(15, 23, 42, 0.05)',
-  ELEVATED: '0px 8px 24px rgba(15, 23, 42, 0.1)',
+  CARD: 'var(--shadow-card)',
+  ELEVATED: 'var(--shadow-elevated)',
 } as const;
 
 // Glass effect
 export const GLASS = {
-  BACKGROUND: 'rgba(255, 255, 255, 0.8)',
-  BACKDROP_FILTER: 'blur(20px)',
-  BORDER: '1px solid #E2E8F0',
+  BACKGROUND: 'var(--surface)',
+  BACKDROP_FILTER: 'none',
+  BORDER: '1px solid var(--outline-variant)',
 } as const;
 
 // Animation durations

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Zap, Radio } from 'lucide-react';
 import { REVEAL_UP } from '@/lib/animations';
 import { SystemHealth, NextCycle, formatRelativeTime } from '@/data';
+import { DotText, SegmentedBar } from '@/components/ui';
 
 interface HeroStatusProps {
   systemHealth: SystemHealth;
@@ -12,9 +13,8 @@ interface HeroStatusProps {
 }
 
 const glassCardStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.8)',
-  backdropFilter: 'blur(20px)',
-  border: '1px solid #E2E8F0',
+  background: 'var(--surface)',
+  border: '1px solid var(--outline-variant)',
   borderRadius: 'var(--radius-xl)',
 };
 
@@ -32,6 +32,7 @@ export function HeroStatus({ systemHealth, nextCycle }: HeroStatusProps) {
     >
       <motion.div
         variants={REVEAL_UP}
+        className="dot-grid-subtle"
         style={{
           ...glassCardStyle,
           gridColumn: 'span 8',
@@ -45,26 +46,20 @@ export function HeroStatus({ systemHealth, nextCycle }: HeroStatusProps) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 10 }}>
           <div>
-            <p style={{
-              fontFamily: 'var(--font-label)',
-              fontSize: 'var(--font-size-label-md)',
-              color: 'var(--primary)',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              marginBottom: 'var(--space-xs)',
-            }}>
+            <p className="label-caps" style={{ marginBottom: 'var(--space-xs)' }}>
               System Health
             </p>
-            <h3 style={{
-              fontFamily: 'var(--font-headline)',
-              fontSize: 'var(--font-size-headline-lg)',
-              fontWeight: 700,
-              color: 'var(--on-surface)',
-              marginBottom: 'var(--space-md)',
-            }}>
-              AI Reasoning Engine: {systemHealth.status === 'active' ? 'Active' : systemHealth.status.charAt(0).toUpperCase() + systemHealth.status.slice(1)}
-            </h3>
+            <p className="label-caps" style={{ marginBottom: 'var(--space-sm)', color: 'var(--on-surface-variant)' }}>
+              AI Reasoning Engine
+            </p>
+            <DotText
+              as="h3"
+              size="display"
+              uppercase
+              style={{ marginBottom: 'var(--space-md)' }}
+            >
+              {systemHealth.status === 'active' ? 'OPERATIONAL' : systemHealth.status.toUpperCase()}
+            </DotText>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
               <span style={{
                 display: 'flex',
@@ -109,23 +104,17 @@ export function HeroStatus({ systemHealth, nextCycle }: HeroStatusProps) {
               Data Throughput: {systemHealth.dataProcessed}
             </span>
           </div>
-          <div style={{
-            width: '100%',
-            background: 'var(--surface-container)',
-            borderRadius: '9999px',
-            height: '6px',
-          }}>
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${systemHealth.throughputPercent}%` }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              style={{
-                background: 'var(--primary)',
-                height: '6px',
-                borderRadius: '9999px',
-              }} 
-            />
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 'var(--space-xs)' }}>
+            <span className="label-caps">Throughput</span>
+            <DotText size="sm" style={{ color: 'var(--nothing-accent)' }}>
+              {systemHealth.throughputPercent}%
+            </DotText>
           </div>
+          <SegmentedBar
+            value={systemHealth.throughputPercent}
+            fillColor="var(--nothing-accent)"
+            height={10}
+          />
         </div>
       </motion.div>
 
@@ -156,14 +145,9 @@ export function HeroStatus({ systemHealth, nextCycle }: HeroStatusProps) {
           }}>
             Next AI Cycle
           </p>
-          <h4 style={{
-            fontFamily: 'var(--font-headline)',
-            fontSize: 'var(--font-size-headline-md)',
-            fontWeight: 600,
-            marginBottom: 'var(--space-md)',
-          }}>
+          <DotText as="h4" size="lg" style={{ marginBottom: 'var(--space-md)', color: 'var(--on-primary)' }}>
             {nextCycle.title}
-          </h4>
+          </DotText>
           <p style={{
             fontFamily: 'var(--font-body)',
             fontSize: 'var(--font-size-body-md)',

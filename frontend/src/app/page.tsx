@@ -43,7 +43,7 @@ export default function Home() {
         <div style={{ flex: 1, marginLeft: 'var(--sidebar-width)', minHeight: '100vh' }}>
           <Navbar 
             title="Operations Console" 
-            subtitle={isLoading ? 'Loading...' : `Last updated: ${data.lastUpdated.toLocaleTimeString()}`}
+            subtitle={isLoading ? 'Loading...' : `Last updated: ${data.lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`}
           />
           
           <main style={{ 

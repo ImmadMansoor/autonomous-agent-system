@@ -7,20 +7,46 @@ import { useRouter } from 'next/navigation';
 import { Bell, Activity, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 import { BUTTON_ANIMATION } from '@/lib/animations';
 import { useAuth } from '@/lib/auth';
+import { DotText } from '@/components/ui';
 
 interface NavbarProps {
   title?: string;
   subtitle?: string;
 }
 
-export function Navbar({ 
-  title = 'Dashboard', 
-  subtitle 
+export function Navbar({
+  title = 'Dashboard',
+  subtitle
 }: NavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string | number, message: string, time: string, read: boolean }>>([]);
   const router = useRouter();
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('menumind_theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      setTheme('dark');
+      document.documentElement.classList.add('dark-theme');
+    } else {
+      setTheme('light');
+      document.documentElement.classList.remove('dark-theme');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    localStorage.setItem('menumind_theme', nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+    }
+  };
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -132,27 +158,110 @@ export function Navbar({
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
         <div>
-          <h2 style={{
-            fontFamily: 'var(--font-headline)',
-            fontSize: 'var(--font-size-headline-sm)',
-            fontWeight: 600,
-            color: 'var(--primary)',
-          }}>
-            {title}
-          </h2>
+          <DotText as="h2" size="md" style={{ color: 'var(--text-display)' }}>
+            {title.replace(/\s+/g, ' ').toUpperCase()}
+          </DotText>
           {subtitle && (
-            <p style={{
-              fontSize: 'var(--font-size-label-md)',
-              color: 'var(--on-surface-variant)',
-              marginTop: '2px',
-            }}>
-              {subtitle}
+            <p style={{ marginTop: '6px' }}>
+              <span className="label-caps" style={{ marginRight: '8px' }}>
+                Updated
+              </span>
+              {(() => {
+                const match = subtitle.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+                if (!match) {
+                  return (
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 'var(--font-size-label-md)',
+                      color: 'var(--on-surface-variant)',
+                    }}>
+                      {subtitle}
+                    </span>
+                  );
+                }
+                const [, h, m, s] = match;
+                const formattedTime = `${h}:${m}${s != null ? `:${s}` : ''}`;
+                return (
+                  <span className="data-number data-number-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                    {formattedTime}
+                  </span>
+                );
+              })()}
             </p>
           )}
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+        {/* Nothing Mechanical Theme Toggle */}
+        <div
+          onClick={toggleTheme}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--surface-container-high)',
+            border: '1px solid var(--outline-variant)',
+            borderRadius: 'var(--radius-full)',
+            padding: '2px',
+            cursor: 'pointer',
+            position: 'relative',
+            width: '56px',
+            height: '28px',
+            userSelect: 'none',
+            transition: 'border-color 0.2s',
+            marginRight: '8px',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--outline)'}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--outline-variant)'}
+          title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+        >
+          {/* Knob */}
+          <motion.div
+            animate={{ x: theme === 'dark' ? 26 : 0 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            style={{
+              width: '22px',
+              height: '22px',
+              borderRadius: '50%',
+              background: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              left: '3px',
+              top: '2px',
+              boxShadow: 'none',
+            }}
+          >
+            {/* Red LED accent dot in Nothing Style */}
+            <span style={{
+              width: '4px',
+              height: '4px',
+              borderRadius: '50%',
+              background: '#d71921',
+              display: 'block',
+            }} />
+          </motion.div>
+
+          {/* Background dot labels */}
+          <div style={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'space-between',
+            padding: '0 8px',
+            fontSize: '9px',
+            fontFamily: 'var(--font-mono)',
+            fontWeight: 700,
+            color: 'var(--on-surface-variant)',
+            pointerEvents: 'none',
+            lineHeight: 1,
+            alignItems: 'center',
+          }}>
+            <span style={{ opacity: theme === 'light' ? 0.2 : 0.8 }}>D</span>
+            <span style={{ opacity: theme === 'dark' ? 0.2 : 0.8 }}>L</span>
+          </div>
+        </div>
+
         <motion.button
           {...BUTTON_ANIMATION}
           style={{
@@ -191,20 +300,21 @@ export function Navbar({
             {unreadCount > 0 && (
               <span style={{
                 position: 'absolute',
-                top: '4px',
-                right: '4px',
-                width: '16px',
-                height: '16px',
-                borderRadius: '50%',
-                background: 'var(--error)',
-                color: 'var(--on-error)',
-                fontSize: '10px',
-                fontWeight: 600,
+                top: '2px',
+                right: '2px',
+                minWidth: '20px',
+                height: '20px',
+                borderRadius: '4px',
+                background: 'var(--nothing-accent)',
+                color: '#fff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                padding: '0 4px',
               }}>
-                {unreadCount}
+                <DotText size="sm" style={{ fontSize: '12px', color: '#fff' }}>
+                  {unreadCount}
+                </DotText>
               </span>
             )}
           </motion.button>

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, Lightbulb, Sparkles } from 'lucide-react';
 import { REVEAL_UP } from '@/lib/animations';
 import { AISuggestion as AISuggestionType } from '@/data';
+import { DotText } from '@/components/ui';
 
 interface AISuggestionProps {
   suggestion: AISuggestionType;
@@ -21,7 +22,6 @@ const categoryColors: Record<string, string> = {
 };
 
 const getCategoryColor = (category: string) => categoryColors[category] || 'var(--primary)';
-
 
 export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionProps) {
   const [isApplied, setIsApplied] = useState(false);
@@ -40,12 +40,11 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
     <motion.div
       variants={REVEAL_UP}
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid #E2E8F0',
+        background: 'var(--surface)',
+        border: '1px solid var(--outline-variant)',
         borderRadius: 'var(--radius-xl)',
         padding: 'var(--space-lg)',
-        backgroundColor: `${getCategoryColor(suggestion.category)}10`,
+        backgroundImage: `linear-gradient(${getCategoryColor(suggestion.category)}08, ${getCategoryColor(suggestion.category)}08)`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-sm)' }}>
@@ -69,7 +68,7 @@ export function AISuggestion({ suggestion, onApply, onDismiss }: AISuggestionPro
           fontSize: 'var(--font-size-label-md)',
         }}>
           <Sparkles size={12} />
-          <span>{suggestion.confidence}%</span>
+          <DotText size="sm" style={{ color: 'var(--on-surface-variant)' }}>{suggestion.confidence}%</DotText>
         </div>
       </div>
       <p style={{

@@ -92,11 +92,11 @@ export function SecuritySettings() {
   return (
     <motion.div variants={REVEAL_UP} initial="hidden" animate="visible">
       <div style={{
-        background: 'rgba(255, 255, 255, 0.8)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderRadius: 'var(--radius-xl)',
-        border: '1px solid #E2E8F0',
+        border: '1px solid var(--outline-variant)',
         padding: 'var(--space-lg)',
         position: 'relative',
       }}>
@@ -104,7 +104,8 @@ export function SecuritySettings() {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(255, 255, 255, 0.5)',
+            background: 'var(--surface)',
+            opacity: 0.8,
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
@@ -266,7 +267,7 @@ export function SecuritySettings() {
                   width: '24px',
                   height: '24px',
                   borderRadius: '12px',
-                  background: 'white',
+                  background: 'var(--surface)',
                   transition: 'all 0.2s',
                 }} />
               </button>

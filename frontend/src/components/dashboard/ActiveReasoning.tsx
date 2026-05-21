@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { History, ChevronRight } from 'lucide-react';
 import { STAGGER_CONTAINER, REVEAL_UP } from '@/lib/animations';
 import { ReasoningItem as ReasoningItemType } from '@/data';
+import { DotText, SegmentedBar } from '@/components/ui';
 
 interface ActiveReasoningProps {
   items: ReasoningItemType[];
@@ -23,9 +24,8 @@ export function ActiveReasoning({ items }: ActiveReasoningProps) {
     <motion.div
       variants={REVEAL_UP}
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid #E2E8F0',
+        background: 'var(--surface)',
+        border: '1px solid var(--outline-variant)',
         borderRadius: 'var(--radius-xl)',
         overflow: 'hidden',
         display: 'flex',
@@ -146,31 +146,38 @@ export function ActiveReasoning({ items }: ActiveReasoningProps) {
               </p>
               {item.confidence && (
                 <div style={{
-                  marginTop: 'var(--space-sm)',
+                  marginTop: 'var(--space-md)',
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
                   gap: 'var(--space-xs)',
                 }}>
-                  <div style={{
-                    width: '60px',
-                    height: '4px',
-                    background: 'var(--surface-container)',
-                    borderRadius: '9999px',
-                    overflow: 'hidden',
-                  }}>
-                    <div style={{
-                      width: `${item.confidence}%`,
-                      height: '100%',
-                      background: item.confidence >= 90 ? 'var(--primary)' : item.confidence >= 70 ? '#f59e0b' : 'var(--error)',
-                      borderRadius: '9999px',
-                    }} />
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    <span className="label-caps">Confidence</span>
+                    <DotText
+                      size="sm"
+                      style={{
+                        color: item.confidence >= 90
+                          ? 'var(--success)'
+                          : item.confidence >= 70
+                            ? 'var(--warning)'
+                            : 'var(--error)',
+                      }}
+                    >
+                      {item.confidence}%
+                    </DotText>
                   </div>
-                  <span style={{
-                    fontSize: 'var(--font-size-label-md)',
-                    color: 'var(--on-surface-variant)',
-                  }}>
-                    {item.confidence}% confidence
-                  </span>
+                  <SegmentedBar
+                    value={item.confidence}
+                    segments={20}
+                    fillColor={
+                      item.confidence >= 90
+                        ? 'var(--success)'
+                        : item.confidence >= 70
+                          ? 'var(--warning)'
+                          : 'var(--error)'
+                    }
+                    height={6}
+                  />
                 </div>
               )}
             </motion.div>
@@ -182,7 +189,7 @@ export function ActiveReasoning({ items }: ActiveReasoningProps) {
       <Link href="/logs" style={{ textDecoration: 'none' }}>
         <motion.button
           variants={REVEAL_UP}
-          whileHover={{ background: 'rgba(0, 104, 95, 0.05)' }}
+          whileHover={{ background: 'var(--surface-container-low)' }}
           whileTap={{ scale: 0.98 }}
           style={{
             padding: 'var(--space-md)',

@@ -12,6 +12,25 @@ const navItems = [
   { icon: Settings, label: 'Settings', href: '/settings', activeIcon: false },
 ];
 
+function normalizePath(path: string | null) {
+  if (!path || path === '/') {
+    return '/';
+  }
+
+  return path.replace(/\/+$/, '');
+}
+
+function isActivePath(pathname: string | null, href: string) {
+  const currentPath = normalizePath(pathname);
+  const targetPath = normalizePath(href);
+
+  if (targetPath === '/') {
+    return currentPath === '/';
+  }
+
+  return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+}
+
 export function MobileNav() {
   const pathname = usePathname();
 
@@ -31,7 +50,7 @@ export function MobileNav() {
       zIndex: 50,
     }}>
       {navItems.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = isActivePath(pathname, item.href);
         const Icon = item.icon;
         
         return (

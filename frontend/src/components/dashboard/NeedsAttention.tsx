@@ -7,6 +7,7 @@ import { STAGGER_CONTAINER, REVEAL_UP, BUTTON_ANIMATION } from '@/lib/animations
 import { AttentionItem as AttentionItemType } from '@/data';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY, FONT_SIZES } from '@/lib/constants';
 import { useToast } from '@/components/layout/Toast';
+import { DotText } from '@/components/ui';
 
 interface NeedsAttentionProps {
   items: AttentionItemType[];
@@ -46,9 +47,8 @@ export function NeedsAttention({ items, onAction, onViewDetails }: NeedsAttentio
       <motion.div
         variants={REVEAL_UP}
         style={{
-          background: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid #E2E8F0',
+          background: 'var(--surface)',
+          border: '1px solid var(--outline-variant)',
           borderRadius: 'var(--radius-xl)',
           overflow: 'hidden',
           padding: 'var(--space-xl)',
@@ -71,9 +71,8 @@ export function NeedsAttention({ items, onAction, onViewDetails }: NeedsAttentio
     <motion.div
       variants={REVEAL_UP}
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid #0EA5E9',
+        background: 'var(--surface)',
+        border: '1px solid var(--outline-variant)',
         borderRadius: 'var(--radius-xl)',
         overflow: 'hidden',
       }}
@@ -101,11 +100,14 @@ export function NeedsAttention({ items, onAction, onViewDetails }: NeedsAttentio
           background: 'var(--error)',
           color: 'var(--on-error)',
           padding: '2px 8px',
-          borderRadius: '9999px',
-          fontSize: 'var(--font-size-label-md)',
-          fontWeight: 600,
+          borderRadius: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}>
-          {items.length}
+          <DotText size="sm" style={{ color: 'var(--on-error)', lineHeight: 1 }}>
+            {items.length}
+          </DotText>
         </span>
       </div>
 

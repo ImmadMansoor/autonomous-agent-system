@@ -112,7 +112,7 @@ export default function SignupPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#f7f9fb',
+      background: COLORS.BACKGROUND,
       display: 'flex',
       overflowX: 'hidden',
     }}>
@@ -197,11 +197,10 @@ export default function SignupPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: SPACING.MD,
-                background: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(20px)',
+                background: COLORS.SURFACE,
                 padding: SPACING.MD,
                 borderRadius: RADIUS.XL,
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: `1px solid ${COLORS.OUTLINE_VARIANT}`,
               }}
             >
               <div style={{
