@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TrendingUp, TrendingDown, ChevronDown, X } from "lucide-react";
-import Gauge from "./Gauge.tsx";
+import Gauge from "./Gauge";
 
 export default function DashboardPreview() {
   // --- Card 1 State ---

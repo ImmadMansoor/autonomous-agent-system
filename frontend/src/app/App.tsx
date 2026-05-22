@@ -1,12 +1,14 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
-import Navbar from "./components/Navbar.tsx";
-import DashboardPreview from "./components/DashboardPreview.tsx";
-import FeatureMatrix from "./components/FeatureMatrix.tsx";
-import SimulationConsole from "./components/SimulationConsole.tsx";
-import SandboxModel from "./components/SandboxModel.tsx";
-import AgentLogs from "./components/AgentLogs.tsx";
-import Footer from "./components/Footer.tsx";
+import Navbar from "./components/Navbar";
+import DashboardPreview from "./components/DashboardPreview";
+import FeatureMatrix from "./components/FeatureMatrix";
+import SimulationConsole from "./components/SimulationConsole";
+import SandboxModel from "./components/SandboxModel";
+import AgentLogs from "./components/AgentLogs";
+import Footer from "./components/Footer";
 
 export default function App() {
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);

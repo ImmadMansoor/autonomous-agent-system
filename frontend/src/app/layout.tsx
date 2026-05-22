@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import '../index.css'
 import { ToastProvider } from '@/components/layout'
 import { AuthProvider } from '@/lib/auth'
 
 export const metadata: Metadata = {
-  title: 'MenuMind - Operations Dashboard',
-  description: 'AI-powered cafe management system',
+  title: 'MenuMind - Autonomous Cafe Agent',
+  description: 'Autonomous agent platform for cafe menu and operations intelligence',
 }
 
 export default function RootLayout({
