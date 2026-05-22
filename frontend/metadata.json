@@ -1,0 +1,6 @@
+{
+  "name": "MenuMind",
+  "description": "An autonomous cafe operations platform that processes market telemetry into instant menu adjustments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
