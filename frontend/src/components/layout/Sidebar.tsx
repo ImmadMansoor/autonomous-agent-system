@@ -91,8 +91,9 @@ export function Sidebar() {
           <Brain size={20} color="var(--on-primary)" style={{ fontVariationSettings: "'FILL' 1" }} />
         </div>
         <div>
-          <DotText as="h1" size="md" style={{ color: 'var(--text-display)' }}>
+          <DotText as="h1" size="md" style={{ color: 'var(--text-display)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             MenuMind
+            <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d71921', display: 'inline-block' }} />
           </DotText>
           <p style={{
             fontFamily: 'var(--font-label)',

@@ -1,32 +1,17 @@
-.git/
-.venv/
-venv/
-node_modules/
-frontend/dist/
-frontend/android/
-frontend/ios/
-frontend/.gradle/
-backend/__pycache__/
-artifacts/
-GITHUB REPO/
-*.db
-*.log
-*.pid
-*.apk
-*.pdf
-*.png
-*.jpg
-*.jpeg
-frontend/package-lock.json
-pdf_extract.txt
-agent_brain.py
-challenges.txt
-
-# Historical/reference docs. Open manually only when the task is strategy or judging alignment.
-Google Antigravity Hackathon - Challenges.md
-MenuMind_Project_Proposal_Final.md
-MenuMind_Simulation_Ledger.md
-MenuMind_Technical_DataFlow_Architecture.md
-PROJECT_HISTORY_A_TO_Z.txt
-SHARED_BRAINSTORMING.md
-SHARED_PLAN.md
+**/node_modules/**
+**/.gradle/**
+**/.cxx/**
+**/build/**
+**/dist/**
+**/.expo/**
+**/.git/**
+**/android/app/build/**
+**/android/.gradle/**
+**/android/.kotlin/**
+G:/MenuMind-LiquidGlass/**
+MenuMind-Mobile/**
+MenuMind-UI-Lab/**
+MenuMind-V2-NativeCompose/**
+MenuMind-V2-SourceCode/**
+autonomous-agent-system-main (4)/**
+mobile apk/APK/Archive/**

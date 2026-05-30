@@ -22,6 +22,12 @@ When recording cross-model discussion in markdown, refer to this assistant as Ca
 - Extracted PDF markdown files were compressed into summaries; use the PDFs only if exact challenge wording is needed.
 - Never read `node_modules`, `.venv`, `dist`, `.db`, logs, PDFs, screenshots, or generated artifacts for normal coding tasks.
 
+## UI Experiments (local only)
+
+- Nothing Phone-inspired design skill: `.cursor/skills/nothing-design/SKILL.md` (trigger: "Nothing style", "/nothing-design", or explicit UI experiment).
+- Experimental UI work stays on branch `ui-experiment`; do not push or deploy until the user approves.
+- Rollback copy: `frontend/src_backup` mirrors last known-good `frontend/src`.
+
 ## Safe Priorities
 
 1. Preserve the working signal -> plan -> tools -> database -> trace -> UI loop.

@@ -26,26 +26,19 @@ export function Navbar({
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('menumind_theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
 
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setTheme('dark');
-      document.documentElement.classList.add('dark-theme');
-    } else {
-      setTheme('light');
-      document.documentElement.classList.remove('dark-theme');
-    }
+    setTheme(initialTheme);
+    document.documentElement.classList.toggle('dark-theme', initialTheme === 'dark');
+    document.documentElement.dataset.theme = initialTheme;
   }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
     localStorage.setItem('menumind_theme', nextTheme);
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-    } else {
-      document.documentElement.classList.remove('dark-theme');
-    }
+    document.documentElement.classList.toggle('dark-theme', nextTheme === 'dark');
+    document.documentElement.dataset.theme = nextTheme;
   };
 
   useEffect(() => {

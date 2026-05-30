@@ -2,19 +2,15 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "MenuMind",
   "version": "0.1.0",
-  "identifier": "com.menumind.desktop",
+  "identifier": "com.menumind.operations.app",
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "",
-    "devUrl": "https://menumind-nu.vercel.app",
-    "frontendDist": "../desktop-shell"
+    "frontendDist": "../out"
   },
   "app": {
     "windows": [
       {
         "label": "main",
         "title": "MenuMind Cafe Operations",
-        "url": "https://menumind-nu.vercel.app",
         "width": 1440,
         "height": 950,
         "minWidth": 1100,

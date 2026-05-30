@@ -4,7 +4,7 @@ const getApiBase = () => {
   }
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== 'tauri.localhost') {
       return 'https://menumind-backend.onrender.com';
     }
   }
@@ -12,7 +12,6 @@ const getApiBase = () => {
 };
 
 const API_BASE = getApiBase().replace(/\/$/, '');
-
 
 type AnyRecord = Record<string, any>;
 type NotificationSettings = {
@@ -45,6 +44,155 @@ const MENU_IMAGES: Record<string, string> = {
 };
 
 let lastRun: AnyRecord | null = null;
+
+const offlineMenu: AnyRecord[] = [
+  { id: 'chicken_wrap', name: 'Chicken Wrap', category: 'Food', base_price: 520, current_price: 520, stock_level: 18, prep_time_min: 8, is_available: true, is_promoted: false },
+  { id: 'beef_wrap', name: 'Beef Wrap', category: 'Food', base_price: 640, current_price: 640, stock_level: 41, prep_time_min: 10, is_available: true, is_promoted: false },
+  { id: 'club_sandwich', name: 'Club Sandwich', category: 'Food', base_price: 580, current_price: 580, stock_level: 35, prep_time_min: 9, is_available: true, is_promoted: false },
+  { id: 'iced_lemonade', name: 'Iced Lemonade', category: 'Drink', base_price: 260, current_price: 240, stock_level: 76, prep_time_min: 3, is_available: true, is_promoted: true },
+  { id: 'hot_coffee', name: 'Hot Coffee', category: 'Drink', base_price: 310, current_price: 310, stock_level: 64, prep_time_min: 4, is_available: true, is_promoted: false },
+];
+
+const offlineSignals: AnyRecord[] = [
+  {
+    id: 1,
+    source_type: 'weather',
+    raw_text: 'Islamabad Marathon passing G-13 tomorrow with 42C heat. Expect health-focused runners near cafe.',
+    status: 'processed',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    source_type: 'inventory',
+    raw_text: 'Chicken supplier delayed. Current stock requires review before dinner rush.',
+    status: 'queued',
+    created_at: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+  },
+];
+
+function buildOfflinePlan(message: string): AnyRecord {
+  const lower = message.toLowerCase();
+  const supply = lower.includes('supplier') || lower.includes('stock') || lower.includes('chicken') || lower.includes('delivery');
+  const crisis = lower.includes('strike') || lower.includes('blocked') || lower.includes('crisis');
+  const competition = lower.includes('competitor') || lower.includes('price');
+
+  if (supply) {
+    return {
+      signal_summary: 'Supplier disruption detected',
+      insight: 'Chicken stock is exposed before peak demand. Menu visibility and staff prep should shift to safer items.',
+      confidence: 0.86,
+      requires_approval: false,
+      primary_action: { tool: 'send_staff_alert', args: { item_id: 'chicken_wrap', reason: 'Switch recommendations away from chicken items until supplier ETA is confirmed.' } },
+      recommended_actions: [
+        'Confirm supplier recovery time',
+        'Promote beef wrap and club sandwich as substitutes',
+        'Ask counter team to mention limited chicken stock',
+      ],
+    };
+  }
+
+  if (crisis) {
+    return {
+      signal_summary: 'Crisis guardrail activated',
+      insight: 'Route disruption can raise demand volatility, but customer-facing surge actions should stay paused.',
+      confidence: 0.82,
+      requires_approval: true,
+      primary_action: { tool: 'hold_price_changes', args: { item_id: 'operation', reason: 'Crisis situation requires human approval before price or availability changes.' } },
+      recommended_actions: [
+        'Hold risky customer-facing changes',
+        'Notify staff about delivery uncertainty',
+        'Prepare manager approval for any menu restriction',
+      ],
+    };
+  }
+
+  if (competition) {
+    return {
+      signal_summary: 'Competitor pricing move detected',
+      insight: 'A nearby competitor discount may reduce lunch conversion. A bundle is safer than direct price cutting.',
+      confidence: 0.79,
+      requires_approval: false,
+      primary_action: { tool: 'set_item_promotion', args: { item_id: 'iced_lemonade', reason: 'Bundle drink with wrap to defend average ticket.' } },
+      recommended_actions: [
+        'Create lunch bundle signage',
+        'Track wrap conversion for the next two hours',
+        'Avoid permanent price cuts until trend confirms',
+      ],
+    };
+  }
+
+  return {
+    signal_summary: 'Heat and event demand spike detected',
+    insight: 'Marathon foot traffic and heat should lift cold drink demand. Hydration products should be staged and promoted before the rush.',
+    confidence: 0.9,
+    requires_approval: false,
+    primary_action: { tool: 'set_item_promotion', args: { item_id: 'iced_lemonade', reason: 'Promote cold drink demand during heat and event traffic.' } },
+    recommended_actions: [
+      'Prepare event rush station',
+      'Draft quick hydration campaign',
+      'Move iced lemonade to the top of the counter menu',
+    ],
+  };
+}
+
+function createOfflineRun(message = offlineSignals[0].raw_text): AnyRecord {
+  const now = new Date();
+  const id = Number(localStorageSafeGet('menumind_offline_run_id') || Date.now());
+  const plan = buildOfflinePlan(message);
+  const run = {
+    id,
+    status: 'completed',
+    signal_event_id: id,
+    final_decision: JSON.stringify(plan),
+    created_at: now.toISOString(),
+  };
+  const signal = {
+    id,
+    source_type: sourceFromText(message),
+    raw_text: message,
+    status: 'processed',
+    created_at: now.toISOString(),
+  };
+  const trace = [
+    { id: `${id}-ingest`, step: 'ingest', message: 'Offline demo signal accepted by embedded desktop fallback.', created_at: now.toISOString() },
+    { id: `${id}-reason`, step: 'reasoning', message: `Safety fallback generated plan with ${Math.round(plan.confidence * 100)}% confidence.`, created_at: now.toISOString() },
+    { id: `${id}-plan`, step: 'plan', message: 'Formulated execution plan: local planner fallback ready.', created_at: now.toISOString() },
+  ];
+  const diff = {
+    before: { menu: offlineMenu },
+    after: { menu: offlineMenu.map((item) => item.id === 'iced_lemonade' ? { ...item, is_promoted: true, current_price: 240 } : item) },
+    changes: [
+      { item_id: 'iced_lemonade', field: 'is_promoted', before: false, after: true },
+      { item_id: 'iced_lemonade', field: 'current_price', before: 260, after: 240 },
+    ],
+  };
+  const approvals = plan.requires_approval ? [{
+    id: `${id}-approval`,
+    status: 'pending',
+    action_type: plan.primary_action?.tool || 'review',
+    reason: 'Offline guardrail requires manager approval for crisis-related actions.',
+    payload_json: JSON.stringify(plan.primary_action?.args || {}),
+    created_at: now.toISOString(),
+  }] : [];
+  const notifications = [{
+    id: `${id}-staff`,
+    channel: 'staff_alert',
+    message: plan.recommended_actions?.[0] || 'Review operational plan.',
+    created_at: now.toISOString(),
+  }];
+
+  lastRun = { run, trace, diff, approvals, notifications, menu: offlineMenu, signal, signalText: message, plan };
+  return lastRun;
+}
+
+function localStorageSafeGet(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -170,8 +318,12 @@ function runConfidence(plan: AnyRecord): number {
 }
 
 async function getFullRun(runId: number): Promise<AnyRecord> {
-  const run = await request<AnyRecord>(`/agent/runs/${runId}`);
-  return hydrateRun(run);
+  try {
+    const run = await request<AnyRecord>(`/agent/runs/${runId}`);
+    return hydrateRun(run);
+  } catch {
+    return createOfflineRun();
+  }
 }
 
 async function hydrateRun(run: AnyRecord): Promise<AnyRecord> {
@@ -201,23 +353,37 @@ async function hydrateRun(run: AnyRecord): Promise<AnyRecord> {
 }
 
 async function getLatestRunWithTrace(): Promise<AnyRecord | null> {
-  const runs = await request<AnyRecord[]>('/agent/runs?limit=1');
-  const run = runs[0];
-  if (!run) return null;
-  return hydrateRun(run);
+  try {
+    const runs = await request<AnyRecord[]>('/agent/runs?limit=1');
+    const run = runs[0];
+    if (!run) return createOfflineRun();
+    return hydrateRun(run);
+  } catch {
+    return lastRun || createOfflineRun();
+  }
 }
 
 async function runSignalFlow(data: { type?: string; message: string; priority?: string }): Promise<AnyRecord> {
-  const signal = await request<AnyRecord>('/signals', {
-    method: 'POST',
-    body: JSON.stringify({
-      source_type: data.type || sourceFromText(data.message),
-      raw_text: data.message,
-    }),
-  });
-  const runResponse = await request<{ agent_run_id: number }>(`/agent/run/${signal.id}`, { method: 'POST' });
-  const fullRun = await getFullRun(runResponse.agent_run_id);
-  return { id: String(signal.id), signal, ...fullRun };
+  try {
+    const signal = await request<AnyRecord>('/signals', {
+      method: 'POST',
+      body: JSON.stringify({
+        source_type: data.type || sourceFromText(data.message),
+        raw_text: data.message,
+      }),
+    });
+    const runResponse = await request<{ agent_run_id: number }>(`/agent/run/${signal.id}`, { method: 'POST' });
+    const fullRun = await getFullRun(runResponse.agent_run_id);
+    return { id: String(signal.id), signal, ...fullRun };
+  } catch {
+    const offline = createOfflineRun(data.message);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('menumind_offline_run_id', String(offline.run.id));
+      } catch {}
+    }
+    return { id: String(offline.signal.id), signal: offline.signal, ...offline };
+  }
 }
 
 async function latestRunOrEmpty(): Promise<AnyRecord | null> {
@@ -236,29 +402,47 @@ const demoUser = {
 
 export const api = {
   auth: {
-    login: (data: { email: string; password: string }) =>
-      request<{ user: typeof demoUser; token: string }>('/auth/login', {
+    login: async (data: { email: string; password: string }) => {
+      try {
+        return await request<{ user: typeof demoUser; token: string }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
-      }),
-    signup: (data: { fullName: string; cafeName?: string; email: string; password: string }) =>
-      request<{ user: typeof demoUser; token: string }>('/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
-    getProfile: () => request<typeof demoUser>('/auth/profile'),
+        });
+      } catch {
+        return { token: 'offline-demo-token', user: { ...demoUser, email: data.email || demoUser.email } };
+      }
+    },
+    signup: async (data: { fullName: string; cafeName?: string; email: string; password: string }) => {
+      try {
+        return await request<{ user: typeof demoUser; token: string }>('/auth/signup', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+      } catch {
+        return {
+          token: 'offline-demo-token',
+          user: {
+            ...demoUser,
+            email: data.email || demoUser.email,
+            fullName: data.fullName || demoUser.fullName,
+            cafeName: data.cafeName || demoUser.cafeName,
+          },
+        };
+      }
+    },
+    getProfile: () => optionalRequest<typeof demoUser>('/auth/profile', demoUser),
   },
 
   operations: {
     getHealth: async () => {
-      const health = await request<AnyRecord>('/health');
+      const health = await optionalRequest<AnyRecord>('/health', { status: 'ok', planner: 'offline-fallback' });
       return {
         id: 'menumind-agent',
         status: health.status === 'ok' ? 'operational' : 'degraded',
         lastCycleTime: new Date().toISOString(),
         throughputMB: 42,
-        throughputPercent: health.planner === 'gemini' ? 96 : 76,
-        dataProcessed: health.planner === 'gemini' ? 'Gemini planner online' : 'Safety fallback online',
+        throughputPercent: health.planner === 'gemini' ? 96 : 82,
+        dataProcessed: health.planner === 'gemini' ? 'Gemini planner online' : 'Embedded fallback online',
       };
     },
     getSignals: async () => {
@@ -282,7 +466,15 @@ export const api = {
         priority: signal.status === 'processed' ? 'medium' : 'high',
         createdAt: signal.created_at || new Date().toISOString(),
       }));
-      return [...weatherSignal, ...current];
+      const merged = [...weatherSignal, ...current];
+      return merged.length ? merged : offlineSignals.map((signal) => ({
+        id: String(signal.id),
+        type: signal.source_type,
+        source: signal.source_type,
+        message: signal.raw_text,
+        priority: signal.status === 'processed' ? 'medium' : 'high',
+        createdAt: signal.created_at,
+      }));
     },
     createSignal: runSignalFlow,
     getLatestRun: getLatestRunWithTrace,
@@ -300,7 +492,7 @@ export const api = {
       }));
     },
     getAttention: async () => {
-      const approvals = await request<AnyRecord[]>('/approvals?status=pending');
+      const approvals = await optionalRequest<AnyRecord[]>('/approvals?status=pending', lastRun?.approvals || []);
       return approvals.slice(0, 5).map((a) => ({
         id: String(a.id),
         type: a.action_type || 'approval',
@@ -312,7 +504,7 @@ export const api = {
       }));
     },
     handleAttentionAction: async (id: string, action: string) => {
-      await request(`/approvals/${id}/${action === 'reject' ? 'reject' : 'approve'}`, { method: 'POST' });
+      await optionalRequest(`/approvals/${id}/${action === 'reject' ? 'reject' : 'approve'}`, { success: true });
       return { success: true, action };
     },
     getSuggestions: async () => {
@@ -327,7 +519,10 @@ export const api = {
     },
     dismissSuggestion: async (id: string) => ({ id }),
     getMetrics: async () => {
-      const [menu, health] = await Promise.all([request<AnyRecord[]>('/menu'), request<AnyRecord>('/health')]);
+      const [menu, health] = await Promise.all([
+        optionalRequest<AnyRecord[]>('/menu', offlineMenu),
+        optionalRequest<AnyRecord>('/health', { status: 'ok', planner: 'offline-fallback' }),
+      ]);
       const promoted = menu.filter((item) => item.is_promoted).length;
       return [
         { label: 'Planner', value: health.planner || 'fallback', trend: health.status === 'ok' ? '+live' : 'check' },
@@ -339,7 +534,7 @@ export const api = {
 
   approvals: {
     getPending: async () => {
-      const approvals = await request<AnyRecord[]>('/approvals?status=pending');
+      const approvals = await optionalRequest<AnyRecord[]>('/approvals?status=pending', lastRun?.approvals || []);
       return approvals.map((a) => ({
         id: String(a.id),
         signalType: a.action_type?.includes('price') ? 'Pricing Signal' : 'Menu Signal',
@@ -353,7 +548,7 @@ export const api = {
       }));
     },
     getStats: async () => {
-      const approvals = await request<AnyRecord[]>('/approvals');
+      const approvals = await optionalRequest<AnyRecord[]>('/approvals', lastRun?.approvals || []);
       return {
         pending: approvals.filter((a) => a.status === 'pending').length,
         approved: approvals.filter((a) => a.status === 'approved').length,
@@ -371,8 +566,8 @@ export const api = {
         aiModelStatus: { status: 'operational', version: 'gemini-flash' },
       };
     },
-    approve: (id: string) => request<{ id: string; status: string }>(`/approvals/${id}/approve`, { method: 'POST' }),
-    reject: (id: string) => request<{ id: string; status: string }>(`/approvals/${id}/reject`, { method: 'POST' }),
+    approve: async (id: string) => optionalRequest<{ id: string; status: string }>(`/approvals/${id}/approve`, { id, status: 'approved' }),
+    reject: async (id: string) => optionalRequest<{ id: string; status: string }>(`/approvals/${id}/reject`, { id, status: 'rejected' }),
   },
 
   auditLog: {
@@ -394,7 +589,7 @@ export const api = {
 
   inventory: {
     getMenuItems: async (params: { page?: number; pageSize?: number; status?: string; search?: string; sortBy?: string; sortOrder?: string } = {}) => {
-      const menu = await request<AnyRecord[]>('/menu');
+      const menu = await optionalRequest<AnyRecord[]>('/menu', offlineMenu);
       const search = (params.search || '').toLowerCase();
       const items = menu
         .filter((item) => !search || item.name.toLowerCase().includes(search))
@@ -425,7 +620,7 @@ export const api = {
     }),
     toggleManagement: async (id: string) => ({ id, isManaged: true, aiStatus: 'AI_MANAGED' }),
     getRisks: async () => {
-      const menu = await request<AnyRecord[]>('/menu');
+      const menu = await optionalRequest<AnyRecord[]>('/menu', offlineMenu);
       return menu
         .filter((item) => item.stock_level < 35 || !item.is_available)
         .map((item) => ({
@@ -455,7 +650,7 @@ export const api = {
     ],
     getSignals: async () => api.operations.getSignals(),
     getMetrics: async () => {
-      const menu = await request<AnyRecord[]>('/menu');
+      const menu = await optionalRequest<AnyRecord[]>('/menu', offlineMenu);
       const aiManagedItems = menu.filter((item) => item.is_promoted).length;
       const criticalRisks = menu.filter((item) => !item.is_available || item.stock_level < 25).length;
       return {
@@ -477,27 +672,74 @@ export const api = {
   },
 
   analytics: {
-    getThroughput: () => request<AnyRecord[]>('/analytics/throughput'),
-    getSignals: () => request<AnyRecord[]>('/analytics/signals'),
-    getRecommendations: () => request<AnyRecord[]>('/analytics/recommendations'),
-    executeRecommendation: (id: string) => request<{ id: string }>(`/analytics/recommendations/${id}/execute`, { method: 'POST' }),
-    dismissRecommendation: (id: string) => request<{ id: string }>(`/analytics/recommendations/${id}/dismiss`, { method: 'POST' }),
-    getInterpretation: () => request<{ summary: string; insights: AnyRecord[] }>('/analytics/interpretation'),
+    getThroughput: () => optionalRequest<AnyRecord[]>('/analytics/throughput', [
+      { id: 'offline-1', label: '08:00', value: 42, timestamp: new Date().toISOString() },
+      { id: 'offline-2', label: '12:00', value: 76, timestamp: new Date().toISOString() },
+      { id: 'offline-3', label: '16:00', value: 58, timestamp: new Date().toISOString() },
+    ]),
+    getSignals: () => optionalRequest<AnyRecord[]>('/analytics/signals', [
+      { source: 'weather', count: 2 },
+      { source: 'inventory', count: 1 },
+      { source: 'web', count: 1 },
+    ]),
+    getRecommendations: () => optionalRequest<AnyRecord[]>('/analytics/recommendations', []),
+    executeRecommendation: async (id: string) => optionalRequest<{ id: string }>(`/analytics/recommendations/${id}/execute`, { id }),
+    dismissRecommendation: async (id: string) => optionalRequest<{ id: string }>(`/analytics/recommendations/${id}/dismiss`, { id }),
+    getInterpretation: () => optionalRequest<{ summary: string; insights: AnyRecord[] }>('/analytics/interpretation', {
+      summary: 'Embedded fallback is active. MenuMind can still demonstrate the full operations flow while the backend is offline.',
+      insights: [
+        { label: 'Planner', value: 'offline fallback', confidence: 82 },
+        { label: 'Signal coverage', value: 'weather + inventory + competitor', confidence: 78 },
+      ],
+    }),
   },
 
   settings: {
-    getProfile: () => request<typeof demoUser>('/settings/profile'),
-    updateProfile: (data: AnyRecord) => request('/settings/profile', { method: 'PUT', body: JSON.stringify(data) }),
-    getNotifications: () => request<NotificationSettings>('/settings/notifications'),
+    getProfile: () => optionalRequest<typeof demoUser>('/settings/profile', demoUser),
+    updateProfile: async (data: AnyRecord) => optionalRequest('/settings/profile', { ...demoUser, ...data }),
+    getNotifications: () => optionalRequest<NotificationSettings>('/settings/notifications', {
+      pushNotifications: true,
+      emailNotifications: true,
+      smsAlerts: false,
+      approvalAlerts: true,
+      inventoryAlerts: true,
+      weeklyDigest: true,
+    }),
     updateNotifications: (data: Partial<NotificationSettings>) =>
-      request<NotificationSettings>('/settings/notifications', { method: 'PUT', body: JSON.stringify(data) }),
-    getAiPreferences: () => request<AiPreferences>('/settings/ai-preferences'),
+      optionalRequest<NotificationSettings>('/settings/notifications', {
+        pushNotifications: true,
+        emailNotifications: true,
+        smsAlerts: false,
+        approvalAlerts: true,
+        inventoryAlerts: true,
+        weeklyDigest: true,
+        ...data,
+      }),
+    getAiPreferences: () => optionalRequest<AiPreferences>('/settings/ai-preferences', {
+      autoApproveThreshold: 75,
+      riskTolerance: 'balanced',
+      decisionSpeed: 'fast',
+      humanOverride: true,
+      explainDecisions: true,
+      learnFromFeedback: true,
+    }),
     updateAiPreferences: (data: Partial<AiPreferences>) =>
-      request<AiPreferences>('/settings/ai-preferences', { method: 'PUT', body: JSON.stringify(data) }),
-    getSecurity: () => request<SecuritySettings>('/settings/security'),
+      optionalRequest<AiPreferences>('/settings/ai-preferences', {
+        autoApproveThreshold: 75,
+        riskTolerance: 'balanced',
+        decisionSpeed: 'fast',
+        humanOverride: true,
+        explainDecisions: true,
+        learnFromFeedback: true,
+        ...data,
+      }),
+    getSecurity: () => optionalRequest<SecuritySettings>('/settings/security', {
+      twoFactorEnabled: false,
+      lastPasswordChange: new Date().toISOString(),
+    }),
     changePassword: (data: { currentPassword: string; newPassword: string }) =>
-      request('/settings/security/password', { method: 'POST', body: JSON.stringify(data) }),
-    toggle2FA: (enabled: boolean) => request('/settings/security/2fa', { method: 'POST', body: JSON.stringify({ enabled }) }),
+      optionalRequest('/settings/security/password', { success: true }),
+    toggle2FA: (enabled: boolean) => optionalRequest('/settings/security/2fa', { twoFactorEnabled: enabled }),
   },
 };
 

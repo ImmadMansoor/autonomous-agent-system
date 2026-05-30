@@ -120,6 +120,7 @@ export function HeroStatus({ systemHealth, nextCycle }: HeroStatusProps) {
 
       <motion.div
         variants={REVEAL_UP}
+        className="dot-grid-subtle"
         style={{
           gridColumn: 'span 4',
           background: 'var(--primary)',

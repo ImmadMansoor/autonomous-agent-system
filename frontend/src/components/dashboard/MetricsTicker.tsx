@@ -41,12 +41,15 @@ export function MetricsTicker({ metrics, liveSignals }: MetricsTickerProps) {
         <motion.div
           key={metric.id}
           variants={REVEAL_UP}
+          className="dot-grid-subtle"
           style={{
             ...glassCardStyle,
             padding: 'var(--space-md)',
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--space-md)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
           <div style={{
@@ -59,10 +62,12 @@ export function MetricsTicker({ metrics, liveSignals }: MetricsTickerProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            position: 'relative',
+            zIndex: 2,
           }}>
             {iconMap[metric.icon]}
           </div>
-          <div>
+          <div style={{ position: 'relative', zIndex: 2 }}>
             <p className="label-caps">{metric.label}</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
               <span
@@ -89,11 +94,14 @@ export function MetricsTicker({ metrics, liveSignals }: MetricsTickerProps) {
         initial="hidden"
         animate="visible"
         transition={{ delay: 0.3 }}
+        className="dot-grid-subtle"
         style={{
           background: 'var(--surface-container-low)',
           border: '1px dashed var(--outline-variant)',
           borderRadius: 'var(--radius-xl)',
           padding: 'var(--space-md)',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
         <p style={{
