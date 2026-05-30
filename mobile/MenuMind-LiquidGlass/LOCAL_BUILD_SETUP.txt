@@ -1,0 +1,31 @@
+MenuMind Local Build Environment Setup
+======================================
+
+This machine is now permanently configured for local Android compilation without Expo EAS.
+You do not need to download or install these tools again for future builds.
+
+# Installed Tools:
+* Java JDK: C:\Java\jdk17 (OpenJDK 17 Temurin)
+* Android SDK: C:\Android
+
+# Installed SDK Packages (via sdkmanager):
+* platforms;android-34 & platforms;android-36
+* build-tools;34.0.0 & build-tools;35.0.0
+* platform-tools
+* cmake;3.22.1 (For Skia C++ compilation)
+* ndk;27.1.12297006 (Native Development Kit required by React Native 0.74+)
+
+# Gradle Config:
+* android/gradle.properties has been modified to use 4GB RAM (-Xmx4g -XX:MaxMetaspaceSize=1g) to prevent Out of Memory errors during Skia compilation.
+
+# Exact Build Command:
+1. Ensure JAVA_HOME and ANDROID_HOME are set in your shell, and their \bin folders are in PATH.
+2. (Optional) npx expo prebuild --platform android --clean
+3. cd android
+4. .\gradlew assembleRelease
+
+# Output:
+The final APK is generated at:
+G:\Google Hackathon\autonomous-agent-system\mobile\android\app\build\outputs\apk\release\app-release.apk
+
+You can run `.\build-local-apk.ps1` to automate this process.

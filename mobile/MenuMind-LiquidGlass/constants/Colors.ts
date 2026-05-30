@@ -1,0 +1,126 @@
+/**
+ * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+ */
+
+const tintColorLight = '#004e47';
+const tintColorDark = '#85d5c9';
+
+export const Colors = {
+  light: {
+    text: '#000000',
+    background: '#f5f5f5',
+    tint: '#00685f',
+    icon: '#737373',
+    tabIconDefault: '#a3a3a3',
+    tabIconSelected: '#00685f',
+    
+    primary: '#00685f',
+    primaryContainer: 'rgba(0, 104, 95, 0.08)',
+    onPrimary: '#ffffff',
+    onPrimaryContainer: '#00685f',
+    secondary: '#262626',
+    secondaryContainer: 'rgba(0, 0, 0, 0.05)',
+    onSecondary: '#ffffff',
+    onSecondaryContainer: '#000000',
+    tertiary: '#737373',
+    tertiaryContainer: '#e5e5e5',
+    onTertiary: '#000000',
+    onTertiaryContainer: '#262626',
+    error: '#D71921',
+    errorContainer: '#ffdad6',
+    onError: '#ffffff',
+    onErrorContainer: '#93000a',
+    surface: '#ffffff',
+    onSurface: '#000000',
+    surfaceVariant: '#f5f5f5',
+    onSurfaceVariant: '#737373',
+    outline: '#e5e5e5',
+    outlineVariant: '#d4d4d4',
+    inverseSurface: '#171717',
+    inverseOnSurface: '#ffffff',
+    inversePrimary: '#ffffff',
+    
+    // Custom variations used in UI
+    surfaceContainerLowest: '#ffffff',
+    surfaceContainerLow: '#fafafa',
+    surfaceContainer: '#ffffff',
+    surfaceContainerHigh: '#f5f5f5',
+    surfaceContainerHighest: '#eeeeee',
+    
+    // Fixed colors from design system
+    primaryFixed: '#00685f',
+    primaryFixedDim: '#004d47',
+    onPrimaryFixed: '#ffffff',
+    onPrimaryFixedVariant: '#a3a3a3',
+    secondaryFixed: '#262626',
+    secondaryFixedDim: '#404040',
+    onSecondaryFixed: '#ffffff',
+    onSecondaryFixedVariant: '#e5e5e5',
+    tertiaryFixed: '#e5e5e5',
+    tertiaryFixedDim: '#d4d4d4',
+    onTertiaryFixed: '#000000',
+    onTertiaryFixedVariant: '#404040',
+    
+    // Glassmorphism
+    glassBackground: 'rgba(255, 255, 255, 0.8)',
+    glassBorder: 'rgba(0, 0, 0, 0.1)',
+  },
+  dark: {
+    text: '#ffffff',
+    background: '#000000',
+    tint: tintColorDark,
+    icon: '#e5e5e5',
+    tabIconDefault: '#888888',
+    tabIconSelected: tintColorDark,
+
+    primary: '#059669',
+    primaryContainer: '#004d3d',
+    onPrimary: '#ffffff',
+    onPrimaryContainer: '#a1f1e5',
+    secondary: '#e5e5e5',
+    secondaryContainer: '#1c1c1c',
+    onSecondary: '#000000',
+    onSecondaryContainer: '#ffffff',
+    tertiary: '#888888',
+    tertiaryContainer: '#222222',
+    onTertiary: '#000000',
+    onTertiaryContainer: '#e5e5e5',
+    error: '#D71921',
+    errorContainer: '#400000',
+    onError: '#ffffff',
+    onErrorContainer: '#ffdad6',
+    surface: '#000000',
+    onSurface: '#ffffff',
+    surfaceVariant: '#121212',
+    onSurfaceVariant: '#a3a3a3',
+    outline: '#333333',
+    outlineVariant: '#222222',
+    inverseSurface: '#ffffff',
+    inverseOnSurface: '#000000',
+    inversePrimary: '#004e47',
+
+    surfaceContainerLowest: '#000000',
+    surfaceContainerLow: '#000000',
+    surfaceContainer: '#0a0a0a',
+    surfaceContainerHigh: '#121212',
+    surfaceContainerHighest: '#1c1c1c',
+    
+    // Fixed colors from design system
+    primaryFixed: '#005049',
+    primaryFixedDim: '#004639',
+    onPrimaryFixed: '#a1f1e5',
+    onPrimaryFixedVariant: '#85d5c9',
+    secondaryFixed: '#005049',
+    secondaryFixedDim: '#004639',
+    onSecondaryFixed: '#7cf6e7',
+    onSecondaryFixedVariant: '#5ddacb',
+    tertiaryFixed: '#3f4948',
+    tertiaryFixedDim: '#2f3938',
+    onTertiaryFixed: '#dae4e4',
+    onTertiaryFixedVariant: '#bec8c8',
+    
+    // Glassmorphism
+    glassBackground: 'rgba(0, 0, 0, 0.8)',
+    glassBorder: 'rgba(255, 255, 255, 0.1)',
+  },
+};
