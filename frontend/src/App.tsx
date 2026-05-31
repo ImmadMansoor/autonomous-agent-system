@@ -44,6 +44,8 @@ export default function App() {
 
         {/* Overlay */}
         <div className="absolute inset-0 bg-white/5 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none opacity-35 dot-matrix-overlay" />
+        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-white/55 to-transparent pointer-events-none" />
 
         {/* Foreground Content Wrapper */}
         <div className="relative z-10 h-full flex flex-col justify-between overflow-y-auto md:overflow-y-hidden">
@@ -57,9 +59,9 @@ export default function App() {
           <main className="flex-1 flex flex-col items-center justify-start px-4 pt-8 sm:pt-12 pb-6 text-center max-w-5xl mx-auto w-full">
             
             {/* Core Badge */}
-            <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 shadow-xs border border-[#bcc9c6]/30">
-              <span className="w-2 h-2 rounded-full bg-[#00685f]" />
-              <span className="text-[12px] sm:text-[13px] font-semibold text-[#191c1e] tracking-tight">
+            <div className="inline-flex items-center gap-2 premium-glass edge-flow rounded-full px-4 py-1.5 shadow-xs border border-white/70">
+              <span className="w-2 h-2 rounded-full bg-[#00685f] shadow-[0_0_12px_rgba(0,104,95,0.45)]" />
+              <span className="nothing-type text-[12px] sm:text-[13px] font-semibold text-[#191c1e] tracking-tight">
                 MenuMind Core Engine v2.5
               </span>
             </div>
@@ -105,7 +107,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleAccessTelemetry}
-                className="inline-flex items-center gap-3 bg-[#191c1e] text-white rounded-full pl-6 sm:pl-7 pr-2 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold hover:bg-neutral-800 transition-all cursor-pointer shadow-sm group animate-bounce"
+                className="inline-flex items-center gap-3 bg-[#191c1e] text-white rounded-full pl-6 sm:pl-7 pr-2 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-semibold hover:bg-neutral-800 transition-all cursor-pointer shadow-[0_18px_45px_rgba(25,28,30,0.22)] group edge-flow"
               >
                 <span>Access Telemetry</span>
                 <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/15 flex items-center justify-center transition-transform group-hover:translate-x-0.5">

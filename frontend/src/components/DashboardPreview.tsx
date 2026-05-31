@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TrendingUp, TrendingDown, ChevronDown, X } from "lucide-react";
 import Gauge from "./Gauge";
+import { GlowingEffect } from "./GlowingEffect";
 
 export default function DashboardPreview() {
   const [activeTabCard1, setActiveTabCard1] = useState<"automated" | "manual">("automated");
@@ -49,25 +50,27 @@ export default function DashboardPreview() {
 
   return (
     <div className="px-3 sm:px-4 w-full select-none">
-      <div className="bg-white/80 backdrop-blur-md border border-zinc-300/60 rounded-3xl p-4 sm:p-6 w-full max-w-[840px] mx-auto shadow-sm">
+      <div className="premium-glass edge-flow dot-matrix-surface border border-white/70 rounded-3xl p-4 sm:p-6 w-full max-w-[840px] mx-auto shadow-sm relative">
+        <GlowingEffect spread={180} glow proximity={110} borderWidth={1.2} colorFrom="rgba(0,104,95,0.35)" colorTo="rgba(255,255,255,0.7)" />
         
         {/* Terminal/Tray Header to enrich realism */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-zinc-200 pb-3">
+        <div className="relative z-10 flex items-center justify-between mb-4 sm:mb-6 border-b border-zinc-200/80 pb-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00685f] animate-ping" />
-            <span className="font-mono text-[11px] text-[#3d4947] tracking-wider uppercase font-semibold">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#e60033] shadow-[0_0_14px_rgba(230,0,51,0.45)]" />
+            <span className="nothing-type text-[11px] text-[#3d4947] font-semibold">
               Platform Status: Operational
             </span>
           </div>
-          <span className="font-mono text-[11px] text-[#00628d] font-semibold bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
+          <span className="nothing-type text-[11px] text-[#00628d] font-semibold bg-blue-50/80 px-2.5 py-0.5 rounded border border-blue-100">
             v2.5 // Core Engine
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           
           {/* Card 1 — Operational Throughput */}
-          <div className="bg-white rounded-2xl p-5 border border-zinc-300/40 shadow-xs flex flex-col justify-between min-h-[380px]">
+          <div className="bg-white/82 backdrop-blur-xl rounded-2xl p-5 border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_14px_35px_rgba(13,30,29,0.08)] flex flex-col justify-between min-h-[380px] relative edge-flow">
+            <GlowingEffect spread={120} glow={false} proximity={80} borderWidth={1} colorFrom="rgba(0,104,95,0.32)" colorTo="rgba(7,128,119,0.12)" />
             <div>
               {/* Header */}
               <div className="flex justify-between items-baseline mb-2">
@@ -140,7 +143,8 @@ export default function DashboardPreview() {
           </div>
 
           {/* Card 2 — Guardrail & Policy Form */}
-          <div className="bg-white rounded-2xl p-5 border border-zinc-300/40 shadow-xs flex flex-col gap-3 min-h-[380px] relative">
+          <div className="bg-white/82 backdrop-blur-xl rounded-2xl p-5 border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_14px_35px_rgba(13,30,29,0.08)] flex flex-col gap-3 min-h-[380px] relative edge-flow">
+            <GlowingEffect spread={120} glow={false} proximity={80} borderWidth={1} colorFrom="rgba(0,98,141,0.28)" colorTo="rgba(0,104,95,0.12)" />
             
             {/* Form Fields Container */}
             <div className="flex-grow flex flex-col gap-3">
@@ -286,7 +290,8 @@ export default function DashboardPreview() {
           </div>
 
           {/* Card 3 — Crisis Mitigations */}
-          <div className="bg-white rounded-2xl p-5 border border-zinc-300/40 shadow-xs flex flex-col justify-between min-h-[380px]">
+          <div className="bg-white/82 backdrop-blur-xl rounded-2xl p-5 border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_14px_35px_rgba(13,30,29,0.08)] flex flex-col justify-between min-h-[380px] relative edge-flow">
+            <GlowingEffect spread={120} glow={false} proximity={80} borderWidth={1} colorFrom="rgba(186,26,26,0.18)" colorTo="rgba(0,104,95,0.14)" />
             <div>
               {/* Header */}
               <div className="flex justify-between items-baseline mb-2">

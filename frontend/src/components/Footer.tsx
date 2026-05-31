@@ -7,7 +7,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#191c1e] text-white py-16 px-6 sm:px-8 mt-12 rounded-t-3xl border-t border-[#bcc9c6]/20">
+    <footer className="dark-panel dot-matrix-surface edge-flow text-white py-16 px-6 sm:px-8 mt-12 rounded-t-3xl border-t border-[#bcc9c6]/20 relative">
       <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
         
         {/* Left Column - Logo & Descriptor */}

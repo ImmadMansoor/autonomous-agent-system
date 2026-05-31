@@ -79,7 +79,7 @@ export default function FeatureMatrix() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-1.5 bg-white rounded-full px-3.5 py-1 shadow-xs border border-zinc-300/60 text-xs font-semibold text-[#00685f] uppercase tracking-wider mb-4"
+            className="inline-flex items-center gap-1.5 premium-glass edge-flow rounded-full px-3.5 py-1 shadow-xs border border-white/70 text-xs font-semibold text-[#00685f] uppercase tracking-wider mb-4"
           >
             <span>Platform Capabilities</span>
           </motion.div>
@@ -117,7 +117,7 @@ export default function FeatureMatrix() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.05 }}
-                className="relative rounded-3xl p-6 bg-white/40 backdrop-blur-xl border border-zinc-300/40 shadow-[inset_0_1px_3px_rgba(255,255,255,0.7)] hover:shadow-lg transition-all duration-300 overflow-hidden cursor-default flex flex-col justify-between group min-h-[260px]"
+                className="relative rounded-3xl p-6 premium-glass dot-matrix-surface edge-flow border border-white/70 hover:shadow-lg transition-all duration-300 overflow-hidden cursor-default flex flex-col justify-between group min-h-[260px]"
               >
                 {/* 1. Proximity Glowing Border matching the card's specific color theme! */}
                 <GlowingEffect
@@ -138,7 +138,7 @@ export default function FeatureMatrix() {
                     >
                       <Icon className="w-5 h-5 stroke-[2]" />
                     </div>
-                    <span className="font-mono text-[9px] font-bold text-[#3d4947] tracking-widest bg-neutral-100/80 px-2 py-1 rounded">
+                    <span className="nothing-type text-[9px] font-bold text-[#3d4947] bg-neutral-100/80 px-2 py-1 rounded">
                       {item.tag}
                     </span>
                   </div>

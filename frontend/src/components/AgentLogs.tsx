@@ -131,7 +131,7 @@ export default function AgentLogs() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-1.5 bg-white rounded-full px-3.5 py-1 shadow-xs border border-[#bcc9c6]/50 text-xs font-semibold text-[#ba1a1a] uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-1.5 premium-glass edge-flow rounded-full px-3.5 py-1 shadow-xs border border-white/70 text-xs font-semibold text-[#ba1a1a] uppercase tracking-wider mb-4">
               <Terminal className="w-3.5 h-3.5" />
               <span>Realtime Audit Logs</span>
             </div>
@@ -145,7 +145,7 @@ export default function AgentLogs() {
           </div>
 
           {/* Search bar & statistics overview */}
-          <div className="bg-white rounded-2xl p-4 border border-[#bcc9c6] shadow-xs flex items-center gap-3 shrink-0">
+          <div className="premium-glass rounded-2xl p-4 border border-white/70 shadow-xs flex items-center gap-3 shrink-0">
             <div className="relative">
               <Search className="w-4 h-4 text-[#3d4947] absolute left-3 top-2.5" />
               <input
@@ -178,7 +178,7 @@ export default function AgentLogs() {
         </div>
 
         {/* Interactive Logging Output panel */}
-        <div className="bg-white border border-[#bcc9c6] rounded-3xl overflow-hidden shadow-xs">
+        <div className="premium-glass dot-matrix-surface edge-flow border border-white/70 rounded-3xl overflow-hidden shadow-xs">
           
           {/* Mock Console Header */}
           <div className="bg-neutral-100 px-6 py-3 border-b border-[#bcc9c6] flex items-center justify-between">

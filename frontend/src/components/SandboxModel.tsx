@@ -27,7 +27,7 @@ export default function SandboxModel() {
         
         {/* Section Header with smooth reveals */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-1.5 bg-white rounded-full px-3.5 py-1 shadow-xs border border-[#bcc9c6]/50 text-xs font-semibold text-[#00685f] uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-1.5 premium-glass edge-flow rounded-full px-3.5 py-1 shadow-xs border border-white/70 text-xs font-semibold text-[#00685f] uppercase tracking-wider mb-4">
             <Compass className="w-3.5 h-3.5" />
             <span>Policy Sandbox Model</span>
           </div>
@@ -40,7 +40,7 @@ export default function SandboxModel() {
         </div>
 
         {/* Dynamic Sandbox Panel (Liquid Glass Layout) */}
-        <div className="bg-white/50 backdrop-blur-xl border border-[#bcc9c6] rounded-3xl p-6 sm:p-10 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div className="premium-glass dot-matrix-surface edge-flow border border-white/70 rounded-3xl p-6 sm:p-10 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           
           {/* Sliders Input Panel (7 columns) */}
           <div className="lg:col-span-7 space-y-8">
@@ -125,7 +125,7 @@ export default function SandboxModel() {
           </div>
 
           {/* Math Output Visualizer (5 columns) */}
-          <div className="lg:col-span-5 bg-white border border-[#bcc9c6] rounded-2xl p-6 shadow-xs flex flex-col justify-between self-stretch min-h-[300px]">
+          <div className="lg:col-span-5 bg-white/82 backdrop-blur-xl border border-white/75 rounded-2xl p-6 shadow-xs flex flex-col justify-between self-stretch min-h-[300px] relative edge-flow">
             <div>
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#bcc9c6]/20">
                 <span className="text-xs font-bold text-[#3d4947] uppercase tracking-widest block">

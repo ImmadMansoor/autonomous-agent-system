@@ -85,7 +85,7 @@ export default function SimulationConsole() {
         {/* Core Header with Smooth Reveals */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-1.5 bg-white rounded-full px-3.5 py-1 shadow-xs border border-[#bcc9c6]/50 text-xs font-semibold text-[#00628d] uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-1.5 premium-glass edge-flow rounded-full px-3.5 py-1 shadow-xs border border-white/70 text-xs font-semibold text-[#00628d] uppercase tracking-wider mb-4">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Interactive Telemetry Engine</span>
             </div>
@@ -99,7 +99,7 @@ export default function SimulationConsole() {
           </div>
 
           {/* Selector Switch with Premium Pill layout */}
-          <div className="flex flex-col sm:flex-row gap-2 bg-white/80 p-1.5 rounded-2xl border border-[#bcc9c6] shadow-xs">
+          <div className="flex flex-col sm:flex-row gap-2 premium-glass p-1.5 rounded-2xl border border-white/70 shadow-xs">
             {eventsList.map((evt) => {
               const Icon = evt.icon;
               const isSelected = activeEvent.id === evt.id;
@@ -130,7 +130,7 @@ export default function SimulationConsole() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Active Event Environmental telemetry board (4 columns) */}
-          <div className="lg:col-span-4 bg-white border border-[#bcc9c6] rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+          <div className="lg:col-span-4 premium-glass dot-matrix-surface edge-flow border border-white/70 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className={`w-3 h-3 rounded-full bg-gradient-to-r ${activeEvent.impactColor} animate-ping`} />
@@ -189,7 +189,7 @@ export default function SimulationConsole() {
           </div>
 
           {/* Interactive Live Menu Item adjusting (8 columns) */}
-          <div className="lg:col-span-8 bg-white border border-[#bcc9c6] rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+          <div className="lg:col-span-8 premium-glass dot-matrix-surface edge-flow border border-white/70 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between border-b border-[#bcc9c6]/30 pb-4 mb-6">
                 <div>
