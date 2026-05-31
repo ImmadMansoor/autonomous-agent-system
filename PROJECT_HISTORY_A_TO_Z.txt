@@ -1,5 +1,5 @@
 MenuMind Project History A to Z
-Last updated: 2026-05-30
+Last updated: 2026-06-01
 Owner/user: Tayyab Mansoor
 Assistant name in shared docs: Carl (Planning/Research), Codex (Execution)
 
@@ -15,15 +15,16 @@ Purpose
 
 2. Current Stack & Repository Layout
 - Root Directory Structure:
-  - `frontend/` - Next.js production operations dashboard, deployed automatically via Vercel.
+  - `frontend/` - React Vite public marketing landing website ("Shaping Cafes of tomorrow"), deployed automatically via Vercel.
   - `backend/` - FastAPI backend server and core Gemini agent orchestration pipeline.
-  - `desktop-app/` - React/Vite source code wrapped in Tauri for portable desktop systems.
+  - `desktop-app/` - Next.js production operations dashboard wrapped in Tauri for portable desktop systems (and isolated from the landing page).
+  - `website/` - Clean Vite React source blueprint copy of the public landing site.
   - `mobile/` - Dedicated mobile Android platform source and compiled releases:
     - `mobile/MenuMind-LiquidGlass/` - React Native / Expo codebase with native Kotlin Compose UI elements.
     - `mobile/releases/android/MenuMind-release-V49-current.apk` - The final, fully validated mobile release APK.
     - `mobile/build-mobile-apk-fast.ps1` - Dynamic virtual-drive mounting build compiler.
 - Live Web URLs:
-  - Live Frontend: Vercel - https://menumind-nu.vercel.app
+  - Live Frontend (Marketing website): Vercel - https://menumind-nu.vercel.app
   - Live Backend: Render - https://menumind-backend.onrender.com
 
 3. Core Backend Files
@@ -34,12 +35,15 @@ Purpose
 - `backend/models.py`: SQLAlchemy database models.
 - `backend/schemas.py`: Pydantic schema validation contracts.
 
-4. Core Frontend Files
-- `frontend/src/app/layout.tsx`: Root HTML shell with flash-on-load theme prevention script and Error Boundary.
-- `frontend/src/lib/api.ts`: API client featuring robust offline fallbacks (`optionalRequest`) for demo resilience during cold-starts.
-- `frontend/src/app/planner/page.tsx`: Live Operations Board showing task cards in Now/Next/Approvals/Done stages.
-- `frontend/src/app/analytics/page.tsx`: Intelligence page with a dynamic business impact dashboard.
-- `frontend/src/components/ErrorBoundary.tsx`: isolating boundary catching React card failures gracefully.
+4. Core Frontend (Landing Website) & Operations Console Files
+- `frontend/src/index.css`: Root Tailwind CSS v4 styling sheet importing Outfit/Inter Google fonts and defining custom glass-card designs.
+- `frontend/src/App.tsx`: Marketing landing page UI showcasing dynamic metrics, platform statuses, accesses, and hover interactions.
+- `frontend/vite.config.ts`: Vite compilation setup utilizing react() and tailwindcss() plugins.
+- `desktop-app/src/app/layout.tsx`: Root Next.js console HTML shell with theme prevention script and Error Boundary.
+- `desktop-app/src/lib/api.ts`: API client featuring robust offline fallbacks (`optionalRequest`) for console demo resilience during cold-starts.
+- `desktop-app/src/app/planner/page.tsx`: Live Operations Board showing console task cards in Now/Next/Approvals/Done stages.
+- `desktop-app/src/app/analytics/page.tsx`: Intelligence page with a dynamic business impact console dashboard.
+- `desktop-app/src/components/ErrorBoundary.tsx`: isolating boundary catching Next.js React card failures gracefully.
 
 5. Mobile (React Native + Native Kotlin Compose)
 - The mobile system under `mobile/MenuMind-LiquidGlass/` implements a custom, Nothing OS-inspired Liquid Glass UI using Jetpack Compose components.
@@ -82,3 +86,9 @@ Purpose
 - Do not run `git add .` indiscriminately at the root level because untracked temporary local folders exist; stage directories or files precisely.
 - Preserve the active theme class toggle logic (`document.documentElement.dataset.theme`) and offline fallback configurations.
 - Ground all work in high visual quality and aesthetic excellence, respecting dot-matrix typography (Doto) and Deep Glass styling guidelines.
+
+13. Vite Landing Page Compilation Fix (2026-06-01)
+- Resolved the issue where the landing website rendered as unstyled plain text due to a redundant, leftover `frontend/vite.config.js` file that lacked the Tailwind CSS v4 compilation plugin (which overrode `vite.config.ts`).
+- Removed the incorrect config file (`frontend/vite.config.js`) from git, enabling Vercel's automated pipeline to correctly use `frontend/vite.config.ts`.
+- Fixed a local package corruption in `frontend/node_modules/enhanced-resolve/lib/SelfReferencePlugin.js` which was completely empty, ensuring smooth local compiles.
+- Verified local builds output the complete 42.80 kB stylesheet package containing all Outfit/Inter typographies, HSL-harmonized HSL colors, frosted glassmorphism overlays, and micro-animations.
