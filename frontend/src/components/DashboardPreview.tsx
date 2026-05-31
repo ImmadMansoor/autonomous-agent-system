@@ -50,18 +50,18 @@ export default function DashboardPreview() {
 
   return (
     <div className="px-3 sm:px-4 w-full select-none">
-      <div className="premium-glass edge-flow dot-matrix-surface border border-white/70 rounded-3xl p-4 sm:p-6 w-full max-w-[840px] mx-auto shadow-sm relative">
+      <div className="edge-glow-panel dot-matrix-surface rounded-t-3xl p-4 sm:p-6 w-full max-w-[880px] mx-auto shadow-sm relative">
         <GlowingEffect spread={180} glow proximity={110} borderWidth={1.2} colorFrom="rgba(0,104,95,0.35)" colorTo="rgba(255,255,255,0.7)" />
         
         {/* Terminal/Tray Header to enrich realism */}
         <div className="relative z-10 flex items-center justify-between mb-4 sm:mb-6 border-b border-zinc-200/80 pb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#e60033] shadow-[0_0_14px_rgba(230,0,51,0.45)]" />
-            <span className="nothing-type text-[11px] text-[#3d4947] font-semibold">
+            <span className="dot-matrix-label text-[11px] text-[#3d4947] font-semibold uppercase">
               Platform Status: Operational
             </span>
           </div>
-          <span className="nothing-type text-[11px] text-[#00628d] font-semibold bg-blue-50/80 px-2.5 py-0.5 rounded border border-blue-100">
+          <span className="dot-matrix-label text-[11px] text-[#00628d] font-semibold bg-blue-50/80 px-2.5 py-0.5 rounded border border-blue-100 uppercase">
             v2.5 // Core Engine
           </span>
         </div>
@@ -84,7 +84,7 @@ export default function DashboardPreview() {
 
               {/* Stats */}
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[28px] font-bold text-[#191c1e] leading-none">
+                <span className="dot-matrix-number text-[28px] font-bold leading-none">
                   4,250
                 </span>
                 <span className="inline-flex items-center gap-0.5 bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-[11px] font-semibold">
@@ -305,7 +305,7 @@ export default function DashboardPreview() {
 
               {/* Stats */}
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[28px] font-bold text-[#191c1e] leading-none">
+                <span className="dot-matrix-number text-[28px] font-bold leading-none">
                   0
                 </span>
                 <span className="inline-flex items-center gap-0.5 bg-neutral-100 text-[#505f76] rounded-full px-2.5 py-0.5 text-[11px] font-semibold border border-zinc-200">

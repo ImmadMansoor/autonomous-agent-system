@@ -22,25 +22,20 @@ export default function Navbar() {
 
   return (
     <div className="w-full flex justify-center pt-4 sm:pt-6 px-3 sm:px-4 shrink-0">
-      <nav className="premium-glass edge-flow dot-matrix-surface rounded-full shadow-sm border border-white/75 pl-3 pr-3 py-2 w-full max-w-[840px] relative flex items-center">
+      <nav className="premium-glass edge-flow dot-matrix-surface rounded-full shadow-[0_14px_42px_rgba(18,38,44,0.10)] border border-white/75 ring-1 ring-[#bcc9c6]/70 pl-3 pr-3 py-2 w-full max-w-[890px] relative flex items-center">
         <GlowingEffect spread={170} glow proximity={120} borderWidth={1.1} colorFrom="rgba(0,104,95,0.34)" colorTo="rgba(255,255,255,0.7)" />
         {/* Logo */}
-        <div className="relative z-10 flex items-center gap-2 shrink-0">
-          <svg
-            viewBox="0 0 32 32"
-            className="w-7 h-7 sm:w-8 sm:h-8"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M 16 2 Q 16 11 21 11 Q 21 16 30 16 Q 21 16 21 21 Q 16 21 16 30 Q 16 21 11 21 Q 11 16 2 16 Q 11 16 11 11 Q 16 11 16 2 Z"
-              fill="#00685f"
-            />
-          </svg>
-          <span className="font-serif font-semibold text-lg text-[#191c1e] tracking-tight select-none">
-            MenuMind
-          </span>
-        </div>
+        <a
+          href="#dashboard"
+          aria-label="MenuMind home"
+          className="relative z-10 flex items-center shrink-0 rounded-full px-1.5 py-0.5 transition-transform hover:scale-[1.015]"
+        >
+          <img
+            src="/menumind-logo.png"
+            alt="MenuMind"
+            className="h-8 w-auto sm:h-9 object-contain"
+          />
+        </a>
 
         {/* Desktop Links */}
         <div className="relative z-10 hidden md:flex items-center gap-6 text-[14px] ml-8">

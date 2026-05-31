@@ -55,11 +55,17 @@ export default function Gauge({
       >
         <g>{ticks}</g>
         <text
+          className="dot-matrix-number"
           x={100}
           y={105}
           textAnchor="middle"
-          fill="#191c1e"
-          style={{ fontSize: "22px", fontWeight: 700 }}
+          fill="#005f59"
+          style={{
+            fontSize: "24px",
+            fontWeight: 760,
+            fontFamily: '"Doto", var(--font-sans)',
+            fontVariationSettings: '"ROND" 0',
+          }}
         >
           {value}%
         </text>

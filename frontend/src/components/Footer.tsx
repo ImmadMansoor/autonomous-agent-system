@@ -13,20 +13,11 @@ export default function Footer() {
         {/* Left Column - Logo & Descriptor */}
         <div className="max-w-xs">
           <div className="flex items-center gap-2 mb-4">
-            <svg
-              viewBox="0 0 32 32"
-              className="w-7 h-7"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M 16 2 Q 16 11 21 11 Q 21 16 30 16 Q 21 16 21 21 Q 16 21 16 30 Q 16 21 11 21 Q 11 16 2 16 Q 11 16 11 11 Q 16 11 16 2 Z"
-                fill="#00685f"
-              />
-            </svg>
-            <span className="font-serif font-semibold text-lg text-white tracking-tight">
-              MenuMind
-            </span>
+            <img
+              src="/menumind-logo.png"
+              alt="MenuMind"
+              className="h-9 w-auto object-contain invert brightness-0"
+            />
           </div>
           <p className="text-xs text-[#a3b3b0] leading-relaxed mb-6 font-medium">
             Building autonomous state-space solvers that align real-time localized food & beverage margins with ambient high-frequency market realities.
